@@ -11,12 +11,6 @@ Subcommands
                               machines by estimated GPU cost, emit job lists
   status --runs DIR           scan run directories and report progress
 
-The planner exists because the realistic failure mode with ten unmanaged
-desktops is not "we ran out of compute" -- it is "two boxes ran the same
-replica and one system never launched at all".
-
-No third-party dependencies.
-"""
 
 from __future__ import annotations
 
