@@ -1,10 +1,9 @@
 #!/usr/bin/env bash
-# M3.5 -- MM/PBSA on one RNA-bound system.
-#   ./run_mmpbsa.sh <system_name> <replica> [indi]
-#
-# Gate order matters: decomposition FIRST. If the per-residue hot spots do not
+
+# Gate order matters: decomposition first. If the per-residue hot spots do not
 # recover the known operator-contact residues of MS2 CP, the setup is wrong
 # and no binding energy from it means anything. Do not skip ahead.
+
 set -euo pipefail
 source "$(dirname "$0")/../scripts/lib.sh"
 need gmx_MMPBSA
