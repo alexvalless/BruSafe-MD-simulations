@@ -1,5 +1,3 @@
-#!/usr/bin/env bash
-# Shared helpers. Source this, do not execute it.
 
 set -euo pipefail
 
@@ -8,7 +6,7 @@ MDP="$REPO/mdp"
 CFG="$REPO/config"
 RUNS="${BRUSAFE_RUNS:-$REPO/runs}"
 
-# Locked mdrun configuration. Set by bench_gpu.sh, then never changed.
+# Locked mdrun configuration. Set by bench_gpu.sh
 # Every replica in the campaign must use the identical string.
 MDRUN_FLAGS="${BRUSAFE_MDRUN_FLAGS:--nb gpu -pme gpu -bonded gpu -update gpu -ntmpi 1 -ntomp 8 -pin on}"
 
