@@ -1,13 +1,11 @@
 #!/usr/bin/env bash
-# Cross-system comparisons. This is where the actual claims come from --
-# a single system's RMSD proves nothing on its own.
+# Cross-system comparisons.
 #
 #   ./compare_systems.sh <system_A> <system_B>
 #
 # The headline use: compare_systems.sh S1_wt_cc_apo S2_sccp_apo
 # Subspace overlap between the two essential subspaces is the rigorous way to
-# claim "the linker does not alter the dimer's dynamics". Two RMSF curves that
-# look similar by eye is not evidence; overlap is.
+# claim "the linker does not alter the dimer's dynamics". 
 set -euo pipefail
 source "$(dirname "$0")/../scripts/lib.sh"
 need gmx
