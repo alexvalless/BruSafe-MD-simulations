@@ -1,4 +1,4 @@
-# BruSafe MD system registry. One row per system. Tab-separated.
+# BruSafe MD system registry. 
 # tier      1 = cannot ship without it; 2 = do if tier 1 clean by 27 Sep; 3 = stretch
 # has_rna   yes -> Mg2+ added, RNA analysis battery, MM/PBSA eligible
 # consumer  the claim/module this system exists to support. No consumer -> delete the row.
