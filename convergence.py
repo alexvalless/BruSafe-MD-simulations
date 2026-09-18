@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Convergence and sanity analysis for the BruSafe MD campaign. numpy only.
+Convergence and sanity analysis for the BruSafe MD campaign. 
 
 Subcommands
 -----------
