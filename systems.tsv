@@ -1,0 +1,21 @@
+# BruSafe MD system registry. One row per system. Tab-separated.
+# tier      1 = cannot ship without it; 2 = do if tier 1 clean by 27 Sep; 3 = stretch
+# has_rna   yes -> Mg2+ added, RNA analysis battery, MM/PBSA eligible
+# consumer  the claim/module this system exists to support. No consumer -> delete the row.
+#
+name	tier	source_pdb	chains	has_rna	replicas	ns	mg_count	consumer
+S1_wt_cc_apo	1	1MSC	C,C	no	3	250	0	Reference baseline for all RMSF/PCA comparisons
+S2_sccp_apo	1	model	A	no	3	250	0	M0/M1 - does the linker perturb the dimer fold?
+S3_cp_operator	1	cocrystal	A,B,R	yes	3	250	6	M3.5 reference complex (published Kd anchor)
+S4_cp_pacdesign	1	cocrystal	A,B,R	yes	3	250	6	M3.5 -> K_d(pac) prior for M4
+S5_cp_scramble	1	cocrystal	A,B,R	yes	3	250	6	M3.5 specificity ddG vs dPCR 0xpac arm
+S6_wt_ab_apo	2	1MSC	A,B	no	3	250	0	FG-loop switch -> M3 quasi-equivalence
+S7_cal_var01	2	cocrystal	A,B,R	yes	2	150	6	M3.5 method validation regression
+S7_cal_var02	2	cocrystal	A,B,R	yes	2	150	6	M3.5 method validation regression
+S7_cal_var03	2	cocrystal	A,B,R	yes	2	150	6	M3.5 method validation regression
+S7_cal_var04	2	cocrystal	A,B,R	yes	2	150	6	M3.5 method validation regression
+S7_cal_var05	2	cocrystal	A,B,R	yes	2	150	6	M3.5 method validation regression
+S7_cal_u5c	2	cocrystal	A,B,R	yes	2	150	6	M3.5 HARD TEST - tighter-than-WT binder
+S8_pac_free	2	model	R	yes	3	250	4	Pre-organisation penalty; validates ViennaRNA fold
+S9_sccp_pac	2	model	A,R	yes	3	250	6	Does the linker perturb RNA binding?
+S10_patch5	3	2MS2	x10	no	1	100	0	scCP in capsid context (visual + interface sanity)
