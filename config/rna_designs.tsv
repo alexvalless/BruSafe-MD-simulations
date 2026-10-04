@@ -4,11 +4,15 @@
 # rna_chain  chain ID in the BUILT file (RNA chains are renamed R, S, ... in order)
 # target     5'->3' over the RESOLVED nucleotides of that chain only, same length
 #            as `00_build_inputs.py show <PDBID>` prints. '.' keeps a position.
+#            1ZDH chain R: 13 nt, residues 4..16 of the 19-mer = operator -12..+1
+#              4    9   13 16
+#              UGAGGAUCACCCA      (native: C at -5, residue 11 -- the tight variant)
+#              ||||  ||||         stem U4-A16 G5-C15 G7-C14 G8-C13, bulge A6, loop 9-12
 #            'native' keeps the crystal sequence. TODO blocks the build.
 # note       where the sequence comes from (paper, design file, commit)
 #
 name	rna_chain	target	note
-S3_cp_operator	R	native	WT operator exactly as crystallised
+S3_cp_operator	R	UGAGGAUUACCCA	WT operator: 1ZDH has C(-5); reverted to the wild-type U at residue 11
 S4_cp_pacdesign	R	TODO	designed pac hairpin
 S5_cp_scramble	R	TODO	scrambled / non-cognate control, same length and GC content
 S7_cal_var01	R	TODO	literature variant (cite source + Kd)
@@ -16,4 +20,4 @@ S7_cal_var02	R	TODO	literature variant (cite source + Kd)
 S7_cal_var03	R	TODO	literature variant (cite source + Kd)
 S7_cal_var04	R	TODO	literature variant (cite source + Kd)
 S7_cal_var05	R	TODO	literature variant (cite source + Kd)
-S7_cal_u5c	R	TODO	native with U(-5) -> C; tighter than WT
+S7_cal_u5c	R	native	C(-5) variant exactly as crystallised in 1ZDH; tighter than WT

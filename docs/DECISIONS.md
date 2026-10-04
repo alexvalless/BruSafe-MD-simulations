@@ -99,6 +99,32 @@ the new ones.
 
 ---
 
+## 2026-10-04 — Cocrystal: 1ZDH, chains A + B(op5) + R
+
+**Decision.** All CP–RNA systems start from 1ZDH (MS2 capsid soaked with the
+operator hairpin, 2.7 Å). `00_build_inputs.py show 1ZDH` gives:
+
+- The deposited A, B, C are an asymmetric unit around the quasi-three-fold,
+  not a dimer (A–B: 33 contacts). The A/B dimer is A plus B moved by BIOMT
+  op5 (171 contacts); `build` picks that operator automatically.
+- RNA chain R sits on that A/B dimer (19 + 3 contacts). Chain S overlaps its
+  own two-fold copy on the C/C dimer: a symmetry-averaged hairpin, not used.
+- Only residues 4–16 of the 19-mer are resolved (13 nt, four base pairs, the
+  A6 bulge and the loop). No crystallographic Mg²⁺ or other HETATM.
+- The crystallised RNA is the **C(−5) variant** (loop AUCA), not the wild type.
+  S7_cal_u5c therefore uses it as is, and S3 (wild type) reverts residue 11 to U.
+
+**Alternative rejected.** Docking a hairpin onto 1MSC. A solved complex exists.
+
+**Consequence to track.** The 4-bp stem ends in a U–A pair and may fray within
+30 ns; check base pairing of U4–A16 per replica. If it opens in most replicas,
+either extend the stem by three ideal A-form pairs (all systems alike) or add a
+weak flat-bottom restraint on that pair (all systems alike), and record it here.
+Every designed sequence (pac, scramble, calibration) must be written over the
+same 13-nt frame.
+
+---
+
 ## TEMPLATE
 
 ## YYYY-MM-DD — <decision>

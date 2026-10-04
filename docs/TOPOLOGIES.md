@@ -43,12 +43,12 @@ S3, S4, S5 and S7, so that the only thing that changes between them is the RNA
 sequence. No docking is needed: MS2 capsid crystals soaked with the 19-nt
 operator hairpin put one hairpin on the A/B dimer of the asymmetric unit
 (Valegård et al. 1994, 1997; Grahn et al.). The registry uses **1ZDH**
-(wild-type operator, 2.7 Å). Alternatives worth knowing:
+(2.7 Å; its RNA is the C(−5) variant, see `docs/DECISIONS.md`). Alternatives worth knowing:
 
 | entry | what it is | use |
 |---|---|---|
-| 1ZDH | WT operator, 2.7 Å | starting structure for S3–S5, S7 |
-| 1ZDI | operator variant, 2.7 Å (reported as the C(−5) variant — confirm) | check S7_cal_u5c: mutate 1ZDH in silico, compare with this crystal |
+| 1ZDH | C(−5) operator variant, 2.7 Å, 13 nt resolved on A/B(op5) | starting structure for S3–S5, S7; S3 reverts C(−5)→U |
+| 1ZDI | other operator complex, 2.7 Å (run `show` to see its loop) | if it is the wild type: check S3's in-silico C→U against a real crystal |
 | 2BU1 | 5-bromo-U at −5, 2.2 Å | higher resolution; `build` reverts 5BU to U |
 
 Confirm chain letters and resolved nucleotides with `show` before building,
