@@ -1,4 +1,5 @@
-
+#!/usr/bin/env bash
+# Shared helpers. Source this, do not execute it.
 set -euo pipefail
 
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"

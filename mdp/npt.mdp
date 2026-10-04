@@ -1,0 +1,48 @@
+; BruSafe -- NPT equilibration, 1 ns, position restraints retained.
+define                  = -DPOSRES
+
+integrator              = md
+dt                      = 0.002
+nsteps                  = 500000          ; 1 ns
+comm-mode               = Linear
+nstcomm                 = 100
+
+nstxout-compressed      = 5000
+nstenergy               = 1000
+nstlog                  = 1000
+nstcalcenergy           = 100
+
+continuation            = yes
+constraint_algorithm    = lincs
+constraints             = h-bonds
+lincs_iter              = 1
+lincs_order             = 4
+
+cutoff-scheme           = Verlet
+nstlist                 = 20
+pbc                     = xyz
+
+coulombtype             = PME
+rcoulomb                = 1.2
+pme_order               = 4
+fourierspacing          = 0.12
+vdwtype                 = cutoff
+vdw-modifier            = force-switch
+rvdw_switch             = 1.0
+rvdw                    = 1.2
+rlist                   = 1.2
+DispCorr                = no
+
+tcoupl                  = V-rescale
+tc-grps                 = SOLU SOLV
+tau_t                   = 1.0   1.0
+ref_t                   = 310   310
+
+pcoupl                  = C-rescale
+pcoupltype              = isotropic
+tau_p                   = 5.0
+ref_p                   = 1.0
+compressibility         = 4.5e-5
+refcoord_scaling        = com
+
+gen_vel                 = no
