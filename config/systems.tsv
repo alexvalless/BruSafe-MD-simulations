@@ -8,8 +8,8 @@
 name	tier	source_pdb	chains	has_rna	replicas	ns	skip_ns	mg_count	consumer
 S1_wt_cc_apo	1	1MSC	C,C	no	3	100	10	0	Reference baseline for all RMSF/PCA comparisons
 S2_sccp_apo	1	model	A	no	3	100	10	0	M0/M1 - does the linker perturb the dimer fold?
-S4_cp_pacdesign	1	1ZDH	A,B,R	yes	5	30	5	6	pac complex (1ZDH RNA); MM/PBSA reference for the S9 linker ddG
+S4_cp_pacdesign	1	1ZDH	A,B,R	yes	5	30	5	5	pac complex (1ZDH RNA); MM/PBSA reference for the S9 linker ddG
 S6_wt_ab_apo	2	1MSC	A,B	no	3	100	10	0	FG-loop switch -> M3 quasi-equivalence
 S8_pac_free	2	from:S4_cp_pacdesign	R	yes	3	50	5	4	Free pac hairpin from the bound pose; pre-organisation penalty
-S9_sccp_pac	2	graft:S4_cp_pacdesign	A,R	yes	5	30	5	6	Does the linker perturb RNA binding? ddG vs S4
+S9_sccp_pac	2	graft:S4_cp_pacdesign	A,R	yes	5	30	5	5	Does the linker perturb RNA binding? ddG vs S4
 S10_patch5	3	2MS2	x10	no	1	50	5	0	scCP in capsid context (visual + interface sanity)
