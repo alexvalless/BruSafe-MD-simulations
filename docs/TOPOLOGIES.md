@@ -36,13 +36,23 @@ runs/<system>/build/               01_prepare.sh: solvated, ionised, HMR,   (cop
 | `1MSC` (any PDB ID) | downloaded to `input/_pdb/1MSC.pdb` on first use |
 | `model` | your own model at `input/<system>/model.pdb` (AlphaFold, linker graft) |
 | `from:<system>` | take chains from another system's built PDB |
-| `cocrystal` | **placeholder: replace it with the real PDB ID** before building |
+| `cocrystal` | placeholder for a PDB ID (the registry now uses `1ZDH`) |
 
-For the RNA-bound systems pick **one** MS2 coat protein–operator hairpin
-structure and use it for S3, S4, S5 and S7, so that the only thing that changes
-between them is the RNA sequence. Search RCSB for *MS2 coat protein RNA hairpin
-complex*, prefer the best resolution with the full hairpin resolved, and record
-the ID and the reason in `docs/DECISIONS.md`.
+For the RNA-bound systems use **one** MS2 coat protein–operator structure for
+S3, S4, S5 and S7, so that the only thing that changes between them is the RNA
+sequence. No docking is needed: MS2 capsid crystals soaked with the 19-nt
+operator hairpin put one hairpin on the A/B dimer of the asymmetric unit
+(Valegård et al. 1994, 1997; Grahn et al.). The registry uses **1ZDH**
+(wild-type operator, 2.7 Å). Alternatives worth knowing:
+
+| entry | what it is | use |
+|---|---|---|
+| 1ZDH | WT operator, 2.7 Å | starting structure for S3–S5, S7 |
+| 1ZDI | operator variant, 2.7 Å (reported as the C(−5) variant — confirm) | check S7_cal_u5c: mutate 1ZDH in silico, compare with this crystal |
+| 2BU1 | 5-bromo-U at −5, 2.2 Å | higher resolution; `build` reverts 5BU to U |
+
+Confirm chain letters and resolved nucleotides with `show` before building,
+and record the choice in `docs/DECISIONS.md`.
 
 `config/rna_designs.tsv` holds the RNA sequence of each RNA-bound system.
 `native` keeps the crystal sequence; `TODO` blocks the build on purpose.

@@ -105,6 +105,10 @@ PURINES = {"A", "G"}
 PUR_TO_PYR = {"N9": "N1", "C4": "C2", "C8": "C6"}
 PYR_TO_PUR = {v: k for k, v in PUR_TO_PYR.items()}
 
+# Modified nucleotides seen in MS2 soaking structures -> parent base, and the
+# extra atoms to strip (2BU1 carries 5-bromouracil at -5).
+MODIFIED_NT = {"5BU": ("U", {"BR"})}
+
 WATERS = {"HOH", "WAT", "H2O", "DOD", "TIP", "TIP3", "SOL"}
 MG_NAMES = {"MG", "MG2"}
 
@@ -112,7 +116,7 @@ MG_NAMES = {"MG", "MG2"}
 def kind(resname: str) -> str:
     if resname in AA_HEAVY or resname == "MSE":
         return "protein"
-    if resname in RNA_NAMES:
+    if resname in RNA_NAMES or resname in MODIFIED_NT:
         return "rna"
     if resname in WATERS:
         return "water"
@@ -298,7 +302,7 @@ def residues(atoms: list[Atom]) -> list[list[Atom]]:
 
 
 def clean(atoms: list[Atom], keep_mg: bool) -> tuple[list[Atom], list[str]]:
-    kept, dropped, notes = [], {}, []
+    kept, dropped, notes, modified = [], {}, [], {}
     for a in atoms:
         k = kind(a.resname)
         if a.element.upper() in ("H", "D"):
@@ -310,6 +314,12 @@ def clean(atoms: list[Atom], keep_mg: bool) -> tuple[list[Atom], list[str]]:
                     a.name, a.element = "SD", "S"
             kept.append(a)
         elif k == "rna":
+            if a.resname in MODIFIED_NT:
+                parent, extra = MODIFIED_NT[a.resname]
+                modified[a.resname] = parent
+                if a.name in extra:
+                    continue
+                a.resname = parent
             a.resname = RNA_NAMES[a.resname]
             if a.name == "OP3":       # 5'-terminal phosphate oxygen, not in CHARMM
                 continue
@@ -319,6 +329,8 @@ def clean(atoms: list[Atom], keep_mg: bool) -> tuple[list[Atom], list[str]]:
             kept.append(a)
         elif k != "water":
             dropped[a.resname] = dropped.get(a.resname, 0) + 1
+    for m, p in modified.items():
+        notes.append(f"modified nucleotide {m} reverted to {p}")
     if dropped:
         notes.append("dropped HETATM residues: " +
                      ", ".join(f"{k}({v} atoms)" for k, v in sorted(dropped.items())))
