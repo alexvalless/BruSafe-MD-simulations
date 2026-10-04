@@ -22,14 +22,20 @@ GROMACS on 10 × RTX 4070. Model deadline **13 Oct 2026**, wiki freeze **21 Oct*
 ```
 config/systems.tsv     the registry: what runs, how many replicas, and why
 mdp/                   em, nvt, npt, npt_free, prod 
-scripts/               prepare → equilibrate → produce → postprocess
+scripts/               prepare → equilibrate → produce → postprocess, run_night.sh
 analysis/              convergence checks and cross-system comparison
 mmpbsa/                Binding energetics
-docs/                  decision log, pre-registered predictions, env dumps
+docs/                  decision log, predictions, tutorial, WINDOWS.md, env dumps
+input/                 starting structures, one folder per system
 ```
 
 Trajectories are gitignored. Commit `.mdp`, `.top`, `.itp`, `.ndx`, scripts and
 analysis output. 
+
+## Platforms
+
+Linux or WSL (preferred), macOS (CPU only, for prep and analysis), and
+Windows Git Bash without admin rights — see `docs/WINDOWS.md`.
 
 ## Quickstart
 

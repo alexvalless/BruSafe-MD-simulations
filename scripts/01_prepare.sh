@@ -34,9 +34,18 @@ if [ "$SOURCE" = "charmm-gui" ]; then
 else
   [ -f "$IN/$SYS.pdb" ] || die "expected $IN/$SYS.pdb"
 
+  check_ff charmm36-jul2022
+
+  # -ter asks questions on the terminal. Git Bash's default window (mintty)
+  # does not pass keyboard input to native Windows programs; winpty fixes it.
+  WINPTY=""
+  if [ "$BRUSAFE_OS" = windows ] && [ -t 0 ] && command -v winpty >/dev/null 2>&1; then
+    WINPTY="winpty"
+  fi
+
   # 15 = CHARMM36 in the standard pdb2gmx menu ordering; -ter interactive so you
   # consciously choose termini rather than accepting a default you never saw.
-  gmx pdb2gmx -f "$IN/$SYS.pdb" -o proc.gro -p topol.top -i posre.itp \
+  $WINPTY "$GMX_BIN" pdb2gmx -f "$IN/$SYS.pdb" -o proc.gro -p topol.top -i posre.itp \
               -water tip3p -ff charmm36-jul2022 -ignh -ter
 
   gmx editconf -f proc.gro -o box.gro -c -d 1.2 -bt dodecahedron

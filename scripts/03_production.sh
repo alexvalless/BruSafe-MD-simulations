@@ -24,7 +24,7 @@ if [ ! -f prod.tpr ]; then
   gmx grompp -f prod.mdp -c npt_free.gro -t npt_free.cpt \
              -p topol.top -n index.ndx -o prod.tpr
   # provenance: what actually ran, alongside the trajectory
-  { echo "host      : $(hostname)"; echo "started   : $(date -Is)";
+  { echo "host      : $(hostname)"; echo "started   : $(now_iso)";
     echo "gmx       : $(gmx --version 2>/dev/null | head -1)";
     echo "flags     : $MDRUN_FLAGS"; echo "seed      : $(cat seed.txt)";
     echo "target_ns : $NS"; } > PROVENANCE.txt
@@ -39,7 +39,7 @@ else
 fi
 
 if [ -f prod.gro ]; then
-  echo "finished  : $(date -Is)" >> PROVENANCE.txt
+  echo "finished  : $(now_iso)" >> PROVENANCE.txt
   log "COMPLETE $SYS rep$REP"
 else
   log "hit wall clock -- rerun the same command to continue"
