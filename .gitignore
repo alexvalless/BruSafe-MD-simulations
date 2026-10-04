@@ -1,0 +1,22 @@
+# Never commit trajectories or checkpoints — they are large and regenerable
+*.xtc
+*.trr
+*.cpt
+*.edr
+*.tpr
+*.gro
+*.log
+#*#
+step*.pdb
+\#*
+runs/
+bench_*/
+__pycache__/
+*.pyc
+
+# DO commit: mdp, scripts, topologies (.top/.itp), index files, analysis output
+!*.top
+!*.itp
+!*.ndx
+!*.mdp
+!analysis_out/**
