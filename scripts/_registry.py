@@ -11,6 +11,8 @@ Subcommands
                               machines by estimated GPU cost, emit job lists
   status --runs DIR           scan run directories and report progress
 
+No third-party dependencies.
+"""
 
 from __future__ import annotations
 
