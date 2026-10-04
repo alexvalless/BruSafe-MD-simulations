@@ -39,6 +39,12 @@ sed -i -e "s/^  startframe .*/  startframe            = $START/" \
        -e "s/^  interval .*/  interval              = $INTERVAL/" mmpbsa.in
 sed -i "s/^  sys_name .*/  sys_name              = \"${SYS}_rep${REP}\"/" mmpbsa.in
 
+# Group numbers looked up by name unless given explicitly
+PROT_GRP="${PROT_GRP:-$(ndxgroup "$D/index.ndx" Protein)}"
+RNA_GRP="${RNA_GRP:-$(ndxgroup "$D/index.ndx" RNA)}"
+[ -n "$PROT_GRP" ] && [ -n "$RNA_GRP" ] || die "no Protein / RNA group in $D/index.ndx"
+log "groups: Protein=$PROT_GRP RNA=$RNA_GRP"
+
 log "running gmx_MMPBSA (indi=$INDI) -- PB primary, GB cross-check"
 mpirun -np "${MMPBSA_NP:-8}" gmx_MMPBSA MPI -O -i mmpbsa.in \
   -cs "$D/prod.tpr" -ci "$D/index.ndx" -cg "${PROT_GRP:?set PROT_GRP}" "${RNA_GRP:?set RNA_GRP}" \

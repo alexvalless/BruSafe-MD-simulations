@@ -37,12 +37,12 @@ gmx grompp -f nvt.mdp -c em.gro -r em.gro -p topol.top -n index.ndx -o nvt.tpr
 gmx mdrun -deffnm nvt $MDRUN_FLAGS
 
 log "NPT 1 ns (restrained)"
-gmx grompp -f "$MDP/npt.mdp" -c nvt.gro -r nvt.gro -t nvt.cpt \
+grompp_hmr -f "$MDP/npt.mdp" -c nvt.gro -r nvt.gro -t nvt.cpt \
            -p topol.top -n index.ndx -o npt.tpr
 gmx mdrun -deffnm npt $MDRUN_FLAGS
 
 log "NPT 2 ns (unrestrained)"
-gmx grompp -f "$MDP/npt_free.mdp" -c npt.gro -t npt.cpt \
+grompp_hmr -f "$MDP/npt_free.mdp" -c npt.gro -t npt.cpt \
            -p topol.top -n index.ndx -o npt_free.tpr
 gmx mdrun -deffnm npt_free $MDRUN_FLAGS
 

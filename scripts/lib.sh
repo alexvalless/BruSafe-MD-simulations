@@ -15,6 +15,16 @@ MDRUN_FLAGS="${BRUSAFE_MDRUN_FLAGS:--nb gpu -pme gpu -bonded gpu -update gpu -nt
 # Covers the MacKerell GROMACS port (SOL/POT/CLA/MG) and CHARMM-GUI (TIP3).
 SOLVENT_RESNAMES="SOL TIP3 TIP3P POT CLA SOD MG MGA ZN2 CAL"
 
+# RNA residue names: CHARMM-GUI writes ADE/CYT/GUA/URA, which make_ndx does
+# not recognise as RNA, so 01_prepare.sh builds the RNA groups itself.
+RNA_RESNAMES="ADE CYT GUA URA A C G U RA RC RG RU"
+
+# Number of a named group in an index file (0-based, as gmx tools count).
+# usage: ndxgroup <index.ndx> <name>   -- prints nothing if absent
+ndxgroup() {
+  awk -v g="$2" '/^\[/ {gsub(/[][ ]/, ""); if ($0 == g) {print n; exit}; n++}' "$1"
+}
+
 log()  { printf '[%s] %s\n' "$(date +%H:%M:%S)" "$*" >&2; }
 die()  { printf '[FATAL] %s\n' "$*" >&2; exit 1; }
 need() { command -v "$1" >/dev/null 2>&1 || die "missing required command: $1"; }
@@ -24,6 +34,23 @@ need() { command -v "$1" >/dev/null 2>&1 || die "missing required command: $1"; 
 mdpval() {
   awk -v k="$2" -F'=' '{sub(/;.*/, ""); gsub(/[ \t]/, "", $1)}
        $1 == k {gsub(/[ \t]/, "", $2); print $2; exit}' "$1"
+}
+
+# grompp for the 4 fs (HMR) stages. HMR leaves bonds without hydrogens alone,
+# so C=O (period ~19 fs) trips grompp's "period < 5 x dt" WARNING at 4 fs even
+# though HMR at 4 fs is standard practice (Hopkins et al., JCTC 2015). That one
+# warning is accepted; ANY other warning still stops the run.
+# usage: grompp_hmr <normal gmx grompp arguments>
+grompp_hmr() {
+  local out n_all n_ok
+  if ! out="$(gmx grompp "$@" -maxwarn 10 2>&1)"; then
+    printf '%s\n' "$out" >&2; die "grompp failed"
+  fi
+  printf '%s\n' "$out" >&2
+  n_all="$(grep -c '^WARNING [0-9]' <<<"$out" || true)"
+  n_ok="$(grep -A3 '^WARNING [0-9]' <<<"$out" | grep -c 'estimated oscillational period' || true)"
+  [ "$n_all" -eq "$n_ok" ] || die "grompp gave warnings other than the expected HMR bond-period one -- read them above"
+  [ "$n_all" -eq 0 ] || log "accepted $n_all HMR bond-period warning(s) (dt = 4 fs, see docs/DECISIONS.md)"
 }
 
 # Read one field from config/systems.tsv.

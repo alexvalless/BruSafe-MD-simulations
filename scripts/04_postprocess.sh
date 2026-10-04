@@ -27,20 +27,23 @@ printf 'SOLU\n'        | gmx trjconv -s prod.tpr -f "$A/clean.xtc" -n index.ndx 
 rm -f .w.xtc .nj.xtc
 
 cd "$A"
-log "RMSD / Rg / RMSF / SASA / DSSP"
-printf 'Backbone\nBackbone\n' | gmx rms   -s ../prod.tpr -f clean.xtc -n ../index.ndx -o rmsd_backbone.xvg -tu ns
-printf 'Backbone\n'           | gmx gyrate -s ../prod.tpr -f clean.xtc -n ../index.ndx -o gyrate.xvg
+# Protein systems use Backbone / C-alpha; the free hairpin (no protein) uses
+# the RNA sugar-phosphate backbone and its phosphorus atoms instead.
+if grep -q '\[ Backbone \]' ../index.ndx; then BB=Backbone; CA=C-alpha; else BB=RNA_BB; CA=RNA_P; fi
+log "RMSD / Rg / RMSF / SASA / DSSP  (groups: $BB, $CA)"
+printf '%s\n%s\n' "$BB" "$BB" | gmx rms   -s ../prod.tpr -f clean.xtc -n ../index.ndx -o rmsd_backbone.xvg -tu ns
+printf '%s\n' "$BB"           | gmx gyrate -s ../prod.tpr -f clean.xtc -n ../index.ndx -o gyrate.xvg
 # discard the first skip_ns (registry) before RMSF -- fluctuations during
 # relaxation are not the fluctuations you want to report
-printf 'C-alpha\n'            | gmx rmsf  -s ../prod.tpr -f clean.xtc -n ../index.ndx -o rmsf_ca.xvg -res -b "$SKIP_PS"
+printf '%s\n' "$CA"            | gmx rmsf  -s ../prod.tpr -f clean.xtc -n ../index.ndx -o rmsf_ca.xvg -res -b "$SKIP_PS"
 printf 'SOLU\n'               | gmx sasa  -s ../prod.tpr -f clean.xtc -n ../index.ndx -o sasa.xvg
 gmx dssp -s ../prod.tpr -f clean.xtc -n ../index.ndx -o dssp.dat -num dssp_num.xvg 2>/dev/null \
   || log "gmx dssp unavailable (needs GROMACS >= 2023); fall back to do_dssp"
 
 log "PCA (essential dynamics), after the first $(( SKIP_PS / 1000 )) ns"
-printf 'C-alpha\nC-alpha\n' | gmx covar  -s ../prod.tpr -f clean.xtc -n ../index.ndx \
+printf '%s\n%s\n' "$CA" "$CA" | gmx covar  -s ../prod.tpr -f clean.xtc -n ../index.ndx \
                                          -o eigenval.xvg -v eigenvec.trr -b "$SKIP_PS" >/dev/null
-printf 'C-alpha\nC-alpha\n' | gmx anaeig -s ../prod.tpr -f clean.xtc -n ../index.ndx \
+printf '%s\n%s\n' "$CA" "$CA" | gmx anaeig -s ../prod.tpr -f clean.xtc -n ../index.ndx \
                                          -v eigenvec.trr -first 1 -last 1 -proj pc1.xvg -b "$SKIP_PS" >/dev/null
 
 if [ "$HAS_RNA" = "yes" ]; then

@@ -173,6 +173,35 @@ whether the ions actually sit on the RNA.
 
 ---
 
+## 2026-10-04 — Validation of the S4/S8 builds: box rebuilt, 4 fs warning, posres
+
+Ran `01_prepare.sh` → `02_equilibrate.sh` → short 4 fs production on the real
+S4 and S8 CHARMM-GUI builds (GROMACS 2023.3, CPU). Three problems, all fixed:
+
+1. **CHARMM-GUI's octahedral box is broken in GROMACS.** 143 (S8) and 792 (S4)
+   heavy-atom pairs sat within 1.8 Å of a periodic image; minimisation went to
+   infinite force with CHARMM-GUI's own mdp too, so it is the build, not our
+   settings. `01_prepare.sh` now keeps only the CHARMM-GUI topology and rebuilds
+   the box (rhombic dodecahedron, registry `box_nm`), water (renamed to TIP3)
+   and ions (genion: KCl 0.15 M neutralising, Mg²⁺ = `mg_count`) with GROMACS,
+   the same protocol as the pdb2gmx systems. This supersedes the CHARMM-GUI ion
+   table above. As rebuilt: S4 55 364 atoms, 16 994 waters, 51 K⁺ / 51 Cl⁻ /
+   5 Mg²⁺. S8 is set to **1 Mg²⁺** so its concentration matches S4 (≈ 16 mM),
+   which removes the mismatch noted above.
+2. **4 fs warning.** HMR does not touch bonds without hydrogen, and the RNA
+   C2=O2 bond (period 19 fs) is below grompp's 5 × dt threshold at 4 fs. That
+   single warning type is accepted by `grompp_hmr` (scripts/lib.sh); any other
+   warning still stops the run. The test runs were stable (no LINCS warnings)
+   and about 2× faster than at 2 fs.
+3. **Position restraints.** CHARMM-GUI topologies use `POSRES_FC_BB/SC` macros;
+   nvt/npt.mdp now define both as 1000 kJ mol⁻¹ nm⁻², the value pdb2gmx uses.
+
+The S4 test equilibration passed the gate (density 1030 kg/m³, 311.4 K, drift
+1.8 kg/m³). Mg²⁺ placement is now genion (option 3 of the Mg²⁺ entry), since 1ZDH
+has no crystallographic sites: check `mindist_mg.xvg` for ions in the interface.
+
+---
+
 ## TEMPLATE
 
 ## YYYY-MM-DD — <decision>

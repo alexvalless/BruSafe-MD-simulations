@@ -7,9 +7,10 @@
 #   pdb2gmx    : <system_name>.pdb   (cleaned, correct chains, no waters/alt-locs)
 #   charmm-gui : the unzipped CHARMM-GUI Solution Builder gromacs/ output
 #
-# For RNA-containing systems the CHARMM-GUI route is STRONGLY preferred.
-# pdb2gmx residue mapping for RNA under the charmm36 port is fragile and the
-# Mg2+ placement question below is handled properly by the builder.
+# For RNA-containing systems the CHARMM-GUI route is STRONGLY preferred:
+# pdb2gmx residue mapping for RNA under the charmm36 port is fragile. Only the
+# CHARMM-GUI topology is used; box, water and ions are rebuilt here the same
+# way for both routes.
 set -euo pipefail
 source "$(dirname "$0")/lib.sh"
 need gmx
@@ -18,10 +19,9 @@ SYS="${1:?usage: 01_prepare.sh <system_name> [--source pdb2gmx|charmm-gui]}"
 SOURCE="pdb2gmx"
 [ "${2:-}" = "--source" ] && SOURCE="${3:?--source needs a value}"
 
-# Box padding (nm). 1.0 keeps periodic images 2.0 nm apart, above the 1.2 nm
-# cutoff, and saves a large share of the water relative to 1.2. Use
-# BRUSAFE_BOX_PAD=1.2 for the free hairpin (S8), which can extend.
-BOX_PAD="${BRUSAFE_BOX_PAD:-1.0}"
+# Box padding (nm) from the registry's box_nm column: 1.0 keeps periodic images
+# 2.0 nm apart, above the 1.2 nm cutoff; the free hairpin (S8) gets 1.2.
+BOX_PAD="${BRUSAFE_BOX_PAD:-$(sysfield "$SYS" box_nm)}"
 FF="${BRUSAFE_FF:-charmm36-jul2022}"
 HAS_RNA="$(sysfield "$SYS" has_rna)"
 MG="$(sysfield "$SYS" mg_count)"
@@ -31,11 +31,32 @@ mkdir -p "$OUT"; cd "$OUT"
 log "preparing $SYS (rna=$HAS_RNA mg=$MG source=$SOURCE pad=${BOX_PAD}nm)"
 
 if [ "$SOURCE" = "charmm-gui" ]; then
-  [ -d "$IN/gromacs" ] || die "expected $IN/gromacs from CHARMM-GUI"
-  cp "$IN"/gromacs/step3_input.gro solv_ions.gro
-  cp "$IN"/gromacs/topol.top .
-  cp -r "$IN"/gromacs/toppar . 2>/dev/null || true
-  log "using CHARMM-GUI build as-is (box, salt and Mg2+ set in the builder)"
+  # ---------------------------------------------------------------------
+  # CHARMM-GUI supplies the TOPOLOGY (CHARMM36m parameters, termini, rebuilt
+  # atoms). The box is rebuilt here with GROMACS: CHARMM-GUI's octahedral
+  # GROMACS output was found to place hundreds of atoms on top of their own
+  # periodic images (energy minimisation diverges), and rebuilding also gives
+  # every system the same rhombic-dodecahedron protocol as the pdb2gmx route.
+  # BRUSAFE_KEEP_CGUI_BOX=1 keeps CHARMM-GUI's box (only for a RECTANGULAR one).
+  # ---------------------------------------------------------------------
+  G="$IN/gromacs"
+  [ -f "$G/step3_input.gro" ] && [ -f "$G/topol.top" ] || die "expected $G from CHARMM-GUI"
+  rm -rf toppar; cp -r "$G/toppar" .
+  if [ "${BRUSAFE_KEEP_CGUI_BOX:-0}" = "1" ]; then
+    cp "$G/step3_input.gro" solv_ions.gro
+    cp "$G/topol.top" topol.top
+    log "using CHARMM-GUI box as-is (BRUSAFE_KEEP_CGUI_BOX=1)"
+  else
+    log "CHARMM-GUI topology; rebuilding box, water and ions with GROMACS"
+    gmx select -s "$G/step3_input.gro" -on solute.ndx \
+               -select "\"solute\" not resname $SOLVENT_RESNAMES"
+    printf '0\n' | gmx editconf -f "$G/step3_input.gro" -n solute.ndx -o proc.gro
+    # same topology, minus every solvent / ion molecule line
+    awk -v drop=" $SOLVENT_RESNAMES " '
+      /^[ \t]*\[/ { insec = ($0 ~ /molecules/) }
+      insec && NF == 2 && $1 !~ /^;/ && index(drop, " " $1 " ") { next }
+      { print }' "$G/topol.top" > topol.top
+  fi
 else
   [ -f "$IN/$SYS.pdb" ] || die "expected $IN/$SYS.pdb"
 
@@ -43,9 +64,22 @@ else
   # consciously choose termini rather than accepting a default you never saw.
   gmx pdb2gmx -f "$IN/$SYS.pdb" -o proc.gro -p topol.top -i posre.itp \
               -water tip3p -ff "$FF" -ignh -ter
+fi
 
+if [ ! -f solv_ions.gro ]; then
   gmx editconf -f proc.gro -o box.gro -c -d "$BOX_PAD" -bt dodecahedron
   gmx solvate  -cp box.gro -cs spc216.gro -o solv.gro -p topol.top
+  WATER=SOL
+  if [ "$SOURCE" = "charmm-gui" ]; then
+    # CHARMM-GUI names its water TIP3 / OH2 H1 H2; rename the solvate output
+    awk 'NR > 2 && substr($0, 6, 5) == "SOL  " {
+           a = substr($0, 11, 5); gsub(/ /, "", a)
+           n = (a == "OW") ? "OH2" : (a == "HW1") ? "H1" : (a == "HW2") ? "H2" : a
+           $0 = substr($0, 1, 5) "TIP3 " sprintf("%5s", n) substr($0, 16) }
+         { print }' solv.gro > solv.tmp && mv solv.tmp solv.gro
+    sed -i.bak -E 's/^SOL([[:space:]]+[0-9]+)$/TIP3\1/' topol.top && rm -f topol.top.bak
+    WATER=TIP3
+  fi
 
   gmx grompp -f "$MDP/em.mdp" -c solv.gro -p topol.top -o ions.tpr -maxwarn 1
 
@@ -54,22 +88,19 @@ else
     # Mg2+ WARNING -- read before trusting anything downstream.
     # Mg2+ water exchange is a microsecond process. On a 30-100 ns trajectory the
     # ions never equilibrate: they stay essentially wherever genion drops them.
-    # Random placement therefore adds noise, not realism.
-    # Preferred order:
-    #   1. crystallographic Mg2+ sites from the cocrystal, placed explicitly
-    #   2. CHARMM-GUI placement with its ion-distribution options
-    #   3. genion (this branch) -- acceptable only if you document it and run
-    #      04_postprocess.sh's mg_check, which flags Mg2+ that wandered into
-    #      the binding interface.
+    # Random placement therefore adds noise, not realism. Crystallographic
+    # sites would be better; 1ZDH has none, so this is documented in
+    # docs/DECISIONS.md and 04_postprocess.sh runs the interface check
+    # (mindist_mg.xvg), which flags Mg2+ sitting in the binding interface.
     # ---------------------------------------------------------------------
     log "WARNING: genion Mg2+ placement is arbitrary and will not equilibrate"
-    printf 'SOL\n' | gmx genion -s ions.tpr -o mg.gro -p topol.top \
+    printf '%s\n' "$WATER" | gmx genion -s ions.tpr -o mg.gro -p topol.top \
                                 -pname MG -pq 2 -np "$MG"
     gmx grompp -f "$MDP/em.mdp" -c mg.gro -p topol.top -o ions2.tpr -maxwarn 1
-    printf 'SOL\n' | gmx genion -s ions2.tpr -o solv_ions.gro -p topol.top \
+    printf '%s\n' "$WATER" | gmx genion -s ions2.tpr -o solv_ions.gro -p topol.top \
                                 -pname POT -nname CLA -conc 0.15 -neutral
   else
-    printf 'SOL\n' | gmx genion -s ions.tpr -o solv_ions.gro -p topol.top \
+    printf '%s\n' "$WATER" | gmx genion -s ions.tpr -o solv_ions.gro -p topol.top \
                                 -pname POT -nname CLA -conc 0.15 -neutral
   fi
 fi
@@ -88,26 +119,34 @@ python3 "$REPO/scripts/hmr_top.py" topol.top
 #                RNA). `gmx select -on` does not emit them.
 #   custom.ndx   from gmx select -- SOLU / SOLV. Every mdp couples to these,
 #                so one mdp set works for apo, RNA-bound and RNA-only systems.
+#                RNA systems also get RNA, RNA_BB (sugar-phosphate backbone)
+#                and RNA_P (phosphorus); 04_postprocess.sh uses RNA_BB / RNA_P
+#                in place of Backbone / C-alpha when there is no protein.
 #
 # .ndx is plain text ([ name ] followed by atom numbers), so `cat` is a valid
 # merge. Group names must stay unique across the two files.
 EXCL="$SOLVENT_RESNAMES"
 printf 'q\n' | gmx make_ndx -f solv_ions.gro -o default.ndx >/dev/null 2>&1
-gmx select -s solv_ions.gro -on custom.ndx \
-  -select "\"SOLU\" not resname $EXCL; \"SOLV\" resname $EXCL"
+SEL="\"SOLU\" not resname $EXCL; \"SOLV\" resname $EXCL"
+if [ "$HAS_RNA" = "yes" ]; then
+  R="resname $RNA_RESNAMES"
+  grep -q '\[ RNA \]' default.ndx || SEL="$SEL; \"RNA\" $R"
+  SEL="$SEL; \"RNA_BB\" $R and name P \"O5'\" \"C5'\" \"C4'\" \"C3'\" \"O3'\""
+  SEL="$SEL; \"RNA_P\" $R and name P"
+fi
+gmx select -s solv_ions.gro -on custom.ndx -select "$SEL"
 cat default.ndx custom.ndx > index.ndx
 rm -f default.ndx custom.ndx
 
 log "index groups: $(grep -o '\[ [^]]* \]' index.ndx | tr -d '[]' | tr -s ' ' | paste -sd' ' -)"
 
 # Fail loudly here rather than three days later inside 04_postprocess.sh.
-for g in Backbone C-alpha SOLU SOLV; do
+NEED="SOLU SOLV"
+grep -q '\[ Protein \]' index.ndx && NEED="$NEED Backbone C-alpha"
+[ "$HAS_RNA" = "yes" ] && NEED="$NEED RNA RNA_BB RNA_P"
+for g in $NEED; do
   grep -q "\[ $g \]" index.ndx || die "index.ndx has no '$g' group -- 04_postprocess.sh will fail"
 done
-if [ "$HAS_RNA" = "yes" ]; then
-  grep -q '\[ RNA \]' index.ndx || log "WARNING: no 'RNA' group. Add one before postprocessing:
-      gmx make_ndx -f $OUT/solv_ions.gro -n $OUT/index.ndx -o $OUT/index.ndx"
-fi
 
 log "built $OUT/solv_ions.gro and $OUT/index.ndx"
 log "next: 02_equilibrate.sh $SYS <replica>"
