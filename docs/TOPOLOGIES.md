@@ -38,16 +38,15 @@ runs/<system>/build/               01_prepare.sh: solvated, ionised, HMR,   (cop
 | `from:<system>` | take chains from another system's built PDB |
 | `cocrystal` | placeholder for a PDB ID (the registry now uses `1ZDH`) |
 
-For the RNA-bound systems use **one** MS2 coat protein–operator structure for
-S3, S4, S5 and S7, so that the only thing that changes between them is the RNA
-sequence. No docking is needed: MS2 capsid crystals soaked with the 19-nt
+Every RNA-bound system (S4, S8, S9) carries the same pac hairpin,
+ACAUGAGGAUCACCCAUGU, and starts from one crystal structure. No docking is needed: MS2 capsid crystals soaked with the 19-nt
 operator hairpin put one hairpin on the A/B dimer of the asymmetric unit
 (Valegård et al. 1994, 1997; Grahn et al.). The registry uses **1ZDH**
 (2.7 Å; its RNA is the C(−5) variant, see `docs/DECISIONS.md`). Alternatives worth knowing:
 
 | entry | what it is | use |
 |---|---|---|
-| 1ZDH | C(−5) operator variant, 2.7 Å, 13 nt resolved on A/B(op5) | starting structure for S3–S5, S7; S3 reverts C(−5)→U |
+| 1ZDH | C(−5) operator = our pac, 2.7 Å, 13 nt resolved on A/B(op5) | starting structure for S4 (and S8, S9 through it) |
 | 1ZDI | other operator complex, 2.7 Å (run `show` to see its loop) | if it is the wild type: check S3's in-silico C→U against a real crystal |
 | 2BU1 | 5-bromo-U at −5, 2.2 Å | higher resolution; `build` reverts 5BU to U |
 
@@ -92,7 +91,6 @@ What to check here, because nothing downstream can:
 ```bash
 python3 scripts/00_build_inputs.py build S1_wt_cc_apo
 python3 scripts/00_build_inputs.py build S6_wt_ab_apo
-python3 scripts/00_build_inputs.py build S3_cp_operator
 python3 scripts/00_build_inputs.py build S4_cp_pacdesign      # after filling rna_designs.tsv
 ...
 ```
@@ -133,7 +131,7 @@ topol_Protein_chain_A.itp:Protein_chain_A: 1xxx hydrogens repartitioned (total m
 HMR: ...
 ```
 
-## 4b. RNA systems (S3–S5, S7, S8, S9): CHARMM-GUI Solution Builder
+## 4b. RNA systems (S4, S8, S9): CHARMM-GUI Solution Builder
 
 At charmm-gui.org → Input Generator → **Solution Builder**:
 
@@ -158,7 +156,7 @@ At charmm-gui.org → Input Generator → **Solution Builder**:
    (it must contain `step3_input.gro`, `topol.top`, `toppar/`).
 
 ```bash
-./scripts/01_prepare.sh S3_cp_operator --source charmm-gui
+./scripts/01_prepare.sh S4_cp_pacdesign --source charmm-gui
 ```
 
 If it warns that there is no `RNA` group, add one with `gmx make_ndx` as it
@@ -217,7 +215,7 @@ dodecahedron / octahedron at 1.0 nm:
 | system | atoms (approx.) |
 |---|---|
 | CP dimer apo (S1, S6) | 40–60 k |
-| CP dimer + 19-nt hairpin (S3–S5, S7) | 60–100 k (the hairpin protrudes) |
+| CP dimer + pac hairpin, 13 nt resolved (S4, S9) | 60–100 k (the hairpin protrudes) |
 | free hairpin, 1.2 nm (S8) | 15–25 k |
 
 Measure ns/day once with `bench_gpu.sh` and plan with

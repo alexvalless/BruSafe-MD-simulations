@@ -28,9 +28,8 @@ Rule: every system below has a named consumer. If a system has no consumer, cut 
       - [ ] Superpose onto 1MSC dimer, report backbone RMSD **before** simulating
       - [ ] Confirm subunit relative orientation is native, not an AF3 artefact
 - [ ] Obtain CP–operator cocrystal for all RNA-bound systems (do **not** dock de novo)
-- [ ] Build designed pac hairpin by in-place mutation of the cocrystal RNA
-- [ ] Build scrambled/non-cognate hairpin control
-- [ ] Build literature calibration variants (target 6–8, must include the tighter-binding U(−5)C)
+- [x] pac hairpin = ACAUGAGGAUCACCCAUGU, the C(−5) operator already in 1ZDH (no mutation)
+- [ ] ~~Scrambled control, calibration variants~~ dropped 2026-10-04 (docs/DECISIONS.md)
 - [ ] Build free hairpin (RNA only, no protein) for the pre-organisation penalty
 
 ## PHASE 2 — Equilibration (identical protocol, every system)
@@ -53,18 +52,15 @@ Benchmark first (`bench_gpu.sh`), then lock one mdrun config for the whole campa
 |---|---|---|---|
 | S1 | WT CP dimer, C/C apo | 3 × 100 ns | Reference baseline; all RMSF comparisons |
 | S2 | scCP dimer + linker, apo | 3 × 100 ns | **The construct question** — M0/M1 |
-| S3 | CP dimer + WT operator | 5 × 30 ns | M3.5 reference complex |
-| S4 | CP dimer + designed pac | 5 × 30 ns | M3.5 → K_d prior for M4 |
-| S5 | CP dimer + scrambled hairpin | 5 × 30 ns | M3.5 specificity ΔΔG vs dPCR 0×pac arm |
+| S4 | CP dimer + pac (1ZDH) | 5 × 30 ns | MM/PBSA reference for the S9 linker ΔΔG |
 
 ### Tier 2 — do if Tier 1 is clean by 27 Sep
 
 | # | System | Replicas × length | Consumer |
 |---|---|---|---|
 | S6 | WT CP dimer, A/B apo | 3 × 100 ns | FG-loop switch → M3 quasi-equivalence |
-| S7 | Calibration variants (6–8) | 3 × 30 ns each | M3.5 method validation regression |
-| S8 | Free designed pac hairpin | 3 × 50 ns | Pre-organisation penalty; validates ViennaRNA fold |
-| S9 | scCP dimer + designed pac | 5 × 30 ns | Does the linker perturb RNA binding? |
+| S8 | Free pac hairpin, from the bound pose | 3 × 50 ns | Pre-organisation penalty |
+| S9 | scCP dimer + pac | 5 × 30 ns | Does the linker perturb RNA binding? ΔΔG vs S4 |
 
 ### Tier 3 — stretch only
 
