@@ -166,10 +166,18 @@ tells you; `04_postprocess.sh` and MM/PBSA need it.
 
 ### Single-chain CP (S2, S9) and the free hairpin (S8)
 
-- **S2 / S9:** save the model as `input/<system>/model.pdb`, run `build`, then
+- **S2:** save the model as `input/S2_sccp_apo/model.pdb`, run `build`, then
   superpose on S1 and record the backbone RMSD before simulating
-  (`docs/TUTORIAL.md` §2). S9 needs the RNA placed as in the cocrystal: build
-  S4 first and superpose the scCP model onto its protein chains.
+  (`docs/TUTORIAL.md` §2).
+- **S9:** registry source `graft:S4_cp_pacdesign`. Build S4 first, put the same
+  scCP model at `input/S9_sccp_pac/model.pdb` (one protein chain), then
+  `build S9_sccp_pac`. The script aligns the model's sequence to the two CP
+  chains of S4 (the linker drops out as an insertion), superposes on the CA
+  atoms, refits on the rigid core, and takes S4's pac RNA and Mg²⁺ unchanged.
+  It reports the core RMSD (above 2 Å → the two CP copies are not arranged
+  like the native dimer; fix the model), the worst-fitting residues, the
+  linker residues, and any protein–RNA atom pairs closer than 2 Å (the linker
+  or a loop running through the RNA; rebuild that region first).
 - **S8:** either a ViennaRNA-guided 3D model as `model.pdb`, or the bound
   conformation from S4 (`source_pdb = from:S4_cp_pacdesign`, `chains = R`), which
   is the usual starting point for a pre-organisation penalty. Record the choice.

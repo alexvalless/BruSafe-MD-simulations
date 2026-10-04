@@ -19,6 +19,9 @@ What `build` does, in order
        <PDBID>          input/_pdb/<PDBID>.pdb (fetched if missing)
        model            input/<system>/model.pdb (AlphaFold / grafted model)
        from:<system>    input/<other>/<other>.pdb, already built
+       graft:<system>   single-chain model input/<system>/model.pdb superposed on
+                        the protein of an already built complex, whose RNA and
+                        Mg2+ are taken over (scCP + pac, S9)
   2. first MODEL only; one alternate location per residue; MSE -> MET;
      hydrogens, waters and every other HETATM dropped (Mg2+ kept for RNA systems)
   3. assembles the `chains` column. The first chain is taken as deposited; each
@@ -476,6 +479,8 @@ def cmd_show(src: str) -> None:
 
 def cmd_build(system: str, keep_mg: bool | None) -> None:
     row = _registry.get(system, _registry.load())
+    if row["source_pdb"].startswith("graft:"):
+        return cmd_graft(system, row)
     spec = [c.strip() for c in row["chains"].split(",") if c.strip()]
     if not spec or not all(len(c) == 1 for c in spec):
         sys.exit(f"chains '{row['chains']}' for {system} cannot be built "
@@ -557,6 +562,11 @@ def cmd_build(system: str, keep_mg: bool | None) -> None:
         log.append("WARNING: RNA system with no row in config/rna_designs.tsv -- "
                    "native RNA kept")
 
+    write_output(system, row, path, polymer, mg, notes, log)
+
+
+def write_output(system: str, row: dict, path: pathlib.Path, polymer: list[Atom],
+                 mg: list[Atom], notes: list[str], log: list[str]) -> None:
     out_dir = INPUT / system
     out_dir.mkdir(parents=True, exist_ok=True)
     out = out_dir / f"{system}.pdb"
@@ -578,12 +588,180 @@ def cmd_build(system: str, keep_mg: bool | None) -> None:
         print(f"  {x}")
     print("\n".join(chain_report(polymer + mg)))
     print(f"wrote {out.relative_to(REPO)}  ({serial} heavy atoms)")
-    if has_rna:
+    if row["has_rna"] == "yes":
         print("next: CHARMM-GUI Solution Builder with this PDB (docs/TOPOLOGIES.md),\n"
               f"      unzip its gromacs/ folder into input/{system}/gromacs/, then\n"
               f"      ./scripts/01_prepare.sh {system} --source charmm-gui")
     else:
         print(f"next: ./scripts/01_prepare.sh {system}")
+
+
+# --------------------------------------------------------------------------
+# graft: single-chain model + RNA from a built reference complex (S9)
+# --------------------------------------------------------------------------
+
+def align(a: str, b: str) -> list[tuple[int, int]]:
+    """Global alignment (Needleman-Wunsch, linear gaps), returns aligned index
+    pairs. Enough to place the two CP copies of a single-chain construct on
+    the two chains of a dimer; the linker falls out as an insertion."""
+    n, m, gap = len(a), len(b), -2
+    sc = [[0] * (m + 1) for _ in range(n + 1)]
+    for i in range(1, n + 1):
+        sc[i][0] = i * gap
+    for j in range(1, m + 1):
+        sc[0][j] = j * gap
+    for i in range(1, n + 1):
+        for j in range(1, m + 1):
+            sc[i][j] = max(sc[i - 1][j - 1] + (2 if a[i - 1] == b[j - 1] else -1),
+                           sc[i - 1][j] + gap, sc[i][j - 1] + gap)
+    pairs, i, j = [], n, m
+    while i > 0 and j > 0:
+        if sc[i][j] == sc[i - 1][j - 1] + (2 if a[i - 1] == b[j - 1] else -1):
+            pairs.append((i - 1, j - 1)); i -= 1; j -= 1
+        elif sc[i][j] == sc[i - 1][j] + gap:
+            i -= 1
+        else:
+            j -= 1
+    return pairs[::-1]
+
+
+def jacobi4(a: list[list[float]]) -> tuple[list[float], list[list[float]]]:
+    """Eigen-decomposition of a symmetric 4x4 matrix (cyclic Jacobi)."""
+    a = [r[:] for r in a]
+    v = [[1.0 if i == j else 0.0 for j in range(4)] for i in range(4)]
+    for _ in range(100):
+        off = sum(a[i][j] ** 2 for i in range(4) for j in range(4) if i != j)
+        if off < 1e-18:
+            break
+        for p in range(3):
+            for q in range(p + 1, 4):
+                if abs(a[p][q]) < 1e-30:
+                    continue
+                th = (a[q][q] - a[p][p]) / (2 * a[p][q])
+                t = (1 if th >= 0 else -1) / (abs(th) + math.sqrt(th * th + 1))
+                c = 1 / math.sqrt(t * t + 1); s_ = t * c
+                for k in range(4):
+                    akp, akq = a[k][p], a[k][q]
+                    a[k][p], a[k][q] = c * akp - s_ * akq, s_ * akp + c * akq
+                for k in range(4):
+                    apk, aqk = a[p][k], a[q][k]
+                    a[p][k], a[q][k] = c * apk - s_ * aqk, s_ * apk + c * aqk
+                for k in range(4):
+                    vkp, vkq = v[k][p], v[k][q]
+                    v[k][p], v[k][q] = c * vkp - s_ * vkq, s_ * vkp + c * vkq
+    return [a[i][i] for i in range(4)], v
+
+
+def superpose(mobile: list[tuple], target: list[tuple]) -> tuple:
+    """Least-squares rigid fit of mobile onto target (Horn quaternions).
+    Returns a 3x4 operator usable with apply()."""
+    n = len(mobile)
+    cm = [sum(p[k] for p in mobile) / n for k in range(3)]
+    ct = [sum(p[k] for p in target) / n for k in range(3)]
+    S = [[0.0] * 3 for _ in range(3)]
+    for p, q in zip(mobile, target):
+        for i in range(3):
+            for j in range(3):
+                S[i][j] += (p[i] - cm[i]) * (q[j] - ct[j])
+    (xx, xy, xz), (yx, yy, yz), (zx, zy, zz) = S
+    N = [[xx + yy + zz, yz - zy, zx - xz, xy - yx],
+         [yz - zy, xx - yy - zz, xy + yx, zx + xz],
+         [zx - xz, xy + yx, -xx + yy - zz, yz + zy],
+         [xy - yx, zx + xz, yz + zy, -xx - yy + zz]]
+    w, v = jacobi4(N)
+    k = max(range(4), key=lambda i: w[i])
+    q0, q1, q2, q3 = (v[i][k] for i in range(4))
+    R = [[q0*q0 + q1*q1 - q2*q2 - q3*q3, 2*(q1*q2 - q0*q3), 2*(q1*q3 + q0*q2)],
+         [2*(q1*q2 + q0*q3), q0*q0 - q1*q1 + q2*q2 - q3*q3, 2*(q2*q3 - q0*q1)],
+         [2*(q1*q3 - q0*q2), 2*(q2*q3 + q0*q1), q0*q0 - q1*q1 - q2*q2 + q3*q3]]
+    t = [ct[i] - sum(R[i][j] * cm[j] for j in range(3)) for i in range(3)]
+    return tuple(tuple(R[i]) + (t[i],) for i in range(3))
+
+
+def rmsd_after(op: tuple, mobile: list[tuple], target: list[tuple]) -> list[float]:
+    out = []
+    for p, q in zip(mobile, target):
+        x = tuple(sum(op[i][j] * p[j] for j in range(3)) + op[i][3] for i in range(3))
+        out.append(math.dist(x, q))
+    return out
+
+
+def cmd_graft(system: str, row: dict) -> None:
+    """Place a single-chain protein model on the protein chains of an already
+    built reference complex and take that complex's RNA (and Mg2+)."""
+    ref_sys = row["source_pdb"].split(":", 1)[1]
+    ref_path = INPUT / ref_sys / f"{ref_sys}.pdb"
+    model_path = INPUT / system / "model.pdb"
+    if not ref_path.exists():
+        sys.exit(f"build {ref_sys} first ({ref_path.relative_to(REPO)} missing)")
+    if not model_path.exists():
+        sys.exit(f"put the single-chain model at {model_path.relative_to(REPO)}")
+
+    ref, _, _ = read_pdb(ref_path)
+    model, _, notes = read_pdb(model_path)
+    model, n2 = clean(model, keep_mg=False)
+    notes += n2
+    prot_model = [a for a in model if kind(a.resname) == "protein"]
+    if len({a.chain for a in prot_model}) != 1:
+        sys.exit(f"{model_path.name}: expected ONE protein chain (the single-chain "
+                 f"construct), found {sorted({a.chain for a in prot_model})}")
+    ref_prot = [a for a in ref if kind(a.resname) == "protein"]
+    ref_rest = [a for a in ref if kind(a.resname) in ("rna", "mg")]
+    if not ref_rest:
+        sys.exit(f"{ref_sys} has no RNA to graft")
+
+    def ca_list(atoms):
+        rs = [r for r in residues(atoms) if any(a.name == "CA" for a in r)]
+        return ("".join(AA_ONE.get(r[0].resname, "X") for r in rs),
+                [next(a for a in r if a.name == "CA") for r in rs])
+
+    mseq, mca = ca_list(prot_model)
+    rseq, rca = ca_list(ref_prot)        # chain A then chain B, in file order
+    pairs = align(mseq, rseq)
+    if len(pairs) < 0.8 * len(rseq):
+        sys.exit(f"only {len(pairs)} of {len(rseq)} reference residues align to the "
+                 f"model -- is this the right construct?")
+    mob = [mca[i].xyz() for i, _ in pairs]
+    tgt = [rca[j].xyz() for _, j in pairs]
+    op = superpose(mob, tgt)
+    d = rmsd_after(op, mob, tgt)
+    rms_all = math.sqrt(sum(x * x for x in d) / len(d))
+    core = [k for k, x in enumerate(d) if x < 2.0]     # refit on the rigid core
+    if len(core) >= 0.5 * len(d):
+        op = superpose([mob[k] for k in core], [tgt[k] for k in core])
+        d = rmsd_after(op, mob, tgt)
+    rms_core = math.sqrt(sum(d[k] ** 2 for k in core) / max(1, len(core)))
+
+    placed = [apply(op, a) for a in prot_model]
+    for a in placed:
+        a.chain = "A"
+    rna = [a.copy() for a in ref_rest if kind(a.resname) == "rna"]
+    mg = [a.copy() for a in ref_rest if kind(a.resname) == "mg"]
+    aligned = {i for i, _ in pairs}
+    insert = [k for k in range(len(mseq)) if k not in aligned]
+    clashes = sum(1 for a in placed for b in rna if dist(a, b) < 2.0)
+
+    # per-residue deviation, worst first, so a mis-folded copy is obvious
+    worst = sorted(((x, mca[pairs[k][0]]) for k, x in enumerate(d)),
+                   key=lambda t: -t[0])[:5]
+    log = [f"single-chain model {model_path.name} superposed on {ref_sys} protein "
+           f"({len(pairs)} CA pairs)",
+           f"CA RMSD all aligned {rms_all:.2f} A, rigid core ({len(core)} CA) "
+           f"{rms_core:.2f} A",
+           "largest deviations: " + ", ".join(f"{a.resname}{a.resseq} {x:.1f} A"
+                                              for x, a in worst),
+           f"model residues with no counterpart in the dimer (linker etc.): "
+           f"{len(insert)}" + (f", {mseq[insert[0]:insert[-1] + 1]!s:.40}"
+                               if insert else ""),
+           f"RNA and Mg2+ taken from {ref_sys} unchanged",
+           f"protein-RNA heavy-atom pairs closer than 2.0 A: {clashes}"]
+    if rms_core > 2.0:
+        log.append("WARNING: core RMSD > 2 A -- the two CP copies in the model do "
+                   "not sit like the native dimer; fix the model before simulating")
+    if clashes:
+        log.append("WARNING: the linker or a loop overlaps the RNA -- inspect and "
+                   "rebuild that region before CHARMM-GUI")
+    write_output(system, row, model_path, placed + rna, mg, notes, log)
 
 
 def main() -> None:
