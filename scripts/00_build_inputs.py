@@ -358,7 +358,8 @@ def chain_report(atoms: list[Atom]) -> list[str]:
         occ = sum(a.occ for r in rs for a in r) / sum(len(r) for r in rs)
         if occ < 0.99:
             lines.append(f"    mean occupancy {occ:.2f} -- partially occupied (disorder "
-                         f"or two alternative placements); prefer a fully occupied copy")
+                         f"or incomplete soaking); use a fully occupied copy if one exists, "
+                         f"otherwise record it in docs/DECISIONS.md")
         link = ("C", "N", 2.0) if k == "protein" else ("O3'", "P", 2.1)
         for prev, cur in zip(rs, rs[1:]):
             a = next((x for x in prev if x.name == link[0]), None)

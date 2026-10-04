@@ -113,6 +113,12 @@ operator hairpin, 2.7 Å). `00_build_inputs.py show 1ZDH` gives:
   A6 bulge and the loop). No crystallographic Mg²⁺ or other HETATM.
 - The crystallised RNA is the **C(−5) variant** (loop AUCA), not the wild type.
   S7_cal_u5c therefore uses it as is, and S3 (wild type) reverts residue 11 to U.
+- Chain R is refined at mean occupancy 0.56 (incomplete soaking of the capsid
+  sites). It is the only copy on an A/B dimer (S is symmetry-averaged), so it is
+  used anyway: the pose is the bound one, its coordinates are just less certain
+  than the protein's. Restrained NVT/NPT lets it settle, and the MM/PBSA
+  decomposition gate (known operator-contact residues must come out as hot
+  spots) is the check that the interface survived.
 
 **Alternative rejected.** Docking a hairpin onto 1MSC. A solved complex exists.
 
