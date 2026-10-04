@@ -18,8 +18,9 @@ if [ -f prod.gro ]; then log "$SYS rep$REP already finished"; exit 0; fi
 
 if [ ! -f prod.tpr ]; then
   NS="$(sysfield "$SYS" ns)"
-  STEPS=$(( NS * 500000 ))            # ns -> steps at dt = 2 fs
-  log "grompp for $NS ns ($STEPS steps)"
+  DT="$(mdpval "$MDP/prod.mdp" dt)"     # ps; 0.004 with HMR
+  STEPS="$(awk -v ns="$NS" -v dt="$DT" 'BEGIN{printf "%d", ns * 1000 / dt + 0.5}')"
+  log "grompp for $NS ns ($STEPS steps at dt = $DT ps)"
   sed "s/^nsteps .*/nsteps                  = $STEPS/" "$MDP/prod.mdp" > prod.mdp
   gmx grompp -f prod.mdp -c npt_free.gro -t npt_free.cpt \
              -p topol.top -n index.ndx -o prod.tpr

@@ -18,12 +18,17 @@ SYS="${1:?usage: 01_prepare.sh <system_name> [--source pdb2gmx|charmm-gui]}"
 SOURCE="pdb2gmx"
 [ "${2:-}" = "--source" ] && SOURCE="${3:?--source needs a value}"
 
+# Box padding (nm). 1.0 keeps periodic images 2.0 nm apart, above the 1.2 nm
+# cutoff, and saves a large share of the water relative to 1.2. Use
+# BRUSAFE_BOX_PAD=1.2 for the free hairpin (S8), which can extend.
+BOX_PAD="${BRUSAFE_BOX_PAD:-1.0}"
+FF="${BRUSAFE_FF:-charmm36-jul2022}"
 HAS_RNA="$(sysfield "$SYS" has_rna)"
 MG="$(sysfield "$SYS" mg_count)"
 IN="$REPO/input/$SYS"
 OUT="$RUNS/$SYS/build"
 mkdir -p "$OUT"; cd "$OUT"
-log "preparing $SYS (rna=$HAS_RNA mg=$MG source=$SOURCE)"
+log "preparing $SYS (rna=$HAS_RNA mg=$MG source=$SOURCE pad=${BOX_PAD}nm)"
 
 if [ "$SOURCE" = "charmm-gui" ]; then
   [ -d "$IN/gromacs" ] || die "expected $IN/gromacs from CHARMM-GUI"
@@ -37,9 +42,9 @@ else
   # 15 = CHARMM36 in the standard pdb2gmx menu ordering; -ter interactive so you
   # consciously choose termini rather than accepting a default you never saw.
   gmx pdb2gmx -f "$IN/$SYS.pdb" -o proc.gro -p topol.top -i posre.itp \
-              -water tip3p -ff charmm36-jul2022 -ignh -ter
+              -water tip3p -ff "$FF" -ignh -ter
 
-  gmx editconf -f proc.gro -o box.gro -c -d 1.2 -bt dodecahedron
+  gmx editconf -f proc.gro -o box.gro -c -d "$BOX_PAD" -bt dodecahedron
   gmx solvate  -cp box.gro -cs spc216.gro -o solv.gro -p topol.top
 
   gmx grompp -f "$MDP/em.mdp" -c solv.gro -p topol.top -o ions.tpr -maxwarn 1
@@ -47,7 +52,7 @@ else
   if [ "$HAS_RNA" = "yes" ] && [ "$MG" -gt 0 ]; then
     # ---------------------------------------------------------------------
     # Mg2+ WARNING -- read before trusting anything downstream.
-    # Mg2+ water exchange is a microsecond process. On a 250 ns trajectory the
+    # Mg2+ water exchange is a microsecond process. On a 30-100 ns trajectory the
     # ions never equilibrate: they stay essentially wherever genion drops them.
     # Random placement therefore adds noise, not realism.
     # Preferred order:
@@ -68,6 +73,12 @@ else
                                 -pname POT -nname CLA -conc 0.15 -neutral
   fi
 fi
+
+# ---- hydrogen mass repartitioning --------------------------------------------
+# Written into the local topology files (never the GMXLIB force field), so it
+# works on any GROMACS version and dt = 4 fs is safe in every mdp. Skips itself
+# if the topology is already repartitioned (e.g. CHARMM-GUI's HMR option).
+python3 "$REPO/scripts/hmr_top.py" topol.top
 
 # ---- index groups -----------------------------------------------------------
 # TWO sources, concatenated. Both are needed and neither is optional:

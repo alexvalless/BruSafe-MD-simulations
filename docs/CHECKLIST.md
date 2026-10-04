@@ -35,35 +35,36 @@ Rule: every system below has a named consumer. If a system has no consumer, cut 
 
 ## PHASE 2 — Equilibration (identical protocol, every system)
 
-- [ ] Rhombic dodecahedron, 1.2 nm padding, solvate, neutralise, 150 mM salt
+- [ ] Rhombic dodecahedron, 1.0 nm padding, solvate, neutralise, 150 mM salt
+- [ ] HMR applied to the topology (`scripts/hmr_top.py`, run by `01_prepare.sh`)
 - [ ] Energy minimisation (steepest descent, Fmax < 1000 kJ/mol/nm)
 - [ ] NVT 200 ps, position restraints, 310 K — **separate velocity seed per replica**
 - [ ] NPT 1 ns, position restraints
-- [ ] NPT 5 ns, unrestrained
+- [ ] NPT 2 ns, unrestrained
 - [ ] Gate: density ≈ 1000 kg/m³, T and P stable, no restraint-release blowup
 
 ## PHASE 3 — Production
 
-Benchmark first (`bench_4070.sh`), then lock one mdrun config for the whole campaign.
+Benchmark first (`bench_gpu.sh`), then lock one mdrun config for the whole campaign.
 
 ### Tier 1 — cannot ship without these
 
 | # | System | Replicas × length | Consumer |
 |---|---|---|---|
-| S1 | WT CP dimer, C/C apo | 3 × 250 ns | Reference baseline; all RMSF comparisons |
-| S2 | scCP dimer + linker, apo | 3 × 250 ns | **The construct question** — M0/M1 |
-| S3 | CP dimer + WT operator | 3 × 250 ns | M3.5 reference complex |
-| S4 | CP dimer + designed pac | 3 × 250 ns | M3.5 → K_d prior for M4 |
-| S5 | CP dimer + scrambled hairpin | 3 × 250 ns | M3.5 specificity ΔΔG vs dPCR 0×pac arm |
+| S1 | WT CP dimer, C/C apo | 3 × 100 ns | Reference baseline; all RMSF comparisons |
+| S2 | scCP dimer + linker, apo | 3 × 100 ns | **The construct question** — M0/M1 |
+| S3 | CP dimer + WT operator | 5 × 30 ns | M3.5 reference complex |
+| S4 | CP dimer + designed pac | 5 × 30 ns | M3.5 → K_d prior for M4 |
+| S5 | CP dimer + scrambled hairpin | 5 × 30 ns | M3.5 specificity ΔΔG vs dPCR 0×pac arm |
 
 ### Tier 2 — do if Tier 1 is clean by 27 Sep
 
 | # | System | Replicas × length | Consumer |
 |---|---|---|---|
-| S6 | WT CP dimer, A/B apo | 3 × 250 ns | FG-loop switch → M3 quasi-equivalence |
-| S7 | Calibration variants (6–8) | 1–2 × 150 ns each | M3.5 method validation regression |
-| S8 | Free designed pac hairpin | 3 × 250 ns | Pre-organisation penalty; validates ViennaRNA fold |
-| S9 | scCP dimer + designed pac | 3 × 250 ns | Does the linker perturb RNA binding? |
+| S6 | WT CP dimer, A/B apo | 3 × 100 ns | FG-loop switch → M3 quasi-equivalence |
+| S7 | Calibration variants (6–8) | 3 × 30 ns each | M3.5 method validation regression |
+| S8 | Free designed pac hairpin | 3 × 50 ns | Pre-organisation penalty; validates ViennaRNA fold |
+| S9 | scCP dimer + designed pac | 5 × 30 ns | Does the linker perturb RNA binding? |
 
 ### Tier 3 — stretch only
 

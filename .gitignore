@@ -20,3 +20,7 @@ __pycache__/
 !*.ndx
 !*.mdp
 !analysis_out/**
+
+# Starting structures and CHARMM-GUI builds ARE inputs: commit them
+!input/**/*.gro
+!input/**/*.pdb

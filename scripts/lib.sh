@@ -19,6 +19,13 @@ log()  { printf '[%s] %s\n' "$(date +%H:%M:%S)" "$*" >&2; }
 die()  { printf '[FATAL] %s\n' "$*" >&2; exit 1; }
 need() { command -v "$1" >/dev/null 2>&1 || die "missing required command: $1"; }
 
+# Read one parameter from an mdp file (first match, comments stripped).
+# usage: mdpval <file.mdp> <key>
+mdpval() {
+  awk -v k="$2" -F'=' '{sub(/;.*/, ""); gsub(/[ \t]/, "", $1)}
+       $1 == k {gsub(/[ \t]/, "", $2); print $2; exit}' "$1"
+}
+
 # Read one field from config/systems.tsv.
 # usage: sysfield <system_name> <column_name>
 sysfield() {

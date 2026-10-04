@@ -24,6 +24,10 @@ import sys
 REPO = pathlib.Path(__file__).resolve().parent.parent
 REGISTRY = REPO / "config" / "systems.tsv"
 
+# Per-replica equilibration in ns-equivalent: NVT 0.2 ns at 2 fs counts double,
+# then NPT 1 ns + NPT-free 2 ns at 4 fs (mdp/nvt, npt, npt_free).
+EQUIL_NS = 0.2 * 2 + 1.0 + 2.0
+
 
 # --------------------------------------------------------------------------
 # registry
@@ -80,7 +84,7 @@ def expand(rows: list[dict], max_tier: int) -> list[dict]:
                 "replica": rep,
                 "ns": ns,
                 # RNA systems carry more atoms, so cost more per ns.
-                "cost": ns * (1.6 if r["has_rna"] == "yes" else 1.0),
+                "cost": (ns + EQUIL_NS) * (1.6 if r["has_rna"] == "yes" else 1.0),
                 "consumer": r["consumer"],
             })
     return jobs

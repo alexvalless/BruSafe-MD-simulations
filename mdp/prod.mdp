@@ -1,22 +1,25 @@
 ; ===========================================================================
-; BruSafe -- PRODUCTION, 250 ns. CHARMM36m / CHARMM-modified TIP3P.
+; BruSafe -- PRODUCTION. CHARMM36m / CHARMM-modified TIP3P, HMR, 4 fs.
+; nsteps below is a placeholder: 03_production.sh rewrites it from the ns
+; column of config/systems.tsv and the dt in this file.
 ; This file is IDENTICAL for every system and every replica, including the
 ; GPU benchmark. If you edit it mid-campaign, timings and energies stop being
 ; comparable and the campaign is over.
 ; ===========================================================================
 
 integrator              = md
-dt                      = 0.002
-nsteps                  = 125000000       ; 250 ns @ 2 fs
+dt                      = 0.004
+; HMR (H ~3 Da) is in the topology, applied by scripts/hmr_top.py in 01_prepare.sh
+nsteps                  = 25000000        ; 100 ns @ 4 fs (rewritten per system)
 comm-mode               = Linear
 nstcomm                 = 100
 
 ; ---------- output ----------
-nstxout-compressed      = 5000            ; 10 ps -> 25,000 frames
+nstxout-compressed      = 2500            ; 10 ps -> 100 frames/ns
 compressed-x-grps       = System          ; keeps water for bridge analysis;
                                           ; switch to non-Water if disk is tight
-nstenergy               = 5000
-nstlog                  = 5000
+nstenergy               = 2500
+nstlog                  = 2500
 nstcalcenergy           = 100
 nstxout                 = 0
 nstvout                 = 0
