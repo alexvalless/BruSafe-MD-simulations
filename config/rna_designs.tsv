@@ -13,7 +13,7 @@
 #
 name	rna_chain	target	note
 S3_cp_operator	R	UGAGGAUUACCCA	WT operator: 1ZDH has C(-5); reverted to the wild-type U at residue 11
-S4_cp_pacdesign	R	TODO	designed pac hairpin
+S4_cp_pacdesign	R	native	pac = ACAUGAGGAUCACCCAUGU (C(-5) operator); residues 4-16 identical to 1ZDH chain R
 S5_cp_scramble	R	TODO	scrambled / non-cognate control, same length and GC content
 S7_cal_var01	R	TODO	literature variant (cite source + Kd)
 S7_cal_var02	R	TODO	literature variant (cite source + Kd)
