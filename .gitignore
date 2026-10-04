@@ -24,3 +24,7 @@ __pycache__/
 # Starting structures and CHARMM-GUI builds ARE inputs: commit them
 !input/**/*.gro
 !input/**/*.pdb
+
+# local caches
+.DS_Store
+input/_pdb/
