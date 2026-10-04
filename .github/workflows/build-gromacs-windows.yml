@@ -1,0 +1,122 @@
+# Builds a portable, CUDA-enabled GROMACS for Windows on a GitHub-hosted
+# runner and uploads it as a zip artifact. Nobody needs admin rights or a
+# Windows machine: the runner has them.
+#
+# Runs automatically when this file is pushed, or by hand from the Actions tab
+# ("Run workflow") once the file is on the default branch.
+#
+# CUDA version rule: it must be >= 12.1 (GROMACS requirement) and <= the
+# "CUDA Version" printed at the top right of `nvidia-smi` on the lab PCs.
+# A newer toolkit than the lab driver supports produces a gmx.exe that will
+# not see the GPU. By default two builds are made (CUDA 12.6 and 12.4) so one
+# fits even before anyone has checked the lab driver.
+
+name: Build portable GROMACS (Windows, CUDA)
+
+on:
+  push:
+    paths: [".github/workflows/build-gromacs-windows.yml"]
+  workflow_dispatch:
+    inputs:
+      gromacs_version:
+        description: "GROMACS version"
+        default: "2026.3"
+      cuda_versions:
+        description: 'CUDA toolkits as JSON list (<= CUDA Version shown by nvidia-smi), e.g. ["12.6.3"]'
+        default: '["12.6.3", "12.4.1"]'
+      cuda_sm:
+        description: "GPU architecture (89 = RTX 40xx)"
+        default: "89"
+
+env:
+  GMX_VER: ${{ inputs.gromacs_version || '2026.3' }}
+  CUDA_SM: ${{ inputs.cuda_sm || '89' }}
+
+jobs:
+  build:
+    runs-on: windows-2022
+    timeout-minutes: 300
+    strategy:
+      fail-fast: false
+      matrix:
+        cuda: ${{ fromJSON(inputs.cuda_versions || '["12.6.3", "12.4.1"]') }}
+    env:
+      CUDA_VER: ${{ matrix.cuda }}
+    steps:
+      - name: Install CUDA toolkit
+        uses: Jimver/cuda-toolkit@v0.2.30
+        with:
+          cuda: ${{ matrix.cuda }}
+          method: network
+          sub-packages: '["nvcc", "cudart", "cufft", "cufft_dev", "nvrtc", "nvrtc_dev", "nvtx", "thrust", "cuda_profiler_api", "visual_studio_integration"]'
+
+      - name: MSVC developer environment
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+
+      - name: Ninja
+        run: pip install ninja
+
+      - name: Download GROMACS source
+        shell: pwsh
+        run: |
+          Invoke-WebRequest "https://ftp.gromacs.org/gromacs/gromacs-$env:GMX_VER.tar.gz" -OutFile gmx.tar.gz
+          tar xzf gmx.tar.gz
+          Rename-Item "gromacs-$env:GMX_VER" src
+
+      # GMX_SIMD is pinned to AVX2: auto-detection would pick whatever the
+      # cloud CPU supports (possibly AVX-512) and the binary could crash on
+      # the lab CPUs. AVX2 runs on every Intel/AMD desktop from the last decade.
+      - name: Configure
+        shell: pwsh
+        run: |
+          cmake -S src -B build -G Ninja `
+            -DCMAKE_BUILD_TYPE=Release `
+            -DCMAKE_C_COMPILER=cl -DCMAKE_CXX_COMPILER=cl `
+            -DGMX_GPU=CUDA `
+            -DGMX_CUDA_TARGET_SM="$env:CUDA_SM" `
+            -DCMAKE_CUDA_FLAGS="-allow-unsupported-compiler" `
+            -DGMX_SIMD=AVX2_256 `
+            -DGMX_FFT_LIBRARY=fftpack `
+            -DGMX_HWLOC=OFF `
+            -DGMX_MPI=OFF `
+            -DGMXAPI=OFF `
+            -DGMX_INSTALL_NBLIB_API=OFF `
+            -DREGRESSIONTEST_DOWNLOAD=OFF `
+            -DCMAKE_INSTALL_PREFIX="$PWD/gromacs"
+
+      - name: Build and install
+        shell: pwsh
+        run: |
+          cmake --build build --parallel
+          cmake --install build
+
+      # Make the folder self-contained: CUDA runtime + cuFFT + MSVC runtime
+      # and OpenMP DLLs next to gmx.exe, so the lab PCs need only the driver.
+      - name: Bundle runtime DLLs
+        shell: pwsh
+        run: |
+          $bin = "gromacs\bin"
+          Copy-Item "$env:CUDA_PATH\bin\cudart64_*.dll" $bin
+          Copy-Item "$env:CUDA_PATH\bin\cufft64_*.dll"  $bin
+          Get-ChildItem "$env:CUDA_PATH\bin\nvrtc*.dll" -ErrorAction SilentlyContinue | Copy-Item -Destination $bin
+          $redist = Get-ChildItem "$env:VCToolsRedistDir\x64" -Directory
+          $redist | Where-Object Name -like "Microsoft.VC*.CRT"    | ForEach-Object { Copy-Item "$($_.FullName)\*.dll" $bin }
+          $redist | Where-Object Name -like "Microsoft.VC*.OpenMP" | ForEach-Object { Copy-Item "$($_.FullName)\*.dll" $bin }
+          Get-ChildItem $bin
+
+      # No GPU on the runner, so this only proves the binary starts and
+      # reports the right build options. The real GPU test is on a lab PC.
+      - name: Smoke test
+        shell: pwsh
+        run: |
+          .\gromacs\bin\gmx.exe --version | Tee-Object gromacs\BUILD_INFO.txt
+          Add-Content gromacs\BUILD_INFO.txt "`nBuilt by GitHub Actions run ${{ github.run_id }} (CUDA $env:CUDA_VER, sm_$env:CUDA_SM)"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: gromacs-${{ env.GMX_VER }}-win64-cuda${{ matrix.cuda }}-sm${{ env.CUDA_SM }}
+          path: gromacs
+          retention-days: 90
