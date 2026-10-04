@@ -131,6 +131,28 @@ same 13-nt frame.
 
 ---
 
+## 2026-10-04 — One RNA for every system; S3, S5, S7 dropped
+
+**Decision.** Every RNA-bound system carries the pac hairpin
+ACAUGAGGAUCACCCAUGU (the C(−5) operator). Residues 4–16 are exactly the RNA
+resolved in 1ZDH chain R, so S4 uses the crystal RNA with no mutation, and only
+those 13 nt are simulated: the three terminal pairs (A1–U19, C2–G18, A3–U17)
+are not resolved and do not contact the protein. S8 is the S4 hairpin without
+protein (bound pose); S9 grafts the scCP model onto S4 and keeps its RNA.
+
+The wild-type operator (S3), the scrambled control (S5) and the calibration
+variants (S7) are removed from the registry; S7_cal_u5c would have been an exact
+duplicate of S4. This supersedes the S3/S7 sequences in the 1ZDH entry above.
+
+**Consequence to track.** No specificity ΔΔG (P2 in PREDICTIONS.md) and no
+calibration regression against literature K_d: nothing validates absolute
+MM/PBSA numbers, so they stay unreported (README rule). The one ΔΔG left is
+S9 − S4, the linker effect on binding, which makes S9 the only RNA result that
+carries a claim. The per-residue decomposition gate on S4 is the remaining check
+that the interface is right.
+
+---
+
 ## TEMPLATE
 
 ## YYYY-MM-DD — <decision>

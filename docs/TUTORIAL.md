@@ -148,7 +148,7 @@ non-native relative orientation, every S1-vs-S2 comparison downstream measures
 an AlphaFold artefact instead of a linker effect, and no amount of sampling
 fixes it.
 
-### S3–S5, S7, S9 — RNA-bound systems
+### S4, S8, S9 — RNA-bound systems
 
 Use the CP–operator **cocrystal**. Do not dock an RNA hairpin de novo when a
 solved complex exists; reviewers will ask why, and you will not like the answer.
@@ -159,7 +159,7 @@ For anything containing RNA, prefer CHARMM-GUI Solution Builder over the
 `pdb2gmx` route:
 
 ```bash
-./scripts/01_prepare.sh S3_cp_operator --source charmm-gui
+./scripts/01_prepare.sh S4_cp_pacdesign --source charmm-gui
 ```
 
 Two reasons. `pdb2gmx` residue mapping for RNA under the charmm36 port is
