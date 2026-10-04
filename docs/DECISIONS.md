@@ -153,6 +153,26 @@ that the interface is right.
 
 ---
 
+## 2026-10-04 — CHARMM-GUI builds of S4 and S8: ion counts as built
+
+**Decision.** Registry `mg_count` follows what CHARMM-GUI actually placed
+(it converts concentration to whole ions): S4 5 Mg²⁺ (S9 matches), S8 3 Mg²⁺.
+
+| system | atoms | waters (approx.) | K⁺ | Cl⁻ | Mg²⁺ | box |
+|---|---|---|---|---|---|---|
+| S4 | 57 722 | 17 800 | 60 | 60 | 5 | octahedral, 10 Å |
+| S8 | 9 849 | 3 100 | 21 | 15 | 3 | octahedral, 12 Å |
+
+Both neutral, KCl ≈ 0.15 M. RNA identical in both (13 nt, 5'-OH/3'-OH).
+
+**Consequence to track.** Mg²⁺ is not concentration-matched: about 15 mM in
+S4 versus about 50 mM in the much smaller S8 box. The free hairpin therefore
+sees more Mg²⁺ per phosphate than the bound one. Say so next to any S8 vs S4
+comparison (pre-organisation penalty), and check with `mindist_mg.xvg`
+whether the ions actually sit on the RNA.
+
+---
+
 ## TEMPLATE
 
 ## YYYY-MM-DD — <decision>
