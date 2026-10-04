@@ -1,0 +1,47 @@
+; BruSafe -- NVT equilibration, 200 ps, position restraints.
+; gen_seed is rewritten per replica by 02_equilibrate.sh. This is what makes
+; replicas statistically independent -- do NOT branch replicas after this stage.
+define                  = -DPOSRES
+
+integrator              = md
+dt                      = 0.002
+nsteps                  = 100000          ; 200 ps
+comm-mode               = Linear
+nstcomm                 = 100
+
+nstxout-compressed      = 5000
+nstenergy               = 1000
+nstlog                  = 1000
+nstcalcenergy           = 100
+
+continuation            = no
+constraint_algorithm    = lincs
+constraints             = h-bonds
+lincs_iter              = 1
+lincs_order             = 4
+
+cutoff-scheme           = Verlet
+nstlist                 = 20
+pbc                     = xyz
+
+coulombtype             = PME
+rcoulomb                = 1.2
+pme_order               = 4
+fourierspacing          = 0.12
+vdwtype                 = cutoff
+vdw-modifier            = force-switch
+rvdw_switch             = 1.0
+rvdw                    = 1.2
+rlist                   = 1.2
+DispCorr                = no
+
+tcoupl                  = V-rescale
+tc-grps                 = SOLU SOLV
+tau_t                   = 0.5   0.5
+ref_t                   = 310   310
+
+pcoupl                  = no
+
+gen_vel                 = yes
+gen_temp                = 310
+gen_seed                = REPLACE_SEED
