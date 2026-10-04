@@ -141,12 +141,12 @@ At charmm-gui.org → Input Generator → **Solution Builder**:
    RNA termini: 5′-OH / 3′-OH (no terminal phosphate) unless your construct
    needs one. Protein termini: NTER / CTER. No mutations here, they were done in
    step 3. Missing atoms (the mutated bases) are built automatically.
-3. **Water box.** Octahedral, *fit to protein size*, edge distance **10 Å**.
-   (S8, the free hairpin: 12 Å.)
-4. **Ions.** KCl **0.15 M**, neutralising. Mg²⁺: if crystallographic Mg²⁺ were
-   kept, do not add more unless `mg_count` in the registry asks for it; if not,
-   add MgCl₂ so the count matches `mg_count`, and write the placement method in
-   `docs/DECISIONS.md` (see the Mg²⁺ entry there).
+3. **Water box and ions.** Anything reasonable (e.g. rectangular, 10 Å, KCl
+   0.15 M). **They are discarded:** `01_prepare.sh` keeps only CHARMM-GUI's
+   topology and rebuilds box, water, KCl and Mg²⁺ (`mg_count`) with GROMACS,
+   exactly as for the pdb2gmx systems. CHARMM-GUI's octahedral GROMACS box put
+   hundreds of atoms on top of their own periodic images and minimisation
+   diverged (docs/DECISIONS.md, 2026-10-04).
 5. **Input generation.** Force field **CHARMM36m**, output **GROMACS**,
    temperature **310 K**. Leave **hydrogen mass repartitioning unticked**:
    `hmr_top.py` applies it in the next step exactly as for the apo systems. (If
@@ -159,8 +159,9 @@ At charmm-gui.org → Input Generator → **Solution Builder**:
 ./scripts/01_prepare.sh S4_cp_pacdesign --source charmm-gui
 ```
 
-If it warns that there is no `RNA` group, add one with `gmx make_ndx` as it
-tells you; `04_postprocess.sh` and MM/PBSA need it.
+It builds the `RNA`, `RNA_BB` and `RNA_P` index groups itself (make_ndx does
+not recognise CHARMM-GUI's ADE/CYT/GUA/URA as RNA), and the box padding comes
+from the registry's `box_nm` column (1.2 nm for S8).
 
 ### Single-chain CP (S2, S9) and the free hairpin (S8)
 
@@ -179,7 +180,7 @@ tells you; `04_postprocess.sh` and MM/PBSA need it.
 - **S8:** either a ViennaRNA-guided 3D model as `model.pdb`, or the bound
   conformation from S4 (`source_pdb = from:S4_cp_pacdesign`, `chains = R`), which
   is the usual starting point for a pre-organisation penalty. Record the choice.
-  Build with `BRUSAFE_BOX_PAD=1.2` / 12 Å.
+  Box padding 1.2 nm comes from the registry.
 
 ---
 

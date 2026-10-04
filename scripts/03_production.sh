@@ -22,7 +22,7 @@ if [ ! -f prod.tpr ]; then
   STEPS="$(awk -v ns="$NS" -v dt="$DT" 'BEGIN{printf "%d", ns * 1000 / dt + 0.5}')"
   log "grompp for $NS ns ($STEPS steps at dt = $DT ps)"
   sed "s/^nsteps .*/nsteps                  = $STEPS/" "$MDP/prod.mdp" > prod.mdp
-  gmx grompp -f prod.mdp -c npt_free.gro -t npt_free.cpt \
+  grompp_hmr -f prod.mdp -c npt_free.gro -t npt_free.cpt \
              -p topol.top -n index.ndx -o prod.tpr
   # provenance: what actually ran, alongside the trajectory
   { echo "host      : $(hostname)"; echo "started   : $(date -Is)";
