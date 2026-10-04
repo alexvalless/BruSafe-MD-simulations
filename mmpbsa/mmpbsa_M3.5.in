@@ -21,9 +21,9 @@
 
 &general
   sys_name              = "CP2_pacWT"
-  startframe            = 2500        ; skip the first 50 ns of a 100 ns run
-  endframe              = 10000
-  interval              = 8           ; ~940 frames; more is not more information
+  startframe            = 501         ; rewritten by run_mmpbsa.sh from skip_ns
+  endframe              = 9999999     ; rewritten by run_mmpbsa.sh (to the end)
+  interval              = 10          ; rewritten by run_mmpbsa.sh (~250 frames/replica)
   temperature           = 310.0
 
   ; --- radii ---
@@ -84,6 +84,7 @@
 ; report the spread as part of your error bar. If your conclusion flips
 ; between indi = 2 and indi = 4, you do not have a conclusion.
 ;
-; Also repeat with startframe shifted (e.g. 5000–10000 vs 2500–7500) to show
+; Also compare the first and second half of the analysed window (e.g. 5-17.5 ns
+; vs 17.5-30 ns, set startframe/endframe by hand) to show
 ; the estimate is not an artefact of one stretch of trajectory.
 ; ============================================================================

@@ -1,13 +1,16 @@
-; BruSafe -- NPT equilibration, 5 ns, UNRESTRAINED. Final gate before production.
+; BruSafe -- NPT equilibration, 2 ns, UNRESTRAINED. Final gate before production.
+; Shortened from 5 ns (2026-10-04): the first skip_ns of every production run is
+; also discarded in analysis, so relaxation is not counted twice. HMR, 4 fs.
 ; no position restraints at this stage
 
 integrator              = md
-dt                      = 0.002
-nsteps                  = 2500000         ; 5 ns
+dt                      = 0.004
+; HMR (H ~3 Da) is in the topology, applied by scripts/hmr_top.py in 01_prepare.sh
+nsteps                  = 500000          ; 2 ns @ 4 fs
 comm-mode               = Linear
 nstcomm                 = 100
 
-nstxout-compressed      = 5000
+nstxout-compressed      = 2500            ; 10 ps
 nstenergy               = 1000
 nstlog                  = 1000
 nstcalcenergy           = 100

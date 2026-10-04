@@ -11,6 +11,7 @@ need gmx
 SYS="${1:?usage: 04_postprocess.sh <system> <replica>}"
 REP="${2:?usage: 04_postprocess.sh <system> <replica>}"
 HAS_RNA="$(sysfield "$SYS" has_rna)"
+SKIP_PS=$(( $(sysfield "$SYS" skip_ns) * 1000 ))
 D="$RUNS/$SYS/rep$REP"
 A="$D/analysis"
 cd "$D"; mkdir -p "$A"
@@ -29,18 +30,18 @@ cd "$A"
 log "RMSD / Rg / RMSF / SASA / DSSP"
 printf 'Backbone\nBackbone\n' | gmx rms   -s ../prod.tpr -f clean.xtc -n ../index.ndx -o rmsd_backbone.xvg -tu ns
 printf 'Backbone\n'           | gmx gyrate -s ../prod.tpr -f clean.xtc -n ../index.ndx -o gyrate.xvg
-# discard the first 50 ns before RMSF -- fluctuations during relaxation are not
-# the fluctuations you want to report
-printf 'C-alpha\n'            | gmx rmsf  -s ../prod.tpr -f clean.xtc -n ../index.ndx -o rmsf_ca.xvg -res -b 50000
+# discard the first skip_ns (registry) before RMSF -- fluctuations during
+# relaxation are not the fluctuations you want to report
+printf 'C-alpha\n'            | gmx rmsf  -s ../prod.tpr -f clean.xtc -n ../index.ndx -o rmsf_ca.xvg -res -b "$SKIP_PS"
 printf 'SOLU\n'               | gmx sasa  -s ../prod.tpr -f clean.xtc -n ../index.ndx -o sasa.xvg
 gmx dssp -s ../prod.tpr -f clean.xtc -n ../index.ndx -o dssp.dat -num dssp_num.xvg 2>/dev/null \
   || log "gmx dssp unavailable (needs GROMACS >= 2023); fall back to do_dssp"
 
-log "PCA (essential dynamics), last 200 ns"
+log "PCA (essential dynamics), after the first $(( SKIP_PS / 1000 )) ns"
 printf 'C-alpha\nC-alpha\n' | gmx covar  -s ../prod.tpr -f clean.xtc -n ../index.ndx \
-                                         -o eigenval.xvg -v eigenvec.trr -b 50000 >/dev/null
+                                         -o eigenval.xvg -v eigenvec.trr -b "$SKIP_PS" >/dev/null
 printf 'C-alpha\nC-alpha\n' | gmx anaeig -s ../prod.tpr -f clean.xtc -n ../index.ndx \
-                                         -v eigenvec.trr -first 1 -last 1 -proj pc1.xvg -b 50000 >/dev/null
+                                         -v eigenvec.trr -first 1 -last 1 -proj pc1.xvg -b "$SKIP_PS" >/dev/null
 
 if [ "$HAS_RNA" = "yes" ]; then
   log "RNA-specific analysis"

@@ -1,0 +1,19 @@
+# RNA sequences built by scripts/00_build_inputs.py by in-place mutation of the
+# cocrystal hairpin. One row per RNA-bound system built from the cocrystal.
+#
+# rna_chain  chain ID in the BUILT file (RNA chains are renamed R, S, ... in order)
+# target     5'->3' over the RESOLVED nucleotides of that chain only, same length
+#            as `00_build_inputs.py show <PDBID>` prints. '.' keeps a position.
+#            'native' keeps the crystal sequence. TODO blocks the build.
+# note       where the sequence comes from (paper, design file, commit)
+#
+name	rna_chain	target	note
+S3_cp_operator	R	native	WT operator exactly as crystallised
+S4_cp_pacdesign	R	TODO	designed pac hairpin
+S5_cp_scramble	R	TODO	scrambled / non-cognate control, same length and GC content
+S7_cal_var01	R	TODO	literature variant (cite source + Kd)
+S7_cal_var02	R	TODO	literature variant (cite source + Kd)
+S7_cal_var03	R	TODO	literature variant (cite source + Kd)
+S7_cal_var04	R	TODO	literature variant (cite source + Kd)
+S7_cal_var05	R	TODO	literature variant (cite source + Kd)
+S7_cal_u5c	R	TODO	native with U(-5) -> C; tighter than WT

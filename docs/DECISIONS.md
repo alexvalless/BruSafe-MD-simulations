@@ -60,6 +60,45 @@ trenchcoat, and the error bars computed from them are fiction.
 
 ---
 
+## 2026-10-04 — Shorter campaign: HMR at 4 fs, 100 ns apo / 5 × 30 ns complexes
+
+**Problem.** Nine days to the model deadline, and production runs on shared
+school machines that are not ours around the clock. 3 × 250 ns per system no
+longer fits.
+
+**Decision.**
+1. *Lengths follow the claim, not a uniform number.* Apo systems that carry
+   PCA / RMSF comparisons (S1, S2, S6): 3 × 100 ns. RNA complexes that feed
+   MM/PBSA ΔΔG (S3–S5, S9): 5 × 30 ns; calibration variants (S7): 3 × 30 ns.
+   For MM/PBSA, many short independent replicas give better-converged and more
+   honest error bars than one long trajectory (ensemble approach, e.g. ESMACS,
+   Wan et al.), because the uncertainty is dominated by replica-to-replica
+   spread. PCA overlap needs longer single trajectories, which is why the apo
+   systems keep 100 ns.
+2. *Hydrogen mass repartitioning, dt = 4 fs.* Hydrogen masses ×3 (3.024 Da),
+   taken from the bonded heavy atom; water untouched; h-bond constraints as
+   before. Written into the topology by `scripts/hmr_top.py` because
+   `mass-repartition-factor` only exists from GROMACS 2024. NVT heating stays at
+   2 fs. grompp prints a NOTE that some heavy-atom bonds oscillate faster than
+   10 × dt; this is expected with HMR at 4 fs and is a note, not a warning.
+3. *Box padding 1.0 nm* (was 1.2). Periodic images stay ≥ 2.0 nm apart, above
+   the 1.2 nm cutoff. S8 (free hairpin) keeps 1.2 nm (`BRUSAFE_BOX_PAD=1.2`).
+   CHARMM-GUI builds use its octahedral box with 10 Å edge distance.
+4. *Unrestrained NPT 2 ns* (was 5). The first `skip_ns` of every production run
+   (registry column: 10 ns apo, 5 ns complexes) is discarded before any analysis,
+   RMSF, PCA and MM/PBSA alike.
+
+**Alternative rejected.** A uniform 20 ns for every system. Cheap, but PCA
+subspace overlap does not converge on 20 ns, and "limited compute" is not a
+justification a judge accepts; convergence evidence is.
+
+**Consequence to track.** Every claim reports its convergence check
+(`convergence.py block`, first-half vs second-half of the analysed window). Any
+replica started under the old 2 fs / 1.2 nm protocol is rerun, never mixed with
+the new ones.
+
+---
+
 ## TEMPLATE
 
 ## YYYY-MM-DD — <decision>
