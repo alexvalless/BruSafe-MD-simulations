@@ -1,0 +1,18 @@
+# Force LF line endings on every platform. Git for Windows otherwise converts
+# shell scripts to CRLF and bash fails with "$'\r': command not found".
+* text=auto eol=lf
+
+*.sh   text eol=lf
+*.py   text eol=lf
+*.mdp  text eol=lf
+*.tsv  text eol=lf
+*.top  text eol=lf
+*.itp  text eol=lf
+*.ndx  text eol=lf
+*.in   text eol=lf
+*.md   text eol=lf
+
+*.gz   binary
+*.zip  binary
+*.pdf  binary
+*.png  binary

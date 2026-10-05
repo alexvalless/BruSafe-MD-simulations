@@ -60,6 +60,20 @@ trenchcoat, and the error bars computed from them are fiction.
 
 ---
 
+## 2026-10-03 — Windows (Git Bash) as a supported platform
+
+**Decision.** The pipeline also runs on lab machines where WSL cannot be
+enabled, using Git Bash plus one portable CUDA build of GROMACS copied to
+every machine. Setup in `docs/WINDOWS.md`.
+
+**Consequence to track.** On Windows `-pin on` is dropped from the mdrun
+flags because GROMACS does not support thread pinning there. Pinning changes
+speed, not the trajectory physics, so replicas stay comparable as long as the
+GROMACS version is identical everywhere (`00_env.sh` records it). MM/PBSA
+stays on Linux/WSL/macOS.
+
+---
+
 ## TEMPLATE
 
 ## YYYY-MM-DD — <decision>
