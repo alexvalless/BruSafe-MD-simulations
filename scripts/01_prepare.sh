@@ -60,9 +60,18 @@ if [ "$SOURCE" = "charmm-gui" ]; then
 else
   [ -f "$IN/$SYS.pdb" ] || die "expected $IN/$SYS.pdb"
 
+  check_ff "$FF"
+
+  # -ter asks questions on the terminal. Git Bash's default window (mintty)
+  # does not pass keyboard input to native Windows programs; winpty fixes it.
+  WINPTY=""
+  if [ "$BRUSAFE_OS" = windows ] && [ -t 0 ] && command -v winpty >/dev/null 2>&1; then
+    WINPTY="winpty"
+  fi
+
   # 15 = CHARMM36 in the standard pdb2gmx menu ordering; -ter interactive so you
   # consciously choose termini rather than accepting a default you never saw.
-  gmx pdb2gmx -f "$IN/$SYS.pdb" -o proc.gro -p topol.top -i posre.itp \
+  $WINPTY "$GMX_BIN" pdb2gmx -f "$IN/$SYS.pdb" -o proc.gro -p topol.top -i posre.itp \
               -water tip3p -ff "$FF" -ignh -ter
 fi
 
@@ -77,7 +86,7 @@ if [ ! -f solv_ions.gro ]; then
            n = (a == "OW") ? "OH2" : (a == "HW1") ? "H1" : (a == "HW2") ? "H2" : a
            $0 = substr($0, 1, 5) "TIP3 " sprintf("%5s", n) substr($0, 16) }
          { print }' solv.gro > solv.tmp && mv solv.tmp solv.gro
-    sed -i.bak -E 's/^SOL([[:space:]]+[0-9]+)$/TIP3\1/' topol.top && rm -f topol.top.bak
+    sed -i.bak -E 's/^SOL([[:space:]]+[0-9]+[[:space:]]*)$/TIP3\1/' topol.top && rm -f topol.top.bak
     WATER=TIP3
   fi
 
@@ -94,13 +103,13 @@ if [ ! -f solv_ions.gro ]; then
     # (mindist_mg.xvg), which flags Mg2+ sitting in the binding interface.
     # ---------------------------------------------------------------------
     log "WARNING: genion Mg2+ placement is arbitrary and will not equilibrate"
-    printf '%s\n' "$WATER" | gmx genion -s ions.tpr -o mg.gro -p topol.top \
+    printf '%s\n' "$WATER" | gmx genion -seed 2026 -s ions.tpr -o mg.gro -p topol.top \
                                 -pname MG -pq 2 -np "$MG"
     gmx grompp -f "$MDP/em.mdp" -c mg.gro -p topol.top -o ions2.tpr -maxwarn 1
-    printf '%s\n' "$WATER" | gmx genion -s ions2.tpr -o solv_ions.gro -p topol.top \
+    printf '%s\n' "$WATER" | gmx genion -seed 2026 -s ions2.tpr -o solv_ions.gro -p topol.top \
                                 -pname POT -nname CLA -conc 0.15 -neutral
   else
-    printf '%s\n' "$WATER" | gmx genion -s ions.tpr -o solv_ions.gro -p topol.top \
+    printf '%s\n' "$WATER" | gmx genion -seed 2026 -s ions.tpr -o solv_ions.gro -p topol.top \
                                 -pname POT -nname CLA -conc 0.15 -neutral
   fi
 fi
@@ -109,7 +118,7 @@ fi
 # Written into the local topology files (never the GMXLIB force field), so it
 # works on any GROMACS version and dt = 4 fs is safe in every mdp. Skips itself
 # if the topology is already repartitioned (e.g. CHARMM-GUI's HMR option).
-python3 "$REPO/scripts/hmr_top.py" topol.top
+pyrun "$REPO/scripts/hmr_top.py" topol.top
 
 # ---- index groups -----------------------------------------------------------
 # TWO sources, concatenated. Both are needed and neither is optional:

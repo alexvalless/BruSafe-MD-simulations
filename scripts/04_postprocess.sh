@@ -62,6 +62,6 @@ if [ "$HAS_RNA" = "yes" ]; then
 fi
 
 log "convergence"
-python3 "$REPO/analysis/convergence.py" block  rmsd_backbone.xvg | tail -4
-python3 "$REPO/analysis/convergence.py" cosine pc1.xvg
+pyrun "$REPO/analysis/convergence.py" block  rmsd_backbone.xvg | tail -4
+pyrun "$REPO/analysis/convergence.py" cosine pc1.xvg
 log "done: $A"
