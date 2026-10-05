@@ -25,14 +25,19 @@ config/systems.tsv     the registry: what runs, how many replicas, and why
 config/rna_designs.tsv RNA sequence of each RNA-bound system (in-place mutation)
 input/                 starting structures and CHARMM-GUI builds (committed)
 mdp/                   em, nvt, npt, npt_free, prod 
-scripts/               build inputs → prepare → equilibrate → produce → postprocess
+scripts/               build inputs → prepare → equilibrate → produce → postprocess, run_night.sh
 analysis/              convergence checks and cross-system comparison
 mmpbsa/                Binding energetics
-docs/                  decision log, predictions, topology guide, env dumps
+docs/                  decision log, predictions, tutorial, TOPOLOGIES.md, WINDOWS.md, env dumps
 ```
 
 Trajectories are gitignored. Commit `.mdp`, `.top`, `.itp`, `.ndx`, scripts and
 analysis output. 
+
+## Platforms
+
+Linux or WSL (preferred), macOS (CPU only, for prep and analysis), and
+Windows Git Bash without admin rights — see `docs/WINDOWS.md`.
 
 ## Quickstart
 

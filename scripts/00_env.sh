@@ -8,13 +8,16 @@ source "$(dirname "$0")/lib.sh"
 OUT="$REPO/docs/env_$(hostname).txt"
 {
   echo "host        : $(hostname)"
-  echo "date        : $(date -Is)"
-  echo "kernel      : $(uname -r)"
-  echo "cpu         : $(grep -m1 'model name' /proc/cpuinfo | cut -d: -f2- | xargs)"
-  echo "cores       : $(nproc)"
+  echo "date        : $(now_iso)"
+  echo "os          : $BRUSAFE_OS ($(uname -s) $(uname -r))"
+  echo "cpu         : $( (grep -m1 'model name' /proc/cpuinfo 2>/dev/null | cut -d: -f2- | xargs) || sysctl -n machdep.cpu.brand_string 2>/dev/null || echo unknown)"
+  echo "cores       : $(ncpu)"
+  echo "python      : ${PY:-NOT FOUND} $( [ -n "$PY" ] && pyrun -c 'import sys; print(sys.version.split()[0])' )"
+  echo "numpy       : $( [ -n "$PY" ] && pyrun -c 'import numpy; print(numpy.__version__)' 2>/dev/null || echo NOT FOUND)"
   echo
   echo "--- gromacs ---"
-  gmx --version 2>/dev/null | sed -n '1,25p' || echo "gmx NOT FOUND"
+  echo "binary: $GMX_BIN"
+  gmx --version 2>/dev/null | tr -d '\r' | sed -n '1,25p' || echo "gmx NOT FOUND"
   echo
   echo "--- gpu ---"
   nvidia-smi --query-gpu=name,driver_version,memory.total,power.limit \

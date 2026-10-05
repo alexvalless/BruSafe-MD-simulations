@@ -51,7 +51,7 @@ log "gate: density / temperature / pressure"
 printf 'Density\n\n'     | gmx energy -f npt_free.edr -o density.xvg     >/dev/null 2>&1
 printf 'Temperature\n\n' | gmx energy -f npt_free.edr -o temperature.xvg >/dev/null 2>&1
 printf 'Pressure\n\n'    | gmx energy -f npt_free.edr -o pressure.xvg    >/dev/null 2>&1
-python3 "$REPO/analysis/convergence.py" gate \
+pyrun "$REPO/analysis/convergence.py" gate \
   --density density.xvg --temperature temperature.xvg --ref-t 310 \
   || die "equilibration gate FAILED for $SYS rep$REP -- do not start production"
 

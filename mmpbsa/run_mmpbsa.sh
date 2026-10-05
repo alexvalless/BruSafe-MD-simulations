@@ -6,6 +6,7 @@
 
 set -euo pipefail
 source "$(dirname "$0")/../scripts/lib.sh"
+[ "$BRUSAFE_OS" != windows ] || die "gmx_MMPBSA (AmberTools) does not run on native Windows -- use Linux, WSL or macOS for M3.5"
 need gmx_MMPBSA
 
 SYS="${1:?usage: run_mmpbsa.sh <system> <replica> [indi]}"
