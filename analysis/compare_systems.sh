@@ -24,9 +24,9 @@ log "overlap.xvg written -- >0.7 over the first 10 eigenvectors supports"
 log "'same essential dynamics'; <0.5 means the linker changed something real"
 
 log "replica agreement within each system"
-python3 "$REPO/analysis/convergence.py" replicas "$RUNS/$A"/rep*/analysis/rmsf_ca.xvg \
+pyrun "$REPO/analysis/convergence.py" replicas "$RUNS/$A"/rep*/analysis/rmsf_ca.xvg \
   > rmsf_agreement_"$A".txt
-python3 "$REPO/analysis/convergence.py" replicas "$RUNS/$B"/rep*/analysis/rmsf_ca.xvg \
+pyrun "$REPO/analysis/convergence.py" replicas "$RUNS/$B"/rep*/analysis/rmsf_ca.xvg \
   > rmsf_agreement_"$B".txt
 cat rmsf_agreement_"$A".txt rmsf_agreement_"$B".txt
 

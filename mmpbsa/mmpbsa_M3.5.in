@@ -1,0 +1,89 @@
+; ============================================================================
+; M3.5 — CP dimer : pac hairpin binding energetics
+; gmx_MMPBSA input (Valdés-Tresanco et al.). Verify flag names against
+; `gmx_MMPBSA --help` for YOUR installed version — several moved between
+; 1.4 / 1.5 / 1.6, especially the entropy keywords.
+;
+; Run:
+;   mpirun -np 8 gmx_MMPBSA MPI -O -i mmpbsa.in \
+;     -cs complex.tpr -ci index.ndx -cg <protein_grp> <rna_grp> \
+;     -ct complex_nopbc_nowat.xtc -cp topol.top \
+;     -o FINAL_RESULTS.dat -eo FINAL_RESULTS.csv \
+;     -do FINAL_DECOMP.dat -deo FINAL_DECOMP.csv
+;
+; PREREQUISITE — trajectory must be PBC-clean or every number is garbage:
+;   gmx trjconv -s prod.tpr -f prod.xtc -pbc whole -o w.xtc
+;   gmx trjconv -s prod.tpr -f w.xtc  -pbc nojump -o nj.xtc
+;   gmx trjconv -s prod.tpr -f nj.xtc -center -pbc mol -ur compact \
+;               -n index.ndx -o complex_nopbc.xtc
+;   (then strip SOL/ions — implicit solvent, they must not be present)
+; ============================================================================
+
+&general
+  sys_name              = "CP2_pacWT"
+  startframe            = 2500        ; skip the first 50 ns of a 100 ns run
+  endframe              = 10000
+  interval              = 8           ; ~940 frames; more is not more information
+  temperature           = 310.0
+
+  ; --- radii ---
+  ; LOCKED: CHARMM36m -> PBRadii = 7 (charmm_radii). Do not change.
+  ; AMBER ff99SB-ILDN   -> PBRadii = 3  (mbondi2)
+  PBRadii               = 7
+
+  ; --- entropy ---
+  ; Interaction entropy: cheap, but noisy for highly charged complexes.
+  ; Run it, report it separately, and NEVER fold it silently into "ΔG".
+  ; Do not attempt normal-mode (nmode) on a 258-res + 19-nt system.
+  interaction_entropy   = 1
+  ie_segment            = 25
+  c2_entropy            = 1
+
+  verbose               = 2
+/
+
+; ---------------------------------------------------------------------------
+; PB is the primary number for a protein–RNA complex.
+; GB is run alongside only as an internal consistency check — generalized Born
+; handles the RNA phosphate backbone badly and tends to inflate electrostatic
+; discrimination. If PB and GB disagree by more than a few kcal/mol on ΔΔG,
+; trust neither until you understand why.
+; ---------------------------------------------------------------------------
+
+&pb
+  istrng                = 0.150       ; MUST match your MD salt concentration
+  indi                  = 4.0         ; interior dielectric — see note below
+  exdi                  = 80.0
+  inp                   = 2           ; SASA + dispersion nonpolar model
+  radiopt               = 0           ; use the topology radii, not optimised
+  fillratio             = 4.0
+/
+
+&gb
+  igb                   = 2           ; OBC(I)
+  saltcon               = 0.150
+/
+
+; ---------------------------------------------------------------------------
+; Per-residue decomposition: the cheapest validation you have. The hot spots
+; it returns should recover the known operator-contact residues of MS2 CP.
+; If they don't, the setup is wrong — stop before interpreting any ΔG.
+; ---------------------------------------------------------------------------
+
+&decomposition
+  idecomp               = 2           ; per-residue, backbone/sidechain split
+  dec_verbose           = 0
+  print_res             = "within 5"
+/
+
+; ============================================================================
+; SENSITIVITY RUNS — do these, don't skip them
+;
+; indi (interior dielectric) is the single largest lever on a charged
+; protein–RNA interface. Repeat the whole calculation at indi = 1, 2, 4 and
+; report the spread as part of your error bar. If your conclusion flips
+; between indi = 2 and indi = 4, you do not have a conclusion.
+;
+; Also repeat with startframe shifted (e.g. 5000–10000 vs 2500–7500) to show
+; the estimate is not an artefact of one stretch of trajectory.
+; ============================================================================
