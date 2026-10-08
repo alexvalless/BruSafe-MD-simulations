@@ -17,6 +17,7 @@ No third-party dependencies.
 from __future__ import annotations
 
 import argparse
+import datetime
 import pathlib
 import re
 import sys
@@ -130,7 +131,7 @@ STEP = re.compile(r"^\s+Step\s+Time\s*$")
 
 
 def scan(runs: pathlib.Path, rows: list[dict]) -> None:
-    print(f"{'system':<20}{'rep':<5}{'stage':<14}{'progress':<12}{'ns/day':<9}")
+    print(f"{'system':<20}{'rep':<5}{'stage':<14}{'progress':<15}{'ns/day':<9}")
     print("-" * 72)
     missing = []
     for r in rows:
@@ -138,10 +139,10 @@ def scan(runs: pathlib.Path, rows: list[dict]) -> None:
             d = runs / r["name"] / f"rep{rep}"
             if not d.exists():
                 missing.append(f"{r['name']}/rep{rep}")
-                print(f"{r['name']:<20}{rep:<5}{'NOT STARTED':<14}{'-':<12}{'-':<9}")
+                print(f"{r['name']:<20}{rep:<5}{'NOT STARTED':<14}{'-':<15}{'-':<9}")
                 continue
             stage, prog, perf = inspect(d, int(r["ns"]))
-            print(f"{r['name']:<20}{rep:<5}{stage:<14}{prog:<12}{perf:<9}")
+            print(f"{r['name']:<20}{rep:<5}{stage:<14}{prog:<15}{perf:<9}")
     print("-" * 72)
     if missing:
         print(f"{len(missing)} replica(s) never launched:")
@@ -155,8 +156,9 @@ def inspect(d: pathlib.Path, target_ns: int) -> tuple[str, str, str]:
     if (d / "prod.gro").exists():
         log = d / "prod.log"
         perf = "-"
-        if log.exists():
-            for line in log.read_text(errors="ignore").splitlines():
+        text = read_text_safe(log)
+        if text:
+            for line in text.splitlines():
                 m = PERF.match(line)
                 if m:
                     perf = m.group(1)
@@ -166,17 +168,43 @@ def inspect(d: pathlib.Path, target_ns: int) -> tuple[str, str, str]:
         if (d / gro).exists():
             if stage == "prod":
                 ns = last_ns(d / "prod.log")
-                pct = f"{ns:.0f}/{target_ns} ns" if ns is not None else "running"
+                if ns is not None:
+                    pct = f"{ns:.0f}/{target_ns} ns"
+                else:
+                    # Windows keeps prod.log locked while mdrun runs; fall back
+                    # to the wall-clock time since PROVENANCE.txt "started".
+                    h = hours_since_start(d / "PROVENANCE.txt")
+                    pct = f"running {h:.1f}h" if h is not None else "running"
                 return "prod", pct, "-"
             return stage, "equil", "-"
     return "empty", "-", "-"
 
 
+def read_text_safe(path: pathlib.Path) -> str:
+    """File contents, or "" if it is missing or locked (Windows keeps the
+    mdrun log locked while the run is going)."""
+    try:
+        return path.read_text(errors="ignore")
+    except OSError:
+        return ""
+
+
+def hours_since_start(prov: pathlib.Path) -> float | None:
+    text = read_text_safe(prov)
+    m = re.search(r"^started\s*:\s*(\S+)", text, re.M)
+    if not m:
+        return None
+    try:
+        t0 = datetime.datetime.fromisoformat(m.group(1))
+    except ValueError:
+        return None
+    now = datetime.datetime.now(t0.tzinfo) if t0.tzinfo else datetime.datetime.now()
+    return max(0.0, (now - t0).total_seconds() / 3600)
+
+
 def last_ns(log: pathlib.Path) -> float | None:
     """Last simulation time reported in an mdrun log, in ns."""
-    if not log.exists():
-        return None
-    lines = log.read_text(errors="ignore").splitlines()
+    lines = read_text_safe(log).splitlines()
     for i in range(len(lines) - 1, 0, -1):
         if STEP.match(lines[i]):
             parts = lines[i + 1].split() if i + 1 < len(lines) else []
