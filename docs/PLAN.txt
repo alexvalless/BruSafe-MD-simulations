@@ -1,0 +1,57 @@
+machine  jobs  cost (ns-eq)  est. days  
+------------------------------------------------------------------------
+gpu0     2     157           0.3        
+gpu1     1     103           0.2        
+gpu2     1     103           0.2        
+gpu3     1     103           0.2        
+gpu4     1     103           0.2        
+gpu5     1     103           0.2        
+gpu6     1     103           0.2        
+gpu7     1     103           0.2        
+gpu8     1     103           0.2        
+gpu9     2     139           0.2        
+gpu10    2     139           0.2        
+gpu11    2     139           0.2        
+gpu12    2     107           0.2        
+gpu13    2     107           0.2        
+gpu14    2     107           0.2        
+------------------------------------------------------------------------
+aggregate 1721 ns-eq | makespan 0.3 days at 580 ns/day/GPU
+
+# ---- gpu0 ----
+gpu0	S1_wt_cc_apo	1	100	Reference baseline for all RMSF/PCA comparisons
+gpu0	S9_sccp_pac	5	30	Does the linker perturb RNA binding? ddG vs S4
+# ---- gpu1 ----
+gpu1	S1_wt_cc_apo	2	100	Reference baseline for all RMSF/PCA comparisons
+# ---- gpu2 ----
+gpu2	S1_wt_cc_apo	3	100	Reference baseline for all RMSF/PCA comparisons
+# ---- gpu3 ----
+gpu3	S2_sccp_apo	1	100	M0/M1 - does the linker perturb the dimer fold?
+# ---- gpu4 ----
+gpu4	S2_sccp_apo	2	100	M0/M1 - does the linker perturb the dimer fold?
+# ---- gpu5 ----
+gpu5	S2_sccp_apo	3	100	M0/M1 - does the linker perturb the dimer fold?
+# ---- gpu6 ----
+gpu6	S6_wt_ab_apo	1	100	FG-loop switch -> M3 quasi-equivalence
+# ---- gpu7 ----
+gpu7	S6_wt_ab_apo	2	100	FG-loop switch -> M3 quasi-equivalence
+# ---- gpu8 ----
+gpu8	S6_wt_ab_apo	3	100	FG-loop switch -> M3 quasi-equivalence
+# ---- gpu9 ----
+gpu9	S8_pac_free	1	50	Free pac hairpin from the bound pose; pre-organisation penalty
+gpu9	S9_sccp_pac	2	30	Does the linker perturb RNA binding? ddG vs S4
+# ---- gpu10 ----
+gpu10	S8_pac_free	2	50	Free pac hairpin from the bound pose; pre-organisation penalty
+gpu10	S9_sccp_pac	3	30	Does the linker perturb RNA binding? ddG vs S4
+# ---- gpu11 ----
+gpu11	S8_pac_free	3	50	Free pac hairpin from the bound pose; pre-organisation penalty
+gpu11	S9_sccp_pac	4	30	Does the linker perturb RNA binding? ddG vs S4
+# ---- gpu12 ----
+gpu12	S4_cp_pacdesign	1	30	pac complex (1ZDH RNA); MM/PBSA reference for the S9 linker ddG
+gpu12	S4_cp_pacdesign	4	30	pac complex (1ZDH RNA); MM/PBSA reference for the S9 linker ddG
+# ---- gpu13 ----
+gpu13	S4_cp_pacdesign	2	30	pac complex (1ZDH RNA); MM/PBSA reference for the S9 linker ddG
+gpu13	S4_cp_pacdesign	5	30	pac complex (1ZDH RNA); MM/PBSA reference for the S9 linker ddG
+# ---- gpu14 ----
+gpu14	S4_cp_pacdesign	3	30	pac complex (1ZDH RNA); MM/PBSA reference for the S9 linker ddG
+gpu14	S9_sccp_pac	1	30	Does the linker perturb RNA binding? ddG vs S4
