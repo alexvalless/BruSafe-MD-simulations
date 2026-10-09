@@ -68,10 +68,43 @@ if [ "$HAS_RNA" = "yes" ]; then
   # ---- Mg2+ sanity check ------------------------------------------------
   # Mg2+ does not equilibrate on this timescale. If an ion has parked itself
   # in the protein-RNA interface, every energy downstream is contaminated.
-  log "Mg2+ interface check -- inspect mindist_mg.xvg by eye"
-  printf 'MG\nSOLU\n' | gmx_timeout 300 mindist -s ../prod.tpr -f clean.xtc -n ../index.ndx \
-                                    -od mindist_mg.xvg > mindist.log 2>&1 \
-    || log "Mg2+ distance check skipped (no MG group, or see $A/mindist.log)"
+  # Uses the RAW prod.xtc: clean.xtc holds only the SOLU group, and the ions
+  # (MG) are not in it, so any MG group is beyond the end of that trajectory
+  # (the old `gmx mindist -f clean.xtc` read out of range and segfaulted).
+  # `gmx pairdist` takes the minimum image for every pair, so unwrapped
+  # molecules are fine. It gives the minimum distance of EACH ion to the RNA
+  # and to the protein.
+  log "Mg2+ interface check -- per-ion distance to RNA and to protein"
+  if grep -q '\[ MG \]' ../index.ndx; then
+    : > mindist.log
+    gmx_timeout 900 pairdist -s ../prod.tpr -f ../prod.xtc -n ../index.ndx \
+        -ref 'group "MG"' -sel 'group "RNA"' -refgrouping none -type min \
+        -o mindist_mg_rna.xvg >> mindist.log 2>&1 \
+      || log "Mg2+ to RNA distances skipped (see $A/mindist.log)"
+    if grep -q '\[ Protein \]' ../index.ndx; then
+      gmx_timeout 900 pairdist -s ../prod.tpr -f ../prod.xtc -n ../index.ndx \
+          -ref 'group "MG"' -sel 'group "Protein"' -refgrouping none -type min \
+          -o mindist_mg_protein.xvg >> mindist.log 2>&1 \
+        || log "Mg2+ to protein distances skipped (see $A/mindist.log)"
+      if [ -s mindist_mg_rna.xvg ] && [ -s mindist_mg_protein.xvg ]; then
+        # columns: time, then one distance (nm) per ion; both files have the same frames
+        paste <(grep -v '^[#@]' mindist_mg_rna.xvg | tr -d '\r') \
+              <(grep -v '^[#@]' mindist_mg_protein.xvg | tr -d '\r') \
+          | awk -v cut=0.5 '
+              { n = NF / 2 - 1; N = n; F = NR
+                for (i = 1; i <= n; i++) {
+                  r = $(1 + i); p = $(n + 2 + i)
+                  if (r < cut) nr[i]++; if (p < cut) np[i]++; if (r < cut && p < cut) both[i]++ } }
+              END { printf "# fraction of %d frames with the ion within %.1f nm of the RNA / the protein / BOTH\n", F, cut
+                    print "# ion    RNA  protein   BOTH   (BOTH > 0: the ion sits at the protein-RNA interface)"
+                    for (i = 1; i <= N; i++) printf "%5d  %5.2f  %7.2f  %5.2f\n", i, nr[i]/F, np[i]/F, both[i]/F }' \
+          > mg_interface.txt
+        log "Mg2+ interface table: $A/mg_interface.txt"
+      fi
+    fi
+  else
+    log "no MG group -- skipping (fine for apo systems)"
+  fi
 fi
 
 log "convergence"

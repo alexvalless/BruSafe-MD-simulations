@@ -314,8 +314,10 @@ gmx make_ndx -f runs/<sys>/build/solv_ions.gro \
              -n runs/<sys>/build/index.ndx -o runs/<sys>/build/index.ndx
 ```
 
-**Mg²⁺ in the interface.** `04_postprocess.sh` writes `mindist_mg.xvg` for
-RNA systems. Look at it. Mg²⁺ water exchange takes microseconds, so on a 30–100 ns
+**Mg²⁺ in the interface.** `04_postprocess.sh` writes `mg_interface.txt` for
+RNA systems (fraction of frames each ion is within 0.5 nm of the RNA, of the
+protein, and of both; BOTH > 0 means it sits at the interface), plus the raw
+`mindist_mg_rna.xvg` / `mindist_mg_protein.xvg`. Look at it. Mg²⁺ water exchange takes microseconds, so on a 30–100 ns
 trajectory the ions sit essentially where you placed them — they do not
 equilibrate, and random `genion` placement adds noise rather than realism. An
 ion parked in the protein–RNA interface contaminates every M3.5 energy from
