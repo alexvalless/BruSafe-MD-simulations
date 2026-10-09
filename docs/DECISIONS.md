@@ -216,16 +216,18 @@ has no crystallographic sites: check `mindist_mg.xvg` for ions in the interface.
 
 ---
 
-## 2026-10-09 — Windows build of GROMACS 2026.3: `mindist` replaced, `hbond` reworked
+## 2026-10-09 — Post-processing fixes found on the first Windows run (GROMACS 2026.3)
 
-Found running the post-processing of S4 rep1 on a school PC:
-- `gmx mindist` segfaults at frame 0 in this Windows build, and Windows then
-  keeps the dead process open, so the script waited on it for a day. The Mg²⁺
-  check now uses `gmx pairdist` (per-ion minimum distance to RNA and to
-  protein) and writes `mg_interface.txt`; same question, different tool.
+Found running `04_postprocess.sh` on S4 rep1 on a school PC:
+- The Mg²⁺ check ran `gmx mindist` on `clean.xtc`, which holds only the SOLU
+  group; the ions are not in it, so the MG group lies beyond the end of that
+  trajectory. The tool read out of range and segfaulted, and Windows kept the
+  dead process open for a day. The check now reads the raw `prod.xtc` with
+  `gmx pairdist` (per-ion minimum distance to RNA and to protein) and writes
+  `mg_interface.txt`. It was never valid on `clean.xtc`, on any platform.
 - `gmx hbond` is selection-based from GROMACS 2024 on; the count is now
-  protein–RNA (RNA only for the free hairpin) with fallbacks to the older tools.
-- Optional steps run under a 5-minute limit (`gmx_timeout`) so a hang cannot
+  protein–RNA (RNA only for the free hairpin), with fallbacks to older tools.
+- Optional steps run under a time limit (`gmx_timeout`), so a hang cannot
   block the rest of a night.
 
 All are analysis-only; no simulation or energy is affected.
