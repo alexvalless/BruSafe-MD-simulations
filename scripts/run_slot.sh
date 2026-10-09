@@ -68,6 +68,11 @@ while IFS=$'\t' read -r SYS REP; do
   fi
 done <<< "$JOBS"
 
+# pack whatever finished (and copy to OneDrive if it is set up); never fatal
+"$REPO/scripts/pack_results.sh" > "$RUNS/pack_slot${SLOT}.log" 2>&1 \
+  && log "results packed (see pack/ and $RUNS/pack_slot${SLOT}.log)" \
+  || log "packing failed (see $RUNS/pack_slot${SLOT}.log); run ./scripts/pack_results.sh by hand"
+
 log "slot $SLOT done in $(awk -v t0="$T0" -v now="$(date +%s)" 'BEGIN{printf "%.1f", (now - t0) / 3600}') h"
 if [ -n "$FAILED" ]; then log "NOT completed:$FAILED"; exit 1; fi
 log "all jobs of slot $SLOT completed"

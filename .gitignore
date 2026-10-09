@@ -28,3 +28,6 @@ __pycache__/
 # local caches
 .DS_Store
 input/_pdb/
+
+# packed results for upload
+pack/
