@@ -16,8 +16,9 @@
 #                                  big (about 1 GB), for backup only.
 #   SHA256SUMS.txt                 checksums of every archive.
 #
-# If a OneDrive folder is found (~/OneDrive*), the archives are copied to
-# <OneDrive>/BruSafe-MD/<hostname>/ ; otherwise upload the pack/<hostname>
+# If a OneDrive folder is found (the Tec one, "OneDrive - Instituto Tecnologico
+# y de Estudios Superiores de Monterrey", is preferred over any other), the
+# archives are copied to <OneDrive>/BruSafe-MD/<hostname>/ ; otherwise upload the pack/<hostname>
 # folder from the browser (onedrive.live.com / the Tec Microsoft 365 page).
 # Override the destination with BRUSAFE_PACK_DEST=/path.
 set -euo pipefail
@@ -30,7 +31,9 @@ mkdir -p "$OUTDIR"
 
 DEST="${BRUSAFE_PACK_DEST:-}"
 if [ -z "$DEST" ]; then
-  for od in "$HOME"/OneDrive*; do
+  # prefer the Tec account ("OneDrive - Instituto Tecnologico y de Estudios
+  # Superiores de Monterrey"), then any other OneDrive folder
+  for od in "$HOME"/OneDrive*Monterrey* "$HOME"/OneDrive*; do
     [ -d "$od" ] && { DEST="$od/BruSafe-MD/$HOST"; break; }
   done
 fi
