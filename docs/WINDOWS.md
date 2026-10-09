@@ -82,13 +82,14 @@ Same commands as everywhere else. Once per system, before the first night
 through pdb2gmx and do):
 
 ```bash
-./scripts/01_prepare.sh S4_cp_pacdesign --source charmm-gui
-./scripts/01_prepare.sh S8_pac_free --source charmm-gui
+./scripts/01_prepare.sh S4_cp_pacdesign --source charmm-gui --replica 2
+./scripts/01_prepare.sh S8_pac_free --source charmm-gui --replica 1
 ```
 
-Ion placement uses a fixed seed, so every machine with the same GROMACS build
-gets an identical `runs/<system>/build/`; replicas then differ only by their
-velocity seed, as they should. For overnight work:
+Ion placement is seeded per replica (`build_rep<N>`), so a given replica builds
+identically on every machine with the same GROMACS build, and different
+replicas have different ion positions as well as different velocities.
+`run_slot.sh` does this step for you; to do it by hand use `--replica N`. For overnight work:
 
 ```bash
 ./scripts/run_night.sh S1_wt_cc_apo 1 11

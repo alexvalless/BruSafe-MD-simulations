@@ -12,15 +12,16 @@ need gmx
 
 SYS="${1:?usage: 02_equilibrate.sh <system> <replica>}"
 REP="${2:?usage: 02_equilibrate.sh <system> <replica>}"
-BUILD="$RUNS/$SYS/build"
+BUILD="$(build_dir "$SYS" "$REP")"
 D="$RUNS/$SYS/rep$REP"
-[ -f "$BUILD/solv_ions.gro" ] || die "run 01_prepare.sh $SYS first"
+[ -f "$BUILD/solv_ions.gro" ] || die "run 01_prepare.sh $SYS --replica $REP first"
 mkdir -p "$D"; cd "$D"
 guard_existing "$D"
 
 SEED="$(replica_seed "$SYS" "$REP")"
-log "$SYS rep$REP  seed=$SEED"
+log "$SYS rep$REP  seed=$SEED  build=$(basename "$BUILD")"
 echo "$SEED" > seed.txt
+basename "$BUILD" > build_used.txt
 
 cp "$BUILD/topol.top" "$BUILD/index.ndx" .
 cp -r "$BUILD/toppar" . 2>/dev/null || true

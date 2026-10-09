@@ -8,7 +8,7 @@ work and every replica of a system starts from the identical topology.
 ```
 input/<system>/<system>.pdb        built by scripts/00_build_inputs.py      (commit)
 input/<system>/gromacs/            CHARMM-GUI output, RNA systems only      (commit)
-runs/<system>/build/               01_prepare.sh: solvated, ionised, HMR,   (copy to
+runs/<system>/build_rep<N>/        01_prepare.sh --replica N: solvated,     (copy to
                                    index.ndx                                 the GPUs)
 ```
 
