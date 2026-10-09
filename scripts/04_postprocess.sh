@@ -109,6 +109,10 @@ if [ "$HAS_RNA" = "yes" ]; then
 fi
 
 log "convergence"
-pyrun "$REPO/analysis/convergence.py" block  rmsd_backbone.xvg | tail -4
+# one xvg row per frame: skip the same first skip_ns as every other analysis
+FRAME_PS="$(awk -v n="$(mdpval ../prod.mdp nstxout-compressed 2>/dev/null)" -v dt="$(mdpval ../prod.mdp dt 2>/dev/null)" \
+  'BEGIN{ if (n > 0 && dt > 0) print n * dt; else print 10 }')"
+SKIP_ROWS="$(awk -v s="$SKIP_PS" -v f="$FRAME_PS" 'BEGIN{printf "%d", s / f + 0.5}')"
+pyrun "$REPO/analysis/convergence.py" block  rmsd_backbone.xvg --skip "$SKIP_ROWS" | tail -4
 pyrun "$REPO/analysis/convergence.py" cosine pc1.xvg
 log "done: $A"
