@@ -100,7 +100,7 @@ if [ ! -f solv_ions.gro ]; then
     # Random placement therefore adds noise, not realism. Crystallographic
     # sites would be better; 1ZDH has none, so this is documented in
     # docs/DECISIONS.md and 04_postprocess.sh runs the interface check
-    # (mindist_mg.xvg), which flags Mg2+ sitting in the binding interface.
+    # (mg_interface.txt), which flags Mg2+ sitting in the binding interface.
     # ---------------------------------------------------------------------
     log "WARNING: genion Mg2+ placement is arbitrary and will not equilibrate"
     printf '%s\n' "$WATER" | gmx genion -seed 2026 -s ions.tpr -o mg.gro -p topol.top \
