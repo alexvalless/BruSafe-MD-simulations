@@ -60,16 +60,16 @@ if [ "$HAS_RNA" = "yes" ]; then
     HB_SEL=(-r 'group "RNA"');                      HB_GRP='RNA\nRNA\n'
   fi
   HB_IN=(-s ../prod.tpr -f clean.xtc -n ../index.ndx -num hbond_num.xvg)
-  if   gmx hbond "${HB_IN[@]}" "${HB_SEL[@]}" < /dev/null > hbond.log 2>&1; then :
-  elif printf "$HB_GRP" | gmx hbond-legacy "${HB_IN[@]}" >> hbond.log 2>&1; then :
-  elif printf "$HB_GRP" | gmx hbond "${HB_IN[@]}" >> hbond.log 2>&1; then :
+  if   gmx_timeout 300 hbond "${HB_IN[@]}" "${HB_SEL[@]}" < /dev/null > hbond.log 2>&1; then :
+  elif printf "$HB_GRP" | gmx_timeout 300 hbond-legacy "${HB_IN[@]}" >> hbond.log 2>&1; then :
+  elif printf "$HB_GRP" | gmx_timeout 300 hbond "${HB_IN[@]}" >> hbond.log 2>&1; then :
   else log "hydrogen-bond count skipped (see $A/hbond.log); everything else is unaffected"
   fi
   # ---- Mg2+ sanity check ------------------------------------------------
   # Mg2+ does not equilibrate on this timescale. If an ion has parked itself
   # in the protein-RNA interface, every energy downstream is contaminated.
   log "Mg2+ interface check -- inspect mindist_mg.xvg by eye"
-  printf 'MG\nSOLU\n' | gmx mindist -s ../prod.tpr -f clean.xtc -n ../index.ndx \
+  printf 'MG\nSOLU\n' | gmx_timeout 300 mindist -s ../prod.tpr -f clean.xtc -n ../index.ndx \
                                     -od mindist_mg.xvg > mindist.log 2>&1 \
     || log "Mg2+ distance check skipped (no MG group, or see $A/mindist.log)"
 fi
