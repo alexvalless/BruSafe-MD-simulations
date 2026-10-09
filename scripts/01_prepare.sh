@@ -1,7 +1,13 @@
 #!/usr/bin/env bash
 # Build a solvated, ionised, index-tagged system ready for equilibration.
 #
-#   ./01_prepare.sh <system_name> [--source pdb2gmx|charmm-gui]
+#   ./01_prepare.sh <system_name> [--source pdb2gmx|charmm-gui] [--replica N]
+#
+# With --replica N the system is built into runs/<system>/build_repN and the
+# ions are placed with a seed derived from <system>_repN, so every replica has
+# an independent ion placement (ions do not move much in 30-100 ns, so a shared
+# placement would make the replicas not independent). Without it: one shared
+# build in runs/<system>/build with a fixed seed.
 #
 # Input is expected at  input/<system_name>/  containing either
 #   pdb2gmx    : <system_name>.pdb   (cleaned, correct chains, no waters/alt-locs)
@@ -15,9 +21,21 @@ set -euo pipefail
 source "$(dirname "$0")/lib.sh"
 need gmx
 
-SYS="${1:?usage: 01_prepare.sh <system_name> [--source pdb2gmx|charmm-gui]}"
-SOURCE="pdb2gmx"
-[ "${2:-}" = "--source" ] && SOURCE="${3:?--source needs a value}"
+SYS="${1:?usage: 01_prepare.sh <system_name> [--source pdb2gmx|charmm-gui] [--replica N]}"
+shift
+SOURCE="pdb2gmx"; REP=""
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --source)  SOURCE="${2:?--source needs a value}"; shift 2 ;;
+    --replica) REP="${2:?--replica needs a number}"; shift 2 ;;
+    *) die "unknown argument: $1" ;;
+  esac
+done
+if [ -n "$REP" ]; then
+  BUILD_NAME="build_rep$REP"; ION_SEED="$(replica_seed "$SYS" "$REP")"
+else
+  BUILD_NAME="build"; ION_SEED=2026
+fi
 
 # Box padding (nm) from the registry's box_nm column: 1.0 keeps periodic images
 # 2.0 nm apart, above the 1.2 nm cutoff; the free hairpin (S8) gets 1.2.
@@ -26,9 +44,9 @@ FF="${BRUSAFE_FF:-charmm36-jul2022}"
 HAS_RNA="$(sysfield "$SYS" has_rna)"
 MG="$(sysfield "$SYS" mg_count)"
 IN="$REPO/input/$SYS"
-OUT="$RUNS/$SYS/build"
+OUT="$RUNS/$SYS/$BUILD_NAME"
 mkdir -p "$OUT"; cd "$OUT"
-log "preparing $SYS (rna=$HAS_RNA mg=$MG source=$SOURCE pad=${BOX_PAD}nm)"
+log "preparing $SYS in $BUILD_NAME (rna=$HAS_RNA mg=$MG source=$SOURCE pad=${BOX_PAD}nm ion seed=$ION_SEED)"
 
 if [ "$SOURCE" = "charmm-gui" ]; then
   # ---------------------------------------------------------------------
@@ -103,13 +121,13 @@ if [ ! -f solv_ions.gro ]; then
     # (mg_interface.txt), which flags Mg2+ sitting in the binding interface.
     # ---------------------------------------------------------------------
     log "WARNING: genion Mg2+ placement is arbitrary and will not equilibrate"
-    printf '%s\n' "$WATER" | gmx genion -seed 2026 -s ions.tpr -o mg.gro -p topol.top \
+    printf '%s\n' "$WATER" | gmx genion -seed "$ION_SEED" -s ions.tpr -o mg.gro -p topol.top \
                                 -pname MG -pq 2 -np "$MG"
     gmx grompp -f "$MDP/em.mdp" -c mg.gro -p topol.top -o ions2.tpr -maxwarn 1
-    printf '%s\n' "$WATER" | gmx genion -seed 2026 -s ions2.tpr -o solv_ions.gro -p topol.top \
+    printf '%s\n' "$WATER" | gmx genion -seed "$ION_SEED" -s ions2.tpr -o solv_ions.gro -p topol.top \
                                 -pname POT -nname CLA -conc 0.15 -neutral
   else
-    printf '%s\n' "$WATER" | gmx genion -seed 2026 -s ions.tpr -o solv_ions.gro -p topol.top \
+    printf '%s\n' "$WATER" | gmx genion -seed "$ION_SEED" -s ions.tpr -o solv_ions.gro -p topol.top \
                                 -pname POT -nname CLA -conc 0.15 -neutral
   fi
 fi
@@ -158,4 +176,4 @@ for g in $NEED; do
 done
 
 log "built $OUT/solv_ions.gro and $OUT/index.ndx"
-log "next: 02_equilibrate.sh $SYS <replica>"
+log "next: 02_equilibrate.sh $SYS ${REP:-<replica>}"

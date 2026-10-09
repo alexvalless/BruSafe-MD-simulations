@@ -171,7 +171,7 @@ it looks — see §7.
 ## 3. S1 end to end
 
 ```bash
-./scripts/01_prepare.sh     S1_wt_cc_apo      # once per system
+./scripts/01_prepare.sh     S1_wt_cc_apo --replica 1   # once per replica (own ion placement)
 ./scripts/02_equilibrate.sh S1_wt_cc_apo 1    # once per replica
 ```
 
@@ -261,7 +261,7 @@ git add docs/PLAN.txt && git commit -m "campaign plan, tier 1"
 Per replica, on the assigned machine:
 
 ```bash
-./scripts/01_prepare.sh     S1_wt_cc_apo         # skip if build/ already exists
+./scripts/01_prepare.sh     S1_wt_cc_apo --replica 2   # skip if build_rep2/ already exists
 ./scripts/02_equilibrate.sh S1_wt_cc_apo 2
 ./scripts/03_production.sh  S1_wt_cc_apo 2 23    # 23 = wall-clock hours per chunk
 ./scripts/04_postprocess.sh S1_wt_cc_apo 2

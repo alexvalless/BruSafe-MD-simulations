@@ -234,6 +234,32 @@ All are analysis-only; no simulation or energy is affected.
 
 ---
 
+## 2026-10-09 — Independent ion placement per replica
+
+**Problem.** `01_prepare.sh` built one system per *system* with a fixed genion
+seed, so all replicas of a system started with the same K⁺/Cl⁻/Mg²⁺
+positions, and ions rearrange little in 30–100 ns. Seen in S4 rep1: Mg²⁺ no. 1
+visited the protein–RNA interface (within 0.5 nm of both) in 78 % of 10–15 ns
+and 24 % of 15–20 ns, then left; the same start would repeat in every replica.
+Replicas sharing an ion placement are not independent in that respect, and S4
+vs S9 would differ by placement, not only by the linker.
+
+**Decision.** Each replica gets its own build, `runs/<system>/build_rep<N>`,
+made by `01_prepare.sh <system> --replica N` with the genion seed taken from
+the same deterministic hash as the velocity seed (`replica_seed`). The same
+replica builds byte-identically on every machine with the same GROMACS.
+`run_slot.sh` builds it automatically; `02_equilibrate.sh` uses it. Counts and
+concentrations are unchanged.
+
+**Exception.** S4 rep1 (already produced) keeps the shared `build` made before
+this change. It is one of the five replicas, not a special one.
+
+**Consequence to track.** Report `mg_interface.txt` per replica; a replica
+where an ion sits at the interface for a long stretch is flagged in the
+M3.5 table rather than silently averaged.
+
+---
+
 ## TEMPLATE
 
 ## YYYY-MM-DD — <decision>

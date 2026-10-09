@@ -44,11 +44,14 @@ while IFS=$'\t' read -r SYS REP; do
   fi
 
   if [ ! -f "$D/prod.gro" ]; then
-    if [ ! -f "$RUNS/$SYS/build/solv_ions.gro" ]; then
+    # a replica already started keeps the build it started with; a new one
+    # gets its own ion placement (build_rep<N>), see lib.sh build_dir
+    if [ ! -f "$D/topol.top" ] && [ ! -f "$RUNS/$SYS/build_rep$REP/solv_ions.gro" ]; then
       [ -d "$REPO/input/$SYS/gromacs" ] || { log "NO CHARMM-GUI build for $SYS (input/$SYS/gromacs) -- skipped"; FAILED="$FAILED $SYS/rep$REP"; continue; }
-      log "== building $SYS =="
-      "$REPO/scripts/01_prepare.sh" "$SYS" --source charmm-gui > "$RUNS/prepare_$SYS.log" 2>&1 \
-        || { log "prepare FAILED for $SYS (see $RUNS/prepare_$SYS.log)"; FAILED="$FAILED $SYS/rep$REP"; continue; }
+      log "== building $SYS for replica $REP =="
+      mkdir -p "$RUNS"
+      "$REPO/scripts/01_prepare.sh" "$SYS" --source charmm-gui --replica "$REP" > "$RUNS/prepare_${SYS}_rep${REP}.log" 2>&1 \
+        || { log "prepare FAILED for $SYS rep$REP (see $RUNS/prepare_${SYS}_rep${REP}.log)"; FAILED="$FAILED $SYS/rep$REP"; continue; }
     fi
     "$REPO/scripts/run_night.sh" "$SYS" "$REP" "$LEFT" \
       || { log "run FAILED for $SYS rep$REP"; FAILED="$FAILED $SYS/rep$REP"; continue; }

@@ -118,6 +118,17 @@ grompp_hmr() {
   [ "$n_all" -eq 0 ] || log "accepted $n_all HMR bond-period warning(s) (dt = 4 fs, see docs/DECISIONS.md)"
 }
 
+# Where the solvated/ionised system for one replica lives. Ions (K+, Cl-, Mg2+)
+# are placed at random and do not rearrange in 30-100 ns, so each replica gets
+# its OWN placement: runs/<system>/build_rep<N>, made by
+# `01_prepare.sh <system> --replica <N>`. The shared runs/<system>/build is the
+# older one-build-per-system layout and is only a fallback.
+# usage: build_dir <system> <replica>
+build_dir() {
+  if [ -f "$RUNS/$1/build_rep$2/solv_ions.gro" ]; then echo "$RUNS/$1/build_rep$2"
+  else echo "$RUNS/$1/build"; fi
+}
+
 # Read one field from config/systems.tsv.
 # usage: sysfield <system_name> <column_name>
 sysfield() {
