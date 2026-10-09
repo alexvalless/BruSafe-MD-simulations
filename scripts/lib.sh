@@ -85,6 +85,15 @@ ndxgroup() {
   awk -v g="$2" '/^\[/ {gsub(/[][ \r]/, ""); if ($0 == g) {print n; exit}; n++}' "$1"
 }
 
+# Run an OPTIONAL gmx analysis step with a time limit, so one that hangs
+# (e.g. waiting for input that never comes) cannot block a whole night.
+# `timeout` needs a real program, hence GMX_BIN rather than the gmx() function.
+# usage: gmx_timeout <seconds> <gmx arguments...>
+gmx_timeout() {
+  local secs="$1"; shift
+  timeout -k 5 "$secs" "$GMX_BIN" "$@"
+}
+
 # Read one parameter from an mdp file (first match, comments stripped).
 # usage: mdpval <file.mdp> <key>
 mdpval() {
