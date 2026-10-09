@@ -88,14 +88,15 @@ if [ "$HAS_RNA" = "yes" ]; then
         || log "Mg2+ to protein distances skipped (see $A/mindist.log)"
       if [ -s mindist_mg_rna.xvg ] && [ -s mindist_mg_protein.xvg ]; then
         # columns: time, then one distance (nm) per ion; both files have the same frames
-        paste <(grep -v '^[#@]' mindist_mg_rna.xvg | tr -d '\r') \
-              <(grep -v '^[#@]' mindist_mg_protein.xvg | tr -d '\r') \
+        # frames before skip_ns are discarded, as for every other analysis
+        paste <(grep -v '^[#@]' mindist_mg_rna.xvg | tr -d '\r' | awk -v b="$SKIP_PS" '$1 >= b') \
+              <(grep -v '^[#@]' mindist_mg_protein.xvg | tr -d '\r' | awk -v b="$SKIP_PS" '$1 >= b') \
           | awk -v cut=0.5 '
               { n = NF / 2 - 1; N = n; F = NR
                 for (i = 1; i <= n; i++) {
                   r = $(1 + i); p = $(n + 2 + i)
                   if (r < cut) nr[i]++; if (p < cut) np[i]++; if (r < cut && p < cut) both[i]++ } }
-              END { printf "# fraction of %d frames with the ion within %.1f nm of the RNA / the protein / BOTH\n", F, cut
+              END { printf "# fraction of %d frames (after the first skip_ns) with the ion within %.1f nm of the RNA / the protein / BOTH\n", F, cut
                     print "# ion    RNA  protein   BOTH   (BOTH > 0: the ion sits at the protein-RNA interface)"
                     for (i = 1; i <= N; i++) printf "%5d  %5.2f  %7.2f  %5.2f\n", i, nr[i]/F, np[i]/F, both[i]/F }' \
           > mg_interface.txt
