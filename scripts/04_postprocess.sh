@@ -50,15 +50,28 @@ if [ "$HAS_RNA" = "yes" ]; then
   log "RNA-specific analysis"
   printf 'RNA\nRNA\n' | gmx rms -s ../prod.tpr -f clean.xtc -n ../index.ndx -o rmsd_rna.xvg -tu ns \
     || log "no RNA group in index.ndx -- add one with make_ndx"
-  printf 'SOLU\n'     | gmx hbond -s ../prod.tpr -f clean.xtc -n ../index.ndx -num hbond_num.xvg \
-    || true
+  # Hydrogen bonds: protein-RNA when there is a protein, within the RNA when not.
+  # GROMACS >= 2024 rewrote `gmx hbond` (selections via -r/-t) and kept the old
+  # tool as `hbond-legacy`. Try the new interface, then legacy, then the
+  # pre-2024 `hbond`. None of them is fatal: the count is a cross-check only.
+  if grep -q '\[ Protein \]' ../index.ndx; then
+    HB_SEL=(-r 'group "Protein"' -t 'group "RNA"'); HB_GRP='Protein\nRNA\n'
+  else
+    HB_SEL=(-r 'group "RNA"');                      HB_GRP='RNA\nRNA\n'
+  fi
+  HB_IN=(-s ../prod.tpr -f clean.xtc -n ../index.ndx -num hbond_num.xvg)
+  if   gmx hbond "${HB_IN[@]}" "${HB_SEL[@]}" < /dev/null > hbond.log 2>&1; then :
+  elif printf "$HB_GRP" | gmx hbond-legacy "${HB_IN[@]}" >> hbond.log 2>&1; then :
+  elif printf "$HB_GRP" | gmx hbond "${HB_IN[@]}" >> hbond.log 2>&1; then :
+  else log "hydrogen-bond count skipped (see $A/hbond.log); everything else is unaffected"
+  fi
   # ---- Mg2+ sanity check ------------------------------------------------
   # Mg2+ does not equilibrate on this timescale. If an ion has parked itself
   # in the protein-RNA interface, every energy downstream is contaminated.
   log "Mg2+ interface check -- inspect mindist_mg.xvg by eye"
   printf 'MG\nSOLU\n' | gmx mindist -s ../prod.tpr -f clean.xtc -n ../index.ndx \
-                                    -od mindist_mg.xvg 2>/dev/null \
-    || log "no MG group -- skipping (fine for apo systems)"
+                                    -od mindist_mg.xvg > mindist.log 2>&1 \
+    || log "Mg2+ distance check skipped (no MG group, or see $A/mindist.log)"
 fi
 
 log "convergence"
