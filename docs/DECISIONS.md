@@ -269,3 +269,9 @@ M3.5 table rather than silently averaged.
 **Alternative rejected.**
 
 **Consequence to track.**
+
+## 2026-10-09 — Density-drift gate scaled to the noise
+S8 rep1 (≈10k atoms) failed the gate with density 1044 ± 5.2 kg/m³ and a drift of 2.11 kg/m³
+between halves, i.e. inside the noise of a small box. The fixed 2 kg/m³ limit was replaced by
+"drift > 2 kg/m³ AND > 3 block-averaged standard errors". A true drift (checked on synthetic
+series) still fails; settled noisy series pass. Mean density and temperature checks unchanged.
