@@ -383,6 +383,48 @@ Check the output **in this order**, and the order is not negotiable:
 
 ---
 
+## 10b. Figures and animations for the wiki
+
+`analysis/md_report.py` turns the `04_postprocess.sh` output into figures. It
+needs a few extra Python packages, on the analysis machine only:
+
+```bash
+pip install numpy matplotlib plotly MDAnalysis   # MDAnalysis only for animations
+```
+
+```bash
+python3 analysis/md_report.py report  S1_wt_cc_apo              # all replicas overlaid
+python3 analysis/md_report.py compare S1_wt_cc_apo S2_sccp_apo  # cross-system overlays
+python3 analysis/md_report.py animate --top runs/S1_wt_cc_apo/rep1/analysis/clean.gro \
+        --traj runs/S1_wt_cc_apo/rep1/analysis/clean.xtc -o s1_rep1.html
+```
+
+`report` writes to `analysis_out/<system>/`:
+
+| Output | What it is |
+|---|---|
+| `figures/*.png`, `*.svg` | RMSD, RNA RMSD, RMSF (replicas + mean ± SD), Rg, SASA, H-bonds, Mg²⁺ distance, DSSP map and counts, PCA (variance, PC1 with cosine content, PC1×PC2), block-averaging SEM, distributions |
+| `html/index.html` | dashboard: summary table + every plot, interactive |
+| `html/<plot>.html` | one plot per page, for an `<iframe>` on the wiki |
+| `html/traj_rep<N>.html` | 3Dmol.js trajectory player: play/pause, slider, cartoon/sticks, colour by chain, N→C, secondary structure or RMSF |
+| `summary.csv`, `summary.md` | per-replica means, mean ± SD across replicas |
+
+**For the iGEM wiki** upload the whole `html/` folder. The default `--js local`
+puts `plotly.min.js` and `3Dmol-min.js` next to the pages because the wiki does
+not allow external CDNs (3Dmol.js is vendored in `analysis/vendor/`, BSD-3).
+`--js inline` makes every page one self-contained file instead.
+
+Useful knobs: `--frames 100` (frames per movie; fewer = smaller file),
+`--smooth 5` (average neighbouring frames to damp thermal jitter in the movie
+— say so in the caption if you use it), `--sel "name CA P"` (Cα/P only, for
+big systems like S10), `--equil-ns 50` (relaxation window excluded from all
+statistics), `--no-anim`.
+
+The animation must come from `clean.xtc`: a trajectory that is not PBC-whole
+gives a movie with bonds stretched across the box, and the script warns about it.
+
+---
+
 ## 11. Before the wiki freeze
 
 - [ ] `docs/env_*.txt` committed from every machine
