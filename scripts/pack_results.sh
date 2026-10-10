@@ -33,7 +33,7 @@ DEST="${BRUSAFE_PACK_DEST:-}"
 if [ -z "$DEST" ]; then
   # prefer the Tec account ("OneDrive - Instituto Tecnologico y de Estudios
   # Superiores de Monterrey"), then any other OneDrive folder
-  for od in "$HOME"/OneDrive*Monterrey* "$HOME"/OneDrive*; do
+  for od in "$TEC_ONEDRIVE" "$HOME"/OneDrive*Monterrey* "$HOME"/OneDrive*; do
     [ -d "$od" ] && { DEST="$od/BruSafe-MD/$HOST"; break; }
   done
 fi
