@@ -23,7 +23,7 @@ GROMACS on 10 × RTX 4070. Model deadline **13 Oct 2026**, wiki freeze **21 Oct*
 config/systems.tsv     the registry: what runs, how many replicas, and why
 mdp/                   em, nvt, npt, npt_free, prod 
 scripts/               prepare → equilibrate → produce → postprocess, run_night.sh
-analysis/              convergence checks and cross-system comparison
+analysis/              convergence checks, cross-system comparison, md_report.py (figures + wiki HTML)
 mmpbsa/                Binding energetics
 docs/                  decision log, predictions, tutorial, WINDOWS.md, env dumps
 input/                 starting structures, one folder per system
@@ -58,6 +58,10 @@ python3 scripts/_registry.py plan --machines 10 --tier 1 --nsday <measured>
 
 # 4. the comparison that carries the actual claim
 ./analysis/compare_systems.sh S1_wt_cc_apo S2_sccp_apo
+
+# figures, interactive HTML and trajectory animations for the wiki
+python3 analysis/md_report.py report  S1_wt_cc_apo
+python3 analysis/md_report.py compare S1_wt_cc_apo S2_sccp_apo
 
 # 5. Once RNA-bound systems are postprocessed
 PROT_GRP=<n> RNA_GRP=<n> ./mmpbsa/run_mmpbsa.sh S4_cp_pacdesign 1 4.0

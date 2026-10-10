@@ -12,6 +12,9 @@
 *.in   text eol=lf
 *.md   text eol=lf
 
+# vendored third-party bundle: keep byte-identical, hide from diffs/stats
+analysis/vendor/*.js -text -diff linguist-vendored
+
 *.gz   binary
 *.zip  binary
 *.pdf  binary

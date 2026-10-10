@@ -41,6 +41,8 @@ printf 'C-alpha\nC-alpha\n' | gmx covar  -s ../prod.tpr -f clean.xtc -n ../index
                                          -o eigenval.xvg -v eigenvec.trr -b 50000 >/dev/null
 printf 'C-alpha\nC-alpha\n' | gmx anaeig -s ../prod.tpr -f clean.xtc -n ../index.ndx \
                                          -v eigenvec.trr -first 1 -last 1 -proj pc1.xvg -b 50000 >/dev/null
+printf 'C-alpha\nC-alpha\n' | gmx anaeig -s ../prod.tpr -f clean.xtc -n ../index.ndx \
+                                         -v eigenvec.trr -first 1 -last 2 -2d pc12.xvg -b 50000 >/dev/null
 
 if [ "$HAS_RNA" = "yes" ]; then
   log "RNA-specific analysis"
@@ -61,3 +63,4 @@ log "convergence"
 pyrun "$REPO/analysis/convergence.py" block  rmsd_backbone.xvg | tail -4
 pyrun "$REPO/analysis/convergence.py" cosine pc1.xvg
 log "done: $A"
+log "figures + wiki animations: python3 analysis/md_report.py report $SYS"
