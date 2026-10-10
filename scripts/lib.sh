@@ -118,6 +118,10 @@ grompp_hmr() {
   [ "$n_all" -eq 0 ] || log "accepted $n_all HMR bond-period warning(s) (dt = 4 fs, see docs/DECISIONS.md)"
 }
 
+# The team's OneDrive (Tec account). Scripts try this exact folder first, then
+# any other ~/OneDrive*; override with BRUSAFE_ONEDRIVE=/path.
+TEC_ONEDRIVE="${BRUSAFE_ONEDRIVE:-/c/Users/A01563079/OneDrive - Instituto Tecnologico y de Estudios Superiores de Monterrey}"
+
 # Where the solvated/ionised system for one replica lives. Ions (K+, Cl-, Mg2+)
 # are placed at random and do not rearrange in 30-100 ns, so each replica gets
 # its OWN placement: runs/<system>/build_rep<N>, made by

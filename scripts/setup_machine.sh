@@ -54,6 +54,7 @@ GMX_PATH="$(find_gmx)"
 if [ -z "$GMX_PATH" ]; then
   ZIP=""
   for z in "$HOME"/Downloads/gromacs-${WANT_GMX}-win64-cuda*.zip \
+           "$TEC_ONEDRIVE"/BruSafe-MD/software/gromacs-${WANT_GMX}-win64-cuda*.zip \
            "$HOME"/OneDrive*Monterrey*/BruSafe-MD/software/gromacs-${WANT_GMX}-win64-cuda*.zip \
            "$HOME"/OneDrive*/BruSafe-MD/software/gromacs-${WANT_GMX}-win64-cuda*.zip; do
     [ -f "$z" ] && { ZIP="$z"; break; }
@@ -83,7 +84,7 @@ fi
 
 # ---- OneDrive --------------------------------------------------------------
 OD=""
-for od in "$HOME"/OneDrive*Monterrey* "$HOME"/OneDrive*; do [ -d "$od" ] && { OD="$od"; break; }; done
+for od in "$TEC_ONEDRIVE" "$HOME"/OneDrive*Monterrey* "$HOME"/OneDrive*; do [ -d "$od" ] && { OD="$od"; break; }; done
 if [ -n "$OD" ]; then ok "OneDrive: $OD"
 else warn "no OneDrive folder: results must be uploaded from the browser (pack/<host>)"; fi
 
