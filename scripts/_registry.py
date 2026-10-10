@@ -17,12 +17,17 @@ No third-party dependencies.
 from __future__ import annotations
 
 import argparse
+import datetime
 import pathlib
 import re
 import sys
 
 REPO = pathlib.Path(__file__).resolve().parent.parent
 REGISTRY = REPO / "config" / "systems.tsv"
+
+# Per-replica equilibration in ns-equivalent: NVT 0.2 ns at 2 fs counts double,
+# then NPT 1 ns + NPT-free 2 ns at 4 fs (mdp/nvt, npt, npt_free).
+EQUIL_NS = 0.2 * 2 + 1.0 + 2.0
 
 
 # --------------------------------------------------------------------------
@@ -66,21 +71,27 @@ def get(name: str, rows: list[dict]) -> dict:
 # planning
 # --------------------------------------------------------------------------
 
-def expand(rows: list[dict], max_tier: int) -> list[dict]:
-    """One job per replica, with an estimated cost in ns."""
+def expand(rows: list[dict], max_tier: int, systems: set[str] | None = None,
+           exclude: set[str] | None = None) -> list[dict]:
+    """One job per replica, with an estimated cost in ns.
+    systems: only these systems (None = all); exclude: "system/rep" already done."""
     jobs = []
     for r in rows:
         if int(r["tier"]) > max_tier:
             continue
+        if systems and r["name"] not in systems:
+            continue
         ns = int(r["ns"])
         for rep in range(1, int(r["replicas"]) + 1):
+            if exclude and f"{r['name']}/{rep}" in exclude:
+                continue
             jobs.append({
                 "system": r["name"],
                 "tier": int(r["tier"]),
                 "replica": rep,
                 "ns": ns,
                 # RNA systems carry more atoms, so cost more per ns.
-                "cost": ns * (1.6 if r["has_rna"] == "yes" else 1.0),
+                "cost": (ns + EQUIL_NS) * (1.6 if r["has_rna"] == "yes" else 1.0),
                 "consumer": r["consumer"],
             })
     return jobs
@@ -126,7 +137,7 @@ STEP = re.compile(r"^\s+Step\s+Time\s*$")
 
 
 def scan(runs: pathlib.Path, rows: list[dict]) -> None:
-    print(f"{'system':<20}{'rep':<5}{'stage':<14}{'progress':<12}{'ns/day':<9}")
+    print(f"{'system':<20}{'rep':<5}{'stage':<14}{'progress':<15}{'ns/day':<9}")
     print("-" * 72)
     missing = []
     for r in rows:
@@ -134,10 +145,10 @@ def scan(runs: pathlib.Path, rows: list[dict]) -> None:
             d = runs / r["name"] / f"rep{rep}"
             if not d.exists():
                 missing.append(f"{r['name']}/rep{rep}")
-                print(f"{r['name']:<20}{rep:<5}{'NOT STARTED':<14}{'-':<12}{'-':<9}")
+                print(f"{r['name']:<20}{rep:<5}{'NOT STARTED':<14}{'-':<15}{'-':<9}")
                 continue
             stage, prog, perf = inspect(d, int(r["ns"]))
-            print(f"{r['name']:<20}{rep:<5}{stage:<14}{prog:<12}{perf:<9}")
+            print(f"{r['name']:<20}{rep:<5}{stage:<14}{prog:<15}{perf:<9}")
     print("-" * 72)
     if missing:
         print(f"{len(missing)} replica(s) never launched:")
@@ -151,8 +162,9 @@ def inspect(d: pathlib.Path, target_ns: int) -> tuple[str, str, str]:
     if (d / "prod.gro").exists():
         log = d / "prod.log"
         perf = "-"
-        if log.exists():
-            for line in log.read_text(errors="ignore").splitlines():
+        text = read_text_safe(log)
+        if text:
+            for line in text.splitlines():
                 m = PERF.match(line)
                 if m:
                     perf = m.group(1)
@@ -162,17 +174,43 @@ def inspect(d: pathlib.Path, target_ns: int) -> tuple[str, str, str]:
         if (d / gro).exists():
             if stage == "prod":
                 ns = last_ns(d / "prod.log")
-                pct = f"{ns:.0f}/{target_ns} ns" if ns is not None else "running"
+                if ns is not None:
+                    pct = f"{ns:.0f}/{target_ns} ns"
+                else:
+                    # Windows keeps prod.log locked while mdrun runs; fall back
+                    # to the wall-clock time since PROVENANCE.txt "started".
+                    h = hours_since_start(d / "PROVENANCE.txt")
+                    pct = f"running {h:.1f}h" if h is not None else "running"
                 return "prod", pct, "-"
             return stage, "equil", "-"
     return "empty", "-", "-"
 
 
+def read_text_safe(path: pathlib.Path) -> str:
+    """File contents, or "" if it is missing or locked (Windows keeps the
+    mdrun log locked while the run is going)."""
+    try:
+        return path.read_text(errors="ignore")
+    except OSError:
+        return ""
+
+
+def hours_since_start(prov: pathlib.Path) -> float | None:
+    text = read_text_safe(prov)
+    m = re.search(r"^started\s*:\s*(\S+)", text, re.M)
+    if not m:
+        return None
+    try:
+        t0 = datetime.datetime.fromisoformat(m.group(1))
+    except ValueError:
+        return None
+    now = datetime.datetime.now(t0.tzinfo) if t0.tzinfo else datetime.datetime.now()
+    return max(0.0, (now - t0).total_seconds() / 3600)
+
+
 def last_ns(log: pathlib.Path) -> float | None:
     """Last simulation time reported in an mdrun log, in ns."""
-    if not log.exists():
-        return None
-    lines = log.read_text(errors="ignore").splitlines()
+    lines = read_text_safe(log).splitlines()
     for i in range(len(lines) - 1, 0, -1):
         if STEP.match(lines[i]):
             parts = lines[i + 1].split() if i + 1 < len(lines) else []
@@ -196,6 +234,10 @@ def main() -> None:
     p = sub.add_parser("plan")
     p.add_argument("--machines", type=int, required=True)
     p.add_argument("--tier", type=int, default=1)
+    p.add_argument("--systems", default="",
+                   help="comma list: plan only these systems (e.g. the ones already built)")
+    p.add_argument("--exclude", default="",
+                   help="comma list of system/replica already done, e.g. S4_cp_pacdesign/1")
     p.add_argument("--nsday", type=float, default=250.0,
                    help="measured ns/day per GPU from bench_gpu.sh")
     p = sub.add_parser("status"); p.add_argument("--runs", required=True)
@@ -213,7 +255,9 @@ def main() -> None:
             if int(r["tier"]) <= a.tier:
                 print(r["name"])
     elif a.cmd == "plan":
-        jobs = expand(rows, a.tier)
+        jobs = expand(rows, a.tier,
+                      {x for x in a.systems.split(",") if x} or None,
+                      {x for x in a.exclude.split(",") if x} or None)
         if not jobs:
             sys.exit("no jobs at that tier")
         emit_plan(assign(jobs, a.machines), a.nsday)

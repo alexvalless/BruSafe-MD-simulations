@@ -23,8 +23,28 @@ log "stripping solvent (implicit-solvent method -- water must not be present)"
 printf 'SOLU\n' | gmx trjconv -s "$D/prod.tpr" -f "$D/analysis/clean.xtc" \
                               -n "$D/index.ndx" -o complex_dry.xtc
 
+# Frame window from the registry: drop skip_ns, then thin to ~MMPBSA_FRAMES
+# frames per replica. Error bars come from the replica spread, so more frames
+# from one replica mostly buy CPU time, not information.
+PMDP="$D/prod.mdp"
+FRAME_PS="$(awk -v n="$(mdpval "$PMDP" nstxout-compressed)" -v dt="$(mdpval "$PMDP" dt)" 'BEGIN{print n * dt}')"
+read -r START INTERVAL < <(awk -v skip="$(sysfield "$SYS" skip_ns)" -v ns="$(sysfield "$SYS" ns)" \
+  -v fps="$FRAME_PS" -v want="${MMPBSA_FRAMES:-250}" 'BEGIN{
+    s = int(skip * 1000 / fps + 0.5) + 1; n = (ns - skip) * 1000 / fps
+    i = int(n / want); if (i < 1) i = 1; print s, i }')
+log "frames: start=$START interval=$INTERVAL (frame = $FRAME_PS ps)"
+
 sed "s/^  indi .*/  indi                  = $INDI/" "$REPO/mmpbsa/mmpbsa_M3.5.in" > mmpbsa.in
+sed -i -e "s/^  startframe .*/  startframe            = $START/" \
+       -e "s/^  endframe .*/  endframe              = 9999999/" \
+       -e "s/^  interval .*/  interval              = $INTERVAL/" mmpbsa.in
 sed -i "s/^  sys_name .*/  sys_name              = \"${SYS}_rep${REP}\"/" mmpbsa.in
+
+# Group numbers looked up by name unless given explicitly
+PROT_GRP="${PROT_GRP:-$(ndxgroup "$D/index.ndx" Protein)}"
+RNA_GRP="${RNA_GRP:-$(ndxgroup "$D/index.ndx" RNA)}"
+[ -n "$PROT_GRP" ] && [ -n "$RNA_GRP" ] || die "no Protein / RNA group in $D/index.ndx"
+log "groups: Protein=$PROT_GRP RNA=$RNA_GRP"
 
 log "running gmx_MMPBSA (indi=$INDI) -- PB primary, GB cross-check"
 mpirun -np "${MMPBSA_NP:-8}" gmx_MMPBSA MPI -O -i mmpbsa.in \

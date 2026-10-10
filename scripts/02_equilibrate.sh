@@ -12,15 +12,16 @@ need gmx
 
 SYS="${1:?usage: 02_equilibrate.sh <system> <replica>}"
 REP="${2:?usage: 02_equilibrate.sh <system> <replica>}"
-BUILD="$RUNS/$SYS/build"
+BUILD="$(build_dir "$SYS" "$REP")"
 D="$RUNS/$SYS/rep$REP"
-[ -f "$BUILD/solv_ions.gro" ] || die "run 01_prepare.sh $SYS first"
+[ -f "$BUILD/solv_ions.gro" ] || die "run 01_prepare.sh $SYS --replica $REP first"
 mkdir -p "$D"; cd "$D"
 guard_existing "$D"
 
 SEED="$(replica_seed "$SYS" "$REP")"
-log "$SYS rep$REP  seed=$SEED"
+log "$SYS rep$REP  seed=$SEED  build=$(basename "$BUILD")"
 echo "$SEED" > seed.txt
+basename "$BUILD" > build_used.txt
 
 cp "$BUILD/topol.top" "$BUILD/index.ndx" .
 cp -r "$BUILD/toppar" . 2>/dev/null || true
@@ -37,12 +38,12 @@ gmx grompp -f nvt.mdp -c em.gro -r em.gro -p topol.top -n index.ndx -o nvt.tpr
 gmx mdrun -deffnm nvt $MDRUN_FLAGS
 
 log "NPT 1 ns (restrained)"
-gmx grompp -f "$MDP/npt.mdp" -c nvt.gro -r nvt.gro -t nvt.cpt \
+grompp_hmr -f "$MDP/npt.mdp" -c nvt.gro -r nvt.gro -t nvt.cpt \
            -p topol.top -n index.ndx -o npt.tpr
 gmx mdrun -deffnm npt $MDRUN_FLAGS
 
-log "NPT 5 ns (unrestrained)"
-gmx grompp -f "$MDP/npt_free.mdp" -c npt.gro -t npt.cpt \
+log "NPT 2 ns (unrestrained)"
+grompp_hmr -f "$MDP/npt_free.mdp" -c npt.gro -t npt.cpt \
            -p topol.top -n index.ndx -o npt_free.tpr
 gmx mdrun -deffnm npt_free $MDRUN_FLAGS
 

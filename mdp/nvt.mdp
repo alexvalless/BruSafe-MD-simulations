@@ -1,10 +1,14 @@
 ; BruSafe -- NVT equilibration, 200 ps, position restraints.
+; Heating from gen_vel stays at dt = 2 fs. HMR is already in the topology, so the
+; masses are the same in every dynamics stage (see docs/DECISIONS.md, 2026-10-04).
 ; gen_seed is rewritten per replica by 02_equilibrate.sh. This is what makes
 ; replicas statistically independent -- do NOT branch replicas after this stage.
-define                  = -DPOSRES
+define                  = -DPOSRES -DPOSRES_FC_BB=1000.0 -DPOSRES_FC_SC=1000.0
+; the FC macros are read by CHARMM-GUI topologies; pdb2gmx posre.itp uses 1000 itself
 
 integrator              = md
 dt                      = 0.002
+; HMR (H ~3 Da) is in the topology, applied by scripts/hmr_top.py in 01_prepare.sh
 nsteps                  = 100000          ; 200 ps
 comm-mode               = Linear
 nstcomm                 = 100

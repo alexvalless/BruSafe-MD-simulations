@@ -1,0 +1,26 @@
+machine  jobs  cost (ns-eq)  est. days  
+------------------------------------------------------------------------
+gpu0     1     85            0.1        
+gpu1     1     85            0.1        
+gpu2     1     85            0.1        
+gpu3     1     53            0.1        
+gpu4     1     53            0.1        
+gpu5     1     53            0.1        
+gpu6     1     53            0.1        
+------------------------------------------------------------------------
+aggregate 470 ns-eq | makespan 0.1 days at 580 ns/day/GPU
+
+# ---- gpu0 ----
+gpu0	S8_pac_free	1	50	Free pac hairpin from the bound pose; pre-organisation penalty
+# ---- gpu1 ----
+gpu1	S8_pac_free	2	50	Free pac hairpin from the bound pose; pre-organisation penalty
+# ---- gpu2 ----
+gpu2	S8_pac_free	3	50	Free pac hairpin from the bound pose; pre-organisation penalty
+# ---- gpu3 ----
+gpu3	S4_cp_pacdesign	2	30	pac complex (1ZDH RNA); MM/PBSA reference for the S9 linker ddG
+# ---- gpu4 ----
+gpu4	S4_cp_pacdesign	3	30	pac complex (1ZDH RNA); MM/PBSA reference for the S9 linker ddG
+# ---- gpu5 ----
+gpu5	S4_cp_pacdesign	4	30	pac complex (1ZDH RNA); MM/PBSA reference for the S9 linker ddG
+# ---- gpu6 ----
+gpu6	S4_cp_pacdesign	5	30	pac complex (1ZDH RNA); MM/PBSA reference for the S9 linker ddG

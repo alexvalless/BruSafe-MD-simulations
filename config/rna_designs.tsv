@@ -1,0 +1,15 @@
+# RNA sequences built by scripts/00_build_inputs.py by in-place mutation of the
+# cocrystal hairpin. One row per RNA-bound system built from the cocrystal.
+#
+# rna_chain  chain ID in the BUILT file (RNA chains are renamed R, S, ... in order)
+# target     5'->3' over the RESOLVED nucleotides of that chain only, same length
+#            as `00_build_inputs.py show <PDBID>` prints. '.' keeps a position.
+#            1ZDH chain R: 13 nt, residues 4..16 of the 19-mer = operator -12..+1
+#              4    9   13 16
+#              UGAGGAUCACCCA      (native: C at -5, residue 11 -- the tight variant)
+#              ||||  ||||         stem U4-A16 G5-C15 G7-C14 G8-C13, bulge A6, loop 9-12
+#            'native' keeps the crystal sequence. TODO blocks the build.
+# note       where the sequence comes from (paper, design file, commit)
+#
+name	rna_chain	target	note
+S4_cp_pacdesign	R	native	pac = ACAUGAGGAUCACCCAUGU (C(-5) operator); residues 4-16 identical to 1ZDH chain R

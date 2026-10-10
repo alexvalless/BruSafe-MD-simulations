@@ -14,7 +14,7 @@ Be clear about the boundary before you start. The scripts handle solvation,
 ionisation, equilibration, production, PBC cleanup, analysis and bookkeeping.
 
 They do **not** build your starting structures. Choosing the C/C chain pair out
-of 1MSC, modelling the single-chain linker, mutating the RNA to your designed
+of 2MS2, modelling the single-chain linker, mutating the RNA to your designed
 pac sequence — that is science, it is where the mistakes that matter live, and
 it is deliberately left to you. Section 2 covers it.
 
@@ -94,6 +94,10 @@ keep the assignment spreadsheet honest yourself.
 
 ## 2. Input structures — the manual part
 
+The step-by-step version, including CHARMM-GUI settings and the
+`scripts/00_build_inputs.py` helper that assembles the dimers and mutates the
+RNA, is in **`docs/TOPOLOGIES.md`**. This section is the reasoning behind it.
+
 Each system expects one of:
 
 ```
@@ -101,7 +105,7 @@ input/<system>/<system>.pdb        # pdb2gmx route  (apo systems)
 input/<system>/gromacs/            # CHARMM-GUI Solution Builder output (RNA)
 ```
 
-### S1 — WT C/C dimer from 1MSC
+### S1 — WT C/C dimer from 2MS2
 
 The asymmetric unit gives you three quasi-equivalent chains and therefore **two
 physically different dimers**: the symmetric C/C pair and the asymmetric A/B
@@ -130,8 +134,8 @@ Checklist before you accept a PDB as input:
 
 ### S2 — single-chain dimer
 
-Build with AlphaFold3 or by grafting the linker onto the 1MSC dimer. **Before
-simulating**, superpose the model onto the 1MSC C/C dimer and record backbone
+Build with AlphaFold3 or by grafting the linker onto the 2MS2 dimer. **Before
+simulating**, superpose the model onto the 2MS2 C/C dimer and record backbone
 RMSD:
 
 ```bash
@@ -144,7 +148,7 @@ non-native relative orientation, every S1-vs-S2 comparison downstream measures
 an AlphaFold artefact instead of a linker effect, and no amount of sampling
 fixes it.
 
-### S3–S5, S7, S9 — RNA-bound systems
+### S4, S8, S9 — RNA-bound systems
 
 Use the CP–operator **cocrystal**. Do not dock an RNA hairpin de novo when a
 solved complex exists; reviewers will ask why, and you will not like the answer.
@@ -155,7 +159,7 @@ For anything containing RNA, prefer CHARMM-GUI Solution Builder over the
 `pdb2gmx` route:
 
 ```bash
-./scripts/01_prepare.sh S3_cp_operator --source charmm-gui
+./scripts/01_prepare.sh S4_cp_pacdesign --source charmm-gui
 ```
 
 Two reasons. `pdb2gmx` residue mapping for RNA under the charmm36 port is
@@ -167,7 +171,7 @@ it looks — see §7.
 ## 3. S1 end to end
 
 ```bash
-./scripts/01_prepare.sh     S1_wt_cc_apo      # once per system
+./scripts/01_prepare.sh     S1_wt_cc_apo --replica 1   # once per replica (own ion placement)
 ./scripts/02_equilibrate.sh S1_wt_cc_apo 1    # once per replica
 ```
 
@@ -177,7 +181,7 @@ because `04_postprocess.sh` asks for them by name and failing here is much
 cheaper than failing three days later.
 
 `02_equilibrate.sh` runs EM → NVT 200 ps restrained → NPT 1 ns restrained →
-NPT 5 ns free, then applies the **equilibration gate**: density near 1000 kg/m³,
+NPT 2 ns free, then applies the **equilibration gate**: density near 1000 kg/m³,
 temperature within 2 K of 310, and density no longer drifting. It refuses to
 exit successfully otherwise. A drifting box means the system has not settled
 whatever the mean says, and the gate catches that where a mean alone would not.
@@ -203,7 +207,7 @@ rm runs/S1_wt_cc_apo/rep1/prod.tpr    # let 03_production regenerate it from the
 ```
 
 That `rm` matters. `03_production.sh` sets `nsteps` from the `ns` column in
-`config/systems.tsv`, and S7 runs 150 ns rather than 250. A hand-made tpr would
+`config/systems.tsv`, and the RNA systems run 30 ns rather than 100. A hand-made tpr would
 silently override that.
 
 The sweep tries three offload configurations across several thread counts, then
@@ -238,14 +242,15 @@ nominally identical boxes.
 python3 scripts/_registry.py plan --machines 10 --tier 1 --nsday <your measured number>
 ```
 
-You get a cost table and a per-machine job list. At 250 ns/day tier 1 is about
-5,100 ns-equivalent with a **2.6-day makespan**. Compute is not your constraint;
+You get a cost table and a per-machine job list. Tier 1 is about 1,400
+ns-equivalent including equilibration; at 400 ns/day per GPU (HMR, 4 fs) that is
+well under a day on ten GPUs. Compute is not your constraint;
 that is the point of running this early.
 
 Save the job lists and give one to each machine:
 
 ```bash
-python3 scripts/_registry.py plan --machines 10 --tier 1 --nsday 250 > docs/PLAN.txt
+python3 scripts/_registry.py plan --machines 10 --tier 1 --nsday <measured> > docs/PLAN.txt
 git add docs/PLAN.txt && git commit -m "campaign plan, tier 1"
 ```
 
@@ -256,7 +261,7 @@ git add docs/PLAN.txt && git commit -m "campaign plan, tier 1"
 Per replica, on the assigned machine:
 
 ```bash
-./scripts/01_prepare.sh     S1_wt_cc_apo         # skip if build/ already exists
+./scripts/01_prepare.sh     S1_wt_cc_apo --replica 2   # skip if build_rep2/ already exists
 ./scripts/02_equilibrate.sh S1_wt_cc_apo 2
 ./scripts/03_production.sh  S1_wt_cc_apo 2 23    # 23 = wall-clock hours per chunk
 ./scripts/04_postprocess.sh S1_wt_cc_apo 2
@@ -309,8 +314,10 @@ gmx make_ndx -f runs/<sys>/build/solv_ions.gro \
              -n runs/<sys>/build/index.ndx -o runs/<sys>/build/index.ndx
 ```
 
-**Mg²⁺ in the interface.** `04_postprocess.sh` writes `mindist_mg.xvg` for
-RNA systems. Look at it. Mg²⁺ water exchange takes microseconds, so on a 250 ns
+**Mg²⁺ in the interface.** `04_postprocess.sh` writes `mg_interface.txt` for
+RNA systems (fraction of frames each ion is within 0.5 nm of the RNA, of the
+protein, and of both; BOTH > 0 means it sits at the interface), plus the raw
+`mindist_mg_rna.xvg` / `mindist_mg_protein.xvg`. Look at it. Mg²⁺ water exchange takes microseconds, so on a 30–100 ns
 trajectory the ions sit essentially where you placed them — they do not
 equilibrate, and random `genion` placement adds noise rather than realism. An
 ion parked in the protein–RNA interface contaminates every M3.5 energy from

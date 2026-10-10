@@ -13,20 +13,22 @@ GROMACS on 10 × RTX 4070. Model deadline **13 Oct 2026**, wiki freeze **21 Oct*
 | Divalent | Mg²⁺, RNA-containing systems only — see the caveat below |
 | Temperature | 310 K, V-rescale |
 | Pressure | 1 bar, C-rescale, isotropic |
-| Timestep | 2 fs, h-bond constraints |
-| Box | rhombic dodecahedron, 1.2 nm padding |
+| Timestep | 4 fs, h-bond constraints, HMR (H → 3.024 Da, in the topology) |
+| Box | rhombic dodecahedron, 1.0 nm padding (CHARMM-GUI: octahedral, 10 Å) |
+| Lengths | apo 3 × 100 ns, RNA complexes 5 × 30 ns; first `skip_ns` discarded |
 
 
 ## Layout
 
 ```
 config/systems.tsv     the registry: what runs, how many replicas, and why
+config/rna_designs.tsv RNA sequence of each RNA-bound system (in-place mutation)
+input/                 starting structures and CHARMM-GUI builds (committed)
 mdp/                   em, nvt, npt, npt_free, prod 
-scripts/               prepare → equilibrate → produce → postprocess, run_night.sh
+scripts/               build inputs → prepare → equilibrate → produce → postprocess, run_night.sh
 analysis/              convergence checks and cross-system comparison
 mmpbsa/                Binding energetics
-docs/                  decision log, predictions, tutorial, WINDOWS.md, env dumps
-input/                 starting structures, one folder per system
+docs/                  decision log, predictions, tutorial, TOPOLOGIES.md, WINDOWS.md, env dumps
 ```
 
 Trajectories are gitignored. Commit `.mdp`, `.top`, `.itp`, `.ndx`, scripts and
@@ -50,16 +52,21 @@ export BRUSAFE_MDRUN_FLAGS="-nb gpu -pme gpu -bonded gpu -update gpu -ntmpi 1 -n
 # 2. plan the campaign across machines
 python3 scripts/_registry.py plan --machines 10 --tier 1 --nsday <measured>
 
-# 3. per system, per replica
-./scripts/01_prepare.sh     S1_wt_cc_apo               # once per system
+# 3. per system, once, on one machine -- see docs/TOPOLOGIES.md
+python3 scripts/00_build_inputs.py show  2MS2          # chains, gaps, symmetry mates
+python3 scripts/00_build_inputs.py build S1_wt_cc_apo  # -> input/S1_wt_cc_apo/*.pdb
+./scripts/01_prepare.sh     S1_wt_cc_apo --replica 1   # solvate, ions (own placement per replica), HMR, index
+                                                       # RNA systems: --source charmm-gui
+
+# 4. per replica, on the GPU machines
 ./scripts/02_equilibrate.sh S1_wt_cc_apo 1             # per replica
 ./scripts/03_production.sh  S1_wt_cc_apo 1 24          # restartable
 ./scripts/04_postprocess.sh S1_wt_cc_apo 1
 
-# 4. the comparison that carries the actual claim
+# 5. the comparison that carries the actual claim
 ./analysis/compare_systems.sh S1_wt_cc_apo S2_sccp_apo
 
-# 5. Once RNA-bound systems are postprocessed
+# 6. Once RNA-bound systems are postprocessed
 PROT_GRP=<n> RNA_GRP=<n> ./mmpbsa/run_mmpbsa.sh S4_cp_pacdesign 1 4.0
 
 # anytime: what is actually running

@@ -23,6 +23,17 @@ esac
 # Optional explicit gmx binary, e.g. a portable Windows build on a USB stick:
 #   export BRUSAFE_GMX="/c/gromacs/bin/gmx.exe"
 # Every `gmx ...` call in the scripts then goes to that binary.
+# If it is not set in this terminal (e.g. the window was opened before
+# setup_machine.sh wrote it to ~/.bashrc), use the standard location that
+# setup_machine.sh extracts to, and last the value written in ~/.bashrc.
+if [ -z "${BRUSAFE_GMX:-}" ] && [ -x "$HOME/gromacs/bin/gmx.exe" ]; then
+  BRUSAFE_GMX="$HOME/gromacs/bin/gmx.exe"
+fi
+if [ -z "${BRUSAFE_GMX:-}" ] && [ -f "$HOME/.bashrc" ]; then
+  _g="$(sed -n 's/^export BRUSAFE_GMX="\(.*\)"$/\1/p' "$HOME/.bashrc" | tail -1)"
+  [ -n "$_g" ] && [ -x "$_g" ] && BRUSAFE_GMX="$_g"
+  unset _g
+fi
 if [ -n "${BRUSAFE_GMX:-}" ]; then
   [ -x "$BRUSAFE_GMX" ] || die "BRUSAFE_GMX=$BRUSAFE_GMX is not an executable"
   gmx() { "$BRUSAFE_GMX" "$@"; }
@@ -74,6 +85,64 @@ MDRUN_FLAGS="${BRUSAFE_MDRUN_FLAGS:--nb gpu -pme gpu -bonded gpu -update gpu -nt
 # Solvent/ion residue names excluded from the SOLU group.
 # Covers the MacKerell GROMACS port (SOL/POT/CLA/MG) and CHARMM-GUI (TIP3).
 SOLVENT_RESNAMES="SOL TIP3 TIP3P POT CLA SOD MG MGA ZN2 CAL"
+
+# RNA residue names: CHARMM-GUI writes ADE/CYT/GUA/URA, which make_ndx does
+# not recognise as RNA, so 01_prepare.sh builds the RNA groups itself.
+RNA_RESNAMES="ADE CYT GUA URA A C G U RA RC RG RU"
+
+# Number of a named group in an index file (0-based, as gmx tools count).
+# usage: ndxgroup <index.ndx> <name>   -- prints nothing if absent
+ndxgroup() {
+  awk -v g="$2" '/^\[/ {gsub(/[][ \r]/, ""); if ($0 == g) {print n; exit}; n++}' "$1"
+}
+
+# Run an OPTIONAL gmx analysis step with a time limit, so one that hangs
+# (e.g. waiting for input that never comes) cannot block a whole night.
+# `timeout` needs a real program, hence GMX_BIN rather than the gmx() function.
+# usage: gmx_timeout <seconds> <gmx arguments...>
+gmx_timeout() {
+  local secs="$1"; shift
+  timeout -k 5 "$secs" "$GMX_BIN" "$@"
+}
+
+# Read one parameter from an mdp file (first match, comments stripped).
+# usage: mdpval <file.mdp> <key>
+mdpval() {
+  awk -v k="$2" -F'=' '{sub(/\r$/, ""); sub(/;.*/, ""); gsub(/[ \t]/, "", $1)}
+       $1 == k {gsub(/[ \t]/, "", $2); print $2; exit}' "$1"
+}
+
+# grompp for the 4 fs (HMR) stages. HMR leaves bonds without hydrogens alone,
+# so C=O (period ~19 fs) trips grompp's "period < 5 x dt" WARNING at 4 fs even
+# though HMR at 4 fs is standard practice (Hopkins et al., JCTC 2015). That one
+# warning is accepted; ANY other warning still stops the run.
+# usage: grompp_hmr <normal gmx grompp arguments>
+grompp_hmr() {
+  local out n_all n_ok
+  if ! out="$(gmx grompp "$@" -maxwarn 10 2>&1)"; then
+    printf '%s\n' "$out" >&2; die "grompp failed"
+  fi
+  printf '%s\n' "$out" >&2
+  n_all="$(grep -c '^WARNING [0-9]' <<<"$out" || true)"
+  n_ok="$(grep -A3 '^WARNING [0-9]' <<<"$out" | grep -c 'estimated oscillational period' || true)"
+  [ "$n_all" -eq "$n_ok" ] || die "grompp gave warnings other than the expected HMR bond-period one -- read them above"
+  [ "$n_all" -eq 0 ] || log "accepted $n_all HMR bond-period warning(s) (dt = 4 fs, see docs/DECISIONS.md)"
+}
+
+# The team's OneDrive (Tec account). Scripts try this exact folder first, then
+# any other ~/OneDrive*; override with BRUSAFE_ONEDRIVE=/path.
+TEC_ONEDRIVE="${BRUSAFE_ONEDRIVE:-/c/Users/A01563079/OneDrive - Instituto Tecnologico y de Estudios Superiores de Monterrey}"
+
+# Where the solvated/ionised system for one replica lives. Ions (K+, Cl-, Mg2+)
+# are placed at random and do not rearrange in 30-100 ns, so each replica gets
+# its OWN placement: runs/<system>/build_rep<N>, made by
+# `01_prepare.sh <system> --replica <N>`. The shared runs/<system>/build is the
+# older one-build-per-system layout and is only a fallback.
+# usage: build_dir <system> <replica>
+build_dir() {
+  if [ -f "$RUNS/$1/build_rep$2/solv_ions.gro" ]; then echo "$RUNS/$1/build_rep$2"
+  else echo "$RUNS/$1/build"; fi
+}
 
 # Read one field from config/systems.tsv.
 # usage: sysfield <system_name> <column_name>

@@ -21,5 +21,13 @@ __pycache__/
 !*.mdp
 !analysis_out/**
 
-# macOS
+# Starting structures and CHARMM-GUI builds ARE inputs: commit them
+!input/**/*.gro
+!input/**/*.pdb
+
+# local caches
 .DS_Store
+input/_pdb/
+
+# packed results for upload
+pack/
