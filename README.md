@@ -53,7 +53,7 @@ export BRUSAFE_MDRUN_FLAGS="-nb gpu -pme gpu -bonded gpu -update gpu -ntmpi 1 -n
 python3 scripts/_registry.py plan --machines 10 --tier 1 --nsday <measured>
 
 # 3. per system, once, on one machine -- see docs/TOPOLOGIES.md
-python3 scripts/00_build_inputs.py show  1MSC          # chains, gaps, symmetry mates
+python3 scripts/00_build_inputs.py show  2MS2          # chains, gaps, symmetry mates
 python3 scripts/00_build_inputs.py build S1_wt_cc_apo  # -> input/S1_wt_cc_apo/*.pdb
 ./scripts/01_prepare.sh     S1_wt_cc_apo --replica 1   # solvate, ions (own placement per replica), HMR, index
                                                        # RNA systems: --source charmm-gui

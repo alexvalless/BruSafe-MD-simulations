@@ -20,12 +20,12 @@ Rule: every system below has a named consumer. If a system has no consumer, cut 
 
 ## PHASE 1 — Structure prep (by 11 Sep)
 
-- [ ] Extract **C/C symmetric** dimer from 1MSC (not the default chain grab)
+- [ ] Extract **C/C symmetric** dimer from 2MS2 (not the default chain grab)
 - [ ] Extract **A/B asymmetric** dimer separately
 - [ ] Strip crystallographic waters, alt-locs, cryoprotectants
 - [ ] Protonation states at pH 7.4 (check His tautomers near the RNA face)
-- [ ] Build scCP dimer model (AF3 or linker graft onto 1MSC)
-      - [ ] Superpose onto 1MSC dimer, report backbone RMSD **before** simulating
+- [ ] Build scCP dimer model (AF3 or linker graft onto 2MS2)
+      - [ ] Superpose onto 2MS2 dimer, report backbone RMSD **before** simulating
       - [ ] Confirm subunit relative orientation is native, not an AF3 artefact
 - [ ] Obtain CP–operator cocrystal for all RNA-bound systems (do **not** dock de novo)
 - [x] pac hairpin = ACAUGAGGAUCACCCAUGU, the C(−5) operator already in 1ZDH (no mutation)

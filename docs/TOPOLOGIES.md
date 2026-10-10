@@ -33,7 +33,7 @@ runs/<system>/build_rep<N>/        01_prepare.sh --replica N: solvated,     (cop
 
 | value | meaning |
 |---|---|
-| `1MSC` (any PDB ID) | downloaded to `input/_pdb/1MSC.pdb` on first use |
+| `2MS2` (any PDB ID) | downloaded to `input/_pdb/2MS2.pdb` on first use |
 | `model` | your own model at `input/<system>/model.pdb` (AlphaFold, linker graft) |
 | `from:<system>` | take chains from another system's built PDB |
 | `cocrystal` | placeholder for a PDB ID (the registry now uses `1ZDH`) |
@@ -61,7 +61,7 @@ and record the choice in `docs/DECISIONS.md`.
 ## 2. Look before you build
 
 ```bash
-python3 scripts/00_build_inputs.py show 1MSC
+python3 scripts/00_build_inputs.py show 2MS2
 ```
 
 It prints, per chain: sequence, residue range, chain breaks and missing heavy

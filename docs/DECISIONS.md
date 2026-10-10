@@ -275,3 +275,8 @@ S8 rep1 (≈10k atoms) failed the gate with density 1044 ± 5.2 kg/m³ and a dri
 between halves, i.e. inside the noise of a small box. The fixed 2 kg/m³ limit was replaced by
 "drift > 2 kg/m³ AND > 3 block-averaged standard errors". A true drift (checked on synthetic
 series) still fails; settled noisy series pass. Mean density and temperature checks unchanged.
+
+## 2026-10-10 — S1 and S6 come from 2MS2, not 1MSC
+`show 1MSC` reports only chain A, so the quasi-equivalent C/C and A/B dimers cannot be built from it.
+2MS2 (apo capsid) carries chains A, B and C with 60 BIOMT operators: A/B via op5 (166 contacts) and
+C/C via op6 (154 contacts, 180° two-fold). S1 = C,C and S6 = A,B from 2MS2, without RNA.
