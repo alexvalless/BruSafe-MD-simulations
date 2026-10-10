@@ -13,8 +13,12 @@ REP="${2:?usage: 04_postprocess.sh <system> <replica>}"
 HAS_RNA="$(sysfield "$SYS" has_rna)"
 D="$RUNS/$SYS/rep$REP"
 A="$D/analysis"
-cd "$D"; mkdir -p "$A"
-[ -f prod.xtc ] || die "no prod.xtc in $D"
+[ -d "$D" ] || die "no directory $D"
+cd "$D"
+for f in prod.xtc prod.tpr index.ndx; do
+  [ -f "$f" ] || die "no $f in $D (copy it from the machine that ran the replica)"
+done
+mkdir -p "$A"
 
 log "PBC cleanup (whole -> nojump -> centred compact)"
 printf 'SOLU\n'        | gmx trjconv -s prod.tpr -f prod.xtc -n index.ndx -pbc whole  -o .w.xtc
