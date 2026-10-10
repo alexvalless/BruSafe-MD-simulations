@@ -71,14 +71,20 @@ def get(name: str, rows: list[dict]) -> dict:
 # planning
 # --------------------------------------------------------------------------
 
-def expand(rows: list[dict], max_tier: int) -> list[dict]:
-    """One job per replica, with an estimated cost in ns."""
+def expand(rows: list[dict], max_tier: int, systems: set[str] | None = None,
+           exclude: set[str] | None = None) -> list[dict]:
+    """One job per replica, with an estimated cost in ns.
+    systems: only these systems (None = all); exclude: "system/rep" already done."""
     jobs = []
     for r in rows:
         if int(r["tier"]) > max_tier:
             continue
+        if systems and r["name"] not in systems:
+            continue
         ns = int(r["ns"])
         for rep in range(1, int(r["replicas"]) + 1):
+            if exclude and f"{r['name']}/{rep}" in exclude:
+                continue
             jobs.append({
                 "system": r["name"],
                 "tier": int(r["tier"]),
@@ -228,6 +234,10 @@ def main() -> None:
     p = sub.add_parser("plan")
     p.add_argument("--machines", type=int, required=True)
     p.add_argument("--tier", type=int, default=1)
+    p.add_argument("--systems", default="",
+                   help="comma list: plan only these systems (e.g. the ones already built)")
+    p.add_argument("--exclude", default="",
+                   help="comma list of system/replica already done, e.g. S4_cp_pacdesign/1")
     p.add_argument("--nsday", type=float, default=250.0,
                    help="measured ns/day per GPU from bench_gpu.sh")
     p = sub.add_parser("status"); p.add_argument("--runs", required=True)
@@ -245,7 +255,9 @@ def main() -> None:
             if int(r["tier"]) <= a.tier:
                 print(r["name"])
     elif a.cmd == "plan":
-        jobs = expand(rows, a.tier)
+        jobs = expand(rows, a.tier,
+                      {x for x in a.systems.split(",") if x} or None,
+                      {x for x in a.exclude.split(",") if x} or None)
         if not jobs:
             sys.exit("no jobs at that tier")
         emit_plan(assign(jobs, a.machines), a.nsday)
