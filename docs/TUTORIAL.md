@@ -14,7 +14,7 @@ Be clear about the boundary before you start. The scripts handle solvation,
 ionisation, equilibration, production, PBC cleanup, analysis and bookkeeping.
 
 They do **not** build your starting structures. Choosing the C/C chain pair out
-of 1MSC, modelling the single-chain linker, mutating the RNA to your designed
+of 2MS2, modelling the single-chain linker, mutating the RNA to your designed
 pac sequence — that is science, it is where the mistakes that matter live, and
 it is deliberately left to you. Section 2 covers it.
 
@@ -105,7 +105,7 @@ input/<system>/<system>.pdb        # pdb2gmx route  (apo systems)
 input/<system>/gromacs/            # CHARMM-GUI Solution Builder output (RNA)
 ```
 
-### S1 — WT C/C dimer from 1MSC
+### S1 — WT C/C dimer from 2MS2
 
 The asymmetric unit gives you three quasi-equivalent chains and therefore **two
 physically different dimers**: the symmetric C/C pair and the asymmetric A/B
@@ -134,8 +134,8 @@ Checklist before you accept a PDB as input:
 
 ### S2 — single-chain dimer
 
-Build with AlphaFold3 or by grafting the linker onto the 1MSC dimer. **Before
-simulating**, superpose the model onto the 1MSC C/C dimer and record backbone
+Build with AlphaFold3 or by grafting the linker onto the 2MS2 dimer. **Before
+simulating**, superpose the model onto the 2MS2 C/C dimer and record backbone
 RMSD:
 
 ```bash
