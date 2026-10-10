@@ -23,6 +23,17 @@ esac
 # Optional explicit gmx binary, e.g. a portable Windows build on a USB stick:
 #   export BRUSAFE_GMX="/c/gromacs/bin/gmx.exe"
 # Every `gmx ...` call in the scripts then goes to that binary.
+# If it is not set in this terminal (e.g. the window was opened before
+# setup_machine.sh wrote it to ~/.bashrc), use the standard location that
+# setup_machine.sh extracts to, and last the value written in ~/.bashrc.
+if [ -z "${BRUSAFE_GMX:-}" ] && [ -x "$HOME/gromacs/bin/gmx.exe" ]; then
+  BRUSAFE_GMX="$HOME/gromacs/bin/gmx.exe"
+fi
+if [ -z "${BRUSAFE_GMX:-}" ] && [ -f "$HOME/.bashrc" ]; then
+  _g="$(sed -n 's/^export BRUSAFE_GMX="\(.*\)"$/\1/p' "$HOME/.bashrc" | tail -1)"
+  [ -n "$_g" ] && [ -x "$_g" ] && BRUSAFE_GMX="$_g"
+  unset _g
+fi
 if [ -n "${BRUSAFE_GMX:-}" ]; then
   [ -x "$BRUSAFE_GMX" ] || die "BRUSAFE_GMX=$BRUSAFE_GMX is not an executable"
   gmx() { "$BRUSAFE_GMX" "$@"; }
