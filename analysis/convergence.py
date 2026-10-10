@@ -122,10 +122,21 @@ def cmd_gate(a: argparse.Namespace) -> None:
 
     # A density that is still drifting means the box has not settled, whatever
     # the mean says.
+    # The threshold must scale with the noise: a ~10k-atom box has density
+    # fluctuations of several kg/m^3, so a fixed 2 kg/m^3 would fail a box that
+    # is perfectly settled. Fail only if the drift exceeds 2 kg/m^3 AND is
+    # significant (> 3 standard errors, block-averaged) against that noise.
     half = len(d) // 2
-    drift = abs(d[half:].mean() - d[:half].mean())
-    print(f"density drift{drift:8.2f} kg/m^3 across second half", end="  ")
-    if drift < 2.0:
+    a1, a2 = d[:half], d[half:]
+    drift = abs(a2.mean() - a1.mean())
+
+    def sem(x: np.ndarray) -> float:
+        _, e = block_average(x)
+        return float(e[len(e) * 2 // 3:].mean()) if len(e) else float(x.std() / np.sqrt(len(x)))
+
+    se = float(np.hypot(sem(a1), sem(a2)))
+    print(f"density drift{drift:8.2f} kg/m^3 across second half (3 SE = {3 * se:.2f})", end="  ")
+    if drift < 2.0 or drift < 3.0 * se:
         print("PASS")
     else:
         print("FAIL  (still equilibrating -- extend npt_free)")
