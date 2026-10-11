@@ -59,7 +59,9 @@ python3 scripts/_registry.py plan --machines 10 --tier 1 --nsday <measured>
 # 4. the comparison that carries the actual claim
 ./analysis/compare_systems.sh S1_wt_cc_apo S2_sccp_apo
 
-# figures, interactive HTML and trajectory animations for the wiki
+# compact wiki pages: one per system, replicas pooled, one animation each
+python3 analysis/md_report.py wiki --all
+# full set of figures for one system, and cross-system overlays
 python3 analysis/md_report.py report  S1_wt_cc_apo
 python3 analysis/md_report.py compare S1_wt_cc_apo S2_sccp_apo
 
