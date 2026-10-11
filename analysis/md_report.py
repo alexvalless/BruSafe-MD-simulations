@@ -12,6 +12,7 @@ runs/<system>/rep*/analysis/) and turns it into wiki-ready output:
 
 Subcommands
 -----------
+  wiki    <sys...> | --all      compact page per system for the wiki (start here)
   report  <system>              everything for one system, all replicas overlaid
   compare <sysA> <sysB> [...]   cross-system overlays (RMSF, RMSD, distributions)
   animate --top T --traj X -o F one standalone trajectory viewer
@@ -427,6 +428,8 @@ th,td{padding:6px 10px;border-bottom:1px solid var(--rule);text-align:right;
       white-space:nowrap}
 th:first-child,td:first-child{text-align:left}
 th{color:var(--ink2);font-weight:600}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,460px),1fr));gap:12px 16px}
+.grid section{min-width:0}
 .card{background:var(--card);border:1px solid var(--rule);border-radius:8px;
       padding:8px;margin:8px 0}
 iframe{width:100%;height:620px;border:1px solid var(--rule);border-radius:8px;
@@ -488,15 +491,17 @@ def write_plot_page(p: Plot, html_dir: Path, js: JsMode) -> str:
 
 def write_dashboard(html_dir: Path, title: str, lede: str, table_html: str,
                     fragments: list[tuple[str, str]], animations: list[str],
-                    js: JsMode) -> None:
+                    js: JsMode, grid: bool = False) -> None:
     nav = "".join(f"<a href='#sec-{k}'>{html.escape(h)}</a>" for k, h in
                   [("summary", "Summary")] + [(k, k.replace('_', ' ')) for k, _ in fragments]
                   + ([("traj", "Trajectories")] if animations else []))
     body = [f"<h1>{html.escape(title)}</h1><p class='lede'>{html.escape(lede)}</p>",
             f"<nav>{nav}</nav>",
             f"<h2 id='sec-summary'>Summary</h2>{table_html}"]
-    for key, frag in fragments:
-        body.append(frag)
+    if grid:
+        body.append("<div class='grid'>" + "".join(f for _, f in fragments) + "</div>")
+    else:
+        body.extend(f for _, f in fragments)
     if animations:
         body.append("<h2 id='sec-traj'>Trajectories</h2>"
                     "<p class='cap'>Protein/RNA heavy atoms, aligned on the backbone. "
@@ -906,16 +911,30 @@ def cmd_report(a: argparse.Namespace) -> None:
     plots += [p] if p.traces else []
     plots += dist
 
+    if a.compact:
+        # wiki view: what a reader needs to judge the system, nothing per-replica
+        keep = ["rmsd_backbone", "rmsf", "rg", "sasa"]
+        if registry_row(a.system).get("has_rna") == "yes" or any(
+                p.key in ("rmsd_rna", "mindist_mg") for p in plots):
+            keep += ["rmsd_rna", "mindist_mg"]
+        plots = [p for p in plots if p.key in keep]
+        plots.sort(key=lambda p: keep.index(p.key))
+
     html_dir, js, frags = emit(plots, outdir, a.js)
 
     rows, cols = summarise(reps, eq)
+    if a.compact:       # per-replica block SEMs stay in the CSV, not on the page
+        cols = [c for c in cols if "block SEM" not in c]
     note = (f"Means over t ≥ {eq:g} ns. Report mean ± SD across replicas; the per-replica "
             "block SEM is convergence evidence, not the error bar.")
     table = table_outputs(rows, cols, outdir, note)
 
     anims = []
+    anim_reps = reps
+    if a.compact:       # one movie per system keeps the wiki page light
+        anim_reps = [r for r in reps if r.name == f"rep{a.anim_rep}"] or reps[:1]
     if not a.no_anim:
-        for r in reps:
+        for r in anim_reps:
             top, trj = r.path / "clean.gro", r.path / "clean.xtc"
             if not (top.is_file() and trj.is_file()):
                 log(f"{r.name}: no clean.gro/clean.xtc -- skipping animation")
@@ -933,8 +952,49 @@ def cmd_report(a: argparse.Namespace) -> None:
     lede = " · ".join(v for v in [meta.get("consumer", ""),
                                   f"{len(reps)} replica(s)",
                                   f"source {meta['source_pdb']}" if meta.get("source_pdb") else ""] if v)
-    write_dashboard(html_dir, f"{a.system} — MD analysis", lede, table, frags, anims, js)
+    write_dashboard(html_dir, f"{a.system} — MD analysis", lede, table, frags, anims, js,
+                    grid=a.compact)
     log(f"done: open {html_dir / 'index.html'}")
+
+
+def cmd_wiki(a: argparse.Namespace) -> None:
+    """Compact page per system (all replicas pooled) + an index over the systems."""
+    need_modules("matplotlib", "plotly")
+    runs = Path(a.runs)
+    if a.all:
+        tsv = REPO / "config" / "systems.tsv"
+        lines = [ln for ln in open(tsv) if ln.strip() and not ln.startswith("#")]
+        systems = [r["name"] for r in csv.DictReader(lines, delimiter="\t")]
+        systems = [s for s in systems if any((runs / s).glob("rep*/analysis/*.xvg"))]
+        if not systems:
+            sys.exit(f"no system under {runs} has analysis output yet")
+    else:
+        systems = a.systems
+        if not systems:
+            sys.exit("name at least one system, or use --all")
+    root = Path(a.out or REPO / "analysis_out" / "wiki")
+    done, failed = [], []
+    for s in systems:
+        ns = argparse.Namespace(**vars(a))
+        ns.system, ns.out, ns.compact = s, str(root / s), True
+        try:
+            cmd_report(ns)
+            done.append(s)
+        except SystemExit as e:
+            failed.append((s, str(e.code)))
+            log(f"{s}: skipped -- {e.code}")
+    if done:
+        rows = "".join(f"<li><a href='{s}/html/index.html'>{html.escape(s)}</a> "
+                       f"<span class='cap'>{html.escape(registry_row(s).get('consumer', ''))}"
+                       f"</span></li>" for s in done)
+        (root / "index.html").write_text(
+            f"<!doctype html><html lang='en'><head><meta charset='utf-8'>"
+            f"<meta name='viewport' content='width=device-width,initial-scale=1'>"
+            f"<title>BruSafe MD systems</title><style>{PAGE_CSS}</style></head><body><main>"
+            f"<h1>BruSafe MD systems</h1><ul>{rows}</ul></main></body></html>", encoding="utf-8")
+        log(f"index: {root / 'index.html'}")
+    if failed:
+        log("not generated: " + ", ".join(f"{s} ({why.splitlines()[0][:60]})" for s, why in failed))
 
 
 # ==========================================================================
@@ -1331,8 +1391,23 @@ def main() -> None:
     p.add_argument("system")
     p.add_argument("--reps", type=int, nargs="+", help="replica numbers (default: all)")
     p.add_argument("--no-anim", action="store_true", help="skip trajectory animations")
+    p.add_argument("--compact", action="store_true",
+                   help="wiki view: RMSD, RMSF, Rg, SASA (+RNA RMSD, Mg for RNA systems), "
+                        "one animation")
+    p.add_argument("--anim-rep", type=int, default=1,
+                   help="replica to animate with --compact (default 1)")
     common(p)
     p.set_defaults(fn=cmd_report)
+
+    p = sub.add_parser("wiki", help="compact page per system, replicas pooled, for the wiki")
+    p.add_argument("systems", nargs="*", help="system names (or use --all)")
+    p.add_argument("--all", action="store_true",
+                   help="every system in config/systems.tsv that has analysis output")
+    p.add_argument("--reps", type=int, nargs="+", help="replica numbers (default: all)")
+    p.add_argument("--anim-rep", type=int, default=1, help="replica to animate (default 1)")
+    p.add_argument("--no-anim", action="store_true", help="skip trajectory animations")
+    common(p)
+    p.set_defaults(fn=cmd_wiki)
 
     p = sub.add_parser("compare", help="overlay two or more systems")
     p.add_argument("systems", nargs="+")
