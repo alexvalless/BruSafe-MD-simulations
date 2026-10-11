@@ -399,6 +399,20 @@ python3 analysis/md_report.py animate --top runs/S1_wt_cc_apo/rep1/analysis/clea
         --traj runs/S1_wt_cc_apo/rep1/analysis/clean.xtc -o s1_rep1.html
 ```
 
+**For the wiki, start with `wiki`.** It writes one compact page per system to
+`analysis_out/wiki/<system>/html/index.html` (summary table; RMSD, RMSF, Rg and
+SASA with all replicas overlaid and mean ± SD; RNA RMSD and Mg²⁺ distance for RNA
+systems; one animation, `--anim-rep N` picks the replica) and an
+`analysis_out/wiki/index.html` linking them:
+
+```bash
+python3 analysis/md_report.py wiki --all                    # every system with analysis output
+python3 analysis/md_report.py wiki S4_cp_pacdesign S5_cp_scramble
+```
+
+Systems with nothing to plot are skipped with a message. `report` below is the
+full set, for the supplement or for checking convergence.
+
 `report` writes to `analysis_out/<system>/`:
 
 | Output | What it is |
