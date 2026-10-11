@@ -53,6 +53,7 @@ import base64
 import csv
 import html
 import json
+import os
 import re
 import shutil
 import sys
@@ -744,12 +745,30 @@ def table_outputs(rows: list[dict], cols: list[str], outdir: Path, note: str) ->
     return f"<table><thead><tr>{th}</tr></thead><tbody>{tr}</tbody></table><p class='cap'>{html.escape(note)}</p>"
 
 
+def need_modules(*names: str) -> None:
+    """Fail up front, with the install line, instead of a traceback halfway through."""
+    import importlib.util
+    missing = [n for n in names if importlib.util.find_spec(n) is None]
+    if missing:
+        sys.exit(f"missing Python package(s): {', '.join(missing)}\n"
+                 f"install with:  python3 -m pip install --user {' '.join(missing)}")
+
+
 def cmd_report(a: argparse.Namespace) -> None:
+    need_modules("matplotlib", "plotly")
     runs = Path(a.runs)
     sys_dir = runs / a.system
     reps = find_replicas(sys_dir, a.reps)
+    # 04_postprocess.sh creates analysis/ before it checks for prod.xtc, so an
+    # empty analysis/ is common: only count replicas that have actual output
+    empty = [r.name for r in reps if not any(r.path.glob("*.xvg"))]
+    reps = [r for r in reps if r.name not in empty]
+    for name in empty:
+        log(f"{name}: analysis/ has no .xvg files -- skipped")
     if not reps:
-        sys.exit(f"no rep*/analysis/ under {sys_dir} -- run 04_postprocess.sh first")
+        sys.exit(f"nothing to plot under {sys_dir}: run "
+                 f"./scripts/04_postprocess.sh {a.system} <replica> first "
+                 f"(it needs prod.xtc, prod.tpr and index.ndx in rep<N>/)")
     outdir = Path(a.out or REPO / "analysis_out" / a.system)
     log(f"{a.system}: {', '.join(r.name for r in reps)} -> {outdir}")
     eq = a.equil_ns
@@ -922,6 +941,7 @@ def cmd_report(a: argparse.Namespace) -> None:
 # Cross-system comparison
 
 def cmd_compare(a: argparse.Namespace) -> None:
+    need_modules("matplotlib", "plotly")
     runs = Path(a.runs)
     systems = [(s, find_replicas(runs / s, None)) for s in a.systems]
     for s, reps in systems:
@@ -1272,6 +1292,7 @@ const D = __DATA__;
 
 
 def cmd_animate(a: argparse.Namespace) -> None:
+    need_modules("MDAnalysis")
     out = Path(a.output)
     out.parent.mkdir(parents=True, exist_ok=True)
     build_animation(Path(a.top), Path(a.traj), out, a.title or out.stem, a.frames, a.sel,
@@ -1289,8 +1310,8 @@ def main() -> None:
     sub = ap.add_subparsers(dest="cmd", required=True)
 
     def common(p, anim=True):
-        p.add_argument("--runs", default=str(REPO / "runs"),
-                       help="runs directory (default: $REPO/runs)")
+        p.add_argument("--runs", default=os.environ.get("BRUSAFE_RUNS", str(REPO / "runs")),
+                       help="runs directory (default: $BRUSAFE_RUNS, else $REPO/runs)")
         p.add_argument("--out", help="output directory (default: analysis_out/...)")
         p.add_argument("--equil-ns", type=float, default=50.0,
                        help="relaxation window excluded from statistics (default 50)")
