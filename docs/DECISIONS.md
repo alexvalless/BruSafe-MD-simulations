@@ -297,3 +297,8 @@ the first clustered frame (`analysis/clean.gro`) as reference. Toy test: referen
 S1 (C/C) and S6 (A/B), no RNA, NTER/CTER, PROA/PROB. `01_prepare.sh --source charmm-gui` rebuilds the box:
 S1 73,989 atoms (K 68 / Cl 70), S6 54,773 atoms (K 51 / Cl 53). Minimisation starts finite. docs/PLAN.txt now
 holds the 6 apo jobs (gpu0-2 = S1 reps 1-3, gpu3-5 = S6 reps 1-3); the S4/S8 plan is kept in docs/PLAN_S4_S8.txt.
+
+## 2026-10-13 — run_slot retries a production that died
+S1 rep3 (PC-?) stopped at ~14 ns with "Cannot rename checkpoint file" while 422 GB were free: a Windows file
+lock (antivirus/indexer) on prod.cpt, not the physics. run_slot.sh now retries run_night up to 5 times, 60 s
+apart, resuming from the checkpoint, but only if production had already started (prod.cpt exists).

@@ -53,8 +53,18 @@ while IFS=$'\t' read -r SYS REP; do
       "$REPO/scripts/01_prepare.sh" "$SYS" --source charmm-gui --replica "$REP" > "$RUNS/prepare_${SYS}_rep${REP}.log" 2>&1 \
         || { log "prepare FAILED for $SYS rep$REP (see $RUNS/prepare_${SYS}_rep${REP}.log)"; FAILED="$FAILED $SYS/rep$REP"; continue; }
     fi
-    "$REPO/scripts/run_night.sh" "$SYS" "$REP" "$LEFT" \
-      || { log "run FAILED for $SYS rep$REP"; FAILED="$FAILED $SYS/rep$REP"; continue; }
+    # mdrun can die for reasons outside the physics (on Windows an antivirus or
+    # indexer holding prod.cpt makes the checkpoint rename fail: "Cannot rename
+    # checkpoint file", seen on S1 rep3). Production is restartable, so retry
+    # from the last checkpoint instead of giving up on the first error.
+    ok=0
+    for attempt in 1 2 3 4 5; do
+      if "$REPO/scripts/run_night.sh" "$SYS" "$REP" "$(left_hours)"; then ok=1; break; fi
+      [ -f "$D/prod.cpt" ] || break          # failed before production: not a transient error
+      log "run attempt $attempt failed for $SYS rep$REP -- retrying from the checkpoint in 60 s"
+      sleep 60
+    done
+    [ "$ok" = 1 ] || { log "run FAILED for $SYS rep$REP"; FAILED="$FAILED $SYS/rep$REP"; continue; }
   fi
 
   if [ ! -f "$D/prod.gro" ]; then
