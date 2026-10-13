@@ -17,14 +17,18 @@ A="$D/analysis"
 cd "$D"; mkdir -p "$A"
 [ -f prod.xtc ] || die "no prod.xtc in $D"
 
-log "PBC cleanup (whole -> nojump -> centred compact)"
-printf 'SOLU\n'        | gmx trjconv -s prod.tpr -f prod.xtc -n index.ndx -pbc whole  -o .w.xtc
-printf 'SOLU\n'        | gmx trjconv -s prod.tpr -f .w.xtc   -n index.ndx -pbc nojump -o .nj.xtc
-printf 'SOLU\nSOLU\n'  | gmx trjconv -s prod.tpr -f .nj.xtc  -n index.ndx -center \
-                                     -pbc mol -ur compact -o "$A/clean.xtc"
+log "PBC cleanup (whole -> cluster the solute around its centre)"
+# -pbc mol -ur compact (used before) puts every MOLECULE's centre in the box
+# on its own, so the two CP chains and the RNA of a complex end up in
+# different periodic images: backbone RMSD of 1-3 nm and Rg of 3-4 nm for a
+# dimer that is intact (found on S4 rep1). -pbc cluster instead gathers all
+# the solute molecules into one contiguous cluster in every frame.
+printf 'SOLU\n'              | gmx trjconv -s prod.tpr -f prod.xtc -n index.ndx -pbc whole -o .w.xtc
+printf 'SOLU\nSOLU\nSOLU\n' | gmx trjconv -s prod.tpr -f .w.xtc -n index.ndx \
+                                          -pbc cluster -center -o "$A/clean.xtc"
 printf 'SOLU\n'        | gmx trjconv -s prod.tpr -f "$A/clean.xtc" -n index.ndx \
                                      -dump 0 -o "$A/clean.gro"
-rm -f .w.xtc .nj.xtc
+rm -f .w.xtc
 
 cd "$A"
 # Protein systems use Backbone / C-alpha; the free hairpin (no protein) uses

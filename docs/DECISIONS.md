@@ -280,3 +280,11 @@ series) still fails; settled noisy series pass. Mean density and temperature che
 `show 1MSC` reports only chain A, so the quasi-equivalent C/C and A/B dimers cannot be built from it.
 2MS2 (apo capsid) carries chains A, B and C with 60 BIOMT operators: A/B via op5 (166 contacts) and
 C/C via op6 (154 contacts, 180° two-fold). S1 = C,C and S6 = A,B from 2MS2, without RNA.
+
+## 2026-10-13 — PBC cleanup: -pbc cluster instead of -pbc mol -ur compact
+S4 rep1 analysis showed protein backbone RMSD 1.0-2.9 nm and Rg 3-4 nm for an intact CP dimer, while the
+RNA RMSD was a stable 0.13-0.20 nm. `-pbc mol -ur compact` centres each molecule separately, so chains A, B
+and the RNA sat in different periodic images. The cleanup is now `whole -> cluster (-center)`. Reproduced on
+a toy dimer straddling the box edge (Rg 2.755 old vs 0.301 new). The simulation itself is unaffected; only
+clean.xtc and everything derived from it (RMSD, Rg, RMSF, SASA, DSSP, PCA, H-bonds, RNA RMSD) must be redone.
+The Mg2+ table uses the raw prod.xtc and is unaffected.
