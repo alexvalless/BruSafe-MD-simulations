@@ -288,3 +288,7 @@ and the RNA sat in different periodic images. The cleanup is now `whole -> clust
 a toy dimer straddling the box edge (Rg 2.755 old vs 0.301 new). The simulation itself is unaffected; only
 clean.xtc and everything derived from it (RMSD, Rg, RMSF, SASA, DSSP, PCA, H-bonds, RNA RMSD) must be redone.
 The Mg2+ table uses the raw prod.xtc and is unaffected.
+
+Follow-up (same day): after the cluster fix, Rg of S4 rep1 became 1.90 nm (correct) but backbone RMSD stayed at a
+constant 4.03 nm: `gmx rms -s prod.tpr` fits against the UNclustered start structure. RMSD, RMSF and PCA now use
+the first clustered frame (`analysis/clean.gro`) as reference. Toy test: reference tpr -> 2.5, clean.gro -> ~0.

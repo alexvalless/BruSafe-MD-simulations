@@ -31,28 +31,32 @@ printf 'SOLU\n'        | gmx trjconv -s prod.tpr -f "$A/clean.xtc" -n index.ndx 
 rm -f .w.xtc
 
 cd "$A"
+# Reference for every RMSD/RMSF/PCA fit: the first CLUSTERED frame (clean.gro).
+# The structure inside prod.tpr is not clustered, so fitting clean.xtc to it
+# gives a constant, meaningless offset (4.0 nm on S4 rep1). clean.gro only holds
+# the solute, which are atoms 1..N of the system, so the index groups still match.
 # Protein systems use Backbone / C-alpha; the free hairpin (no protein) uses
 # the RNA sugar-phosphate backbone and its phosphorus atoms instead.
 if grep -q '\[ Backbone \]' ../index.ndx; then BB=Backbone; CA=C-alpha; else BB=RNA_BB; CA=RNA_P; fi
 log "RMSD / Rg / RMSF / SASA / DSSP  (groups: $BB, $CA)"
-printf '%s\n%s\n' "$BB" "$BB" | gmx rms   -s ../prod.tpr -f clean.xtc -n ../index.ndx -o rmsd_backbone.xvg -tu ns
+printf '%s\n%s\n' "$BB" "$BB" | gmx rms   -s clean.gro -f clean.xtc -n ../index.ndx -o rmsd_backbone.xvg -tu ns
 printf '%s\n' "$BB"           | gmx gyrate -s ../prod.tpr -f clean.xtc -n ../index.ndx -o gyrate.xvg
 # discard the first skip_ns (registry) before RMSF -- fluctuations during
 # relaxation are not the fluctuations you want to report
-printf '%s\n' "$CA"            | gmx rmsf  -s ../prod.tpr -f clean.xtc -n ../index.ndx -o rmsf_ca.xvg -res -b "$SKIP_PS"
+printf '%s\n' "$CA"            | gmx rmsf  -s clean.gro -f clean.xtc -n ../index.ndx -o rmsf_ca.xvg -res -b "$SKIP_PS"
 printf 'SOLU\n'               | gmx sasa  -s ../prod.tpr -f clean.xtc -n ../index.ndx -o sasa.xvg
 gmx dssp -s ../prod.tpr -f clean.xtc -n ../index.ndx -o dssp.dat -num dssp_num.xvg 2>/dev/null \
   || log "gmx dssp unavailable (needs GROMACS >= 2023); fall back to do_dssp"
 
 log "PCA (essential dynamics), after the first $(( SKIP_PS / 1000 )) ns"
-printf '%s\n%s\n' "$CA" "$CA" | gmx covar  -s ../prod.tpr -f clean.xtc -n ../index.ndx \
+printf '%s\n%s\n' "$CA" "$CA" | gmx covar  -s clean.gro -f clean.xtc -n ../index.ndx \
                                          -o eigenval.xvg -v eigenvec.trr -b "$SKIP_PS" >/dev/null
-printf '%s\n%s\n' "$CA" "$CA" | gmx anaeig -s ../prod.tpr -f clean.xtc -n ../index.ndx \
+printf '%s\n%s\n' "$CA" "$CA" | gmx anaeig -s clean.gro -f clean.xtc -n ../index.ndx \
                                          -v eigenvec.trr -first 1 -last 1 -proj pc1.xvg -b "$SKIP_PS" >/dev/null
 
 if [ "$HAS_RNA" = "yes" ]; then
   log "RNA-specific analysis"
-  printf 'RNA\nRNA\n' | gmx rms -s ../prod.tpr -f clean.xtc -n ../index.ndx -o rmsd_rna.xvg -tu ns \
+  printf 'RNA\nRNA\n' | gmx rms -s clean.gro -f clean.xtc -n ../index.ndx -o rmsd_rna.xvg -tu ns \
     || log "no RNA group in index.ndx -- add one with make_ndx"
   # Hydrogen bonds: protein-RNA when there is a protein, within the RNA when not.
   # GROMACS >= 2024 rewrote `gmx hbond` (selections via -r/-t) and kept the old
