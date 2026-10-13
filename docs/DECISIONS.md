@@ -292,3 +292,8 @@ The Mg2+ table uses the raw prod.xtc and is unaffected.
 Follow-up (same day): after the cluster fix, Rg of S4 rep1 became 1.90 nm (correct) but backbone RMSD stayed at a
 constant 4.03 nm: `gmx rms -s prod.tpr` fits against the UNclustered start structure. RMSD, RMSF and PCA now use
 the first clustered frame (`analysis/clean.gro`) as reference. Toy test: reference tpr -> 2.5, clean.gro -> ~0.
+
+## 2026-10-13 — S1 and S6 built from 2MS2 with CHARMM-GUI
+S1 (C/C) and S6 (A/B), no RNA, NTER/CTER, PROA/PROB. `01_prepare.sh --source charmm-gui` rebuilds the box:
+S1 73,989 atoms (K 68 / Cl 70), S6 54,773 atoms (K 51 / Cl 53). Minimisation starts finite. docs/PLAN.txt now
+holds the 6 apo jobs (gpu0-2 = S1 reps 1-3, gpu3-5 = S6 reps 1-3); the S4/S8 plan is kept in docs/PLAN_S4_S8.txt.
