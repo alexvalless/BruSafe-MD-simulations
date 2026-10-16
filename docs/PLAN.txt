@@ -10,3 +10,9 @@ gpu3	S6_wt_ab_apo	1	100	FG-loop switch -> M3 quasi-equivalence
 gpu4	S6_wt_ab_apo	2	100	FG-loop switch -> M3 quasi-equivalence
 # ---- gpu5 ----
 gpu5	S6_wt_ab_apo	3	100	FG-loop switch -> M3 quasi-equivalence
+# ---- gpu6 ----
+gpu6	S2_sccp_apo	1	100	M0/M1 - does the linker perturb the dimer fold?
+# ---- gpu7 ----
+gpu7	S2_sccp_apo	2	100	M0/M1 - does the linker perturb the dimer fold?
+# ---- gpu8 ----
+gpu8	S2_sccp_apo	3	100	M0/M1 - does the linker perturb the dimer fold?
