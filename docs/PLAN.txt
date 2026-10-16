@@ -16,3 +16,13 @@ gpu6	S2_sccp_apo	1	100	M0/M1 - does the linker perturb the dimer fold?
 gpu7	S2_sccp_apo	2	100	M0/M1 - does the linker perturb the dimer fold?
 # ---- gpu8 ----
 gpu8	S2_sccp_apo	3	100	M0/M1 - does the linker perturb the dimer fold?
+# ---- gpu9 ----
+gpu9	S9_sccp_pac	1	30	Does the linker perturb RNA binding? ddG vs S4
+# ---- gpu10 ----
+gpu10	S9_sccp_pac	2	30	Does the linker perturb RNA binding? ddG vs S4
+# ---- gpu101 ----
+gpu101	S9_sccp_pac	3	30	Does the linker perturb RNA binding? ddG vs S4
+# ---- gpu102 ----
+gpu102	S9_sccp_pac	4	30	Does the linker perturb RNA binding? ddG vs S4
+# ---- gpu103 ----
+gpu103	S9_sccp_pac	5	30	Does the linker perturb RNA binding? ddG vs S4
