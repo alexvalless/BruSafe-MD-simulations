@@ -311,3 +311,7 @@ copy 2 (residues 204-208 = copy-2 residues 71-75, 13-25 A from S4 chain B). One 
 Arg49 of copy 2 vs G8 OP1 (1.4-1.5 A); the linker touches nothing. Steepest descent is expected to resolve the
 Arg49 overlap; if EM diverges, copy that side chain from S4. The FG-loop conformation of copy 2 differs from the
 RNA-bound S4 chain B: report as a limitation of the model.
+
+S2 (scCP apo) built from the same model with CHARMM-GUI (one chain PROA, NTER/CTER): 54,178 atoms, K 51 / Cl 53,
+minimisation starts finite. docs/PLAN.txt: gpu6-8 = S2 reps 1-3 (100 ns each); gpu0-5 stay S1/S6. S9 still waits
+for its own CHARMM-GUI build (protein + RNA + Mg).
