@@ -315,3 +315,10 @@ RNA-bound S4 chain B: report as a limitation of the model.
 S2 (scCP apo) built from the same model with CHARMM-GUI (one chain PROA, NTER/CTER): 54,178 atoms, K 51 / Cl 53,
 minimisation starts finite. docs/PLAN.txt: gpu6-8 = S2 reps 1-3 (100 ns each); gpu0-5 stay S1/S6. S9 still waits
 for its own CHARMM-GUI build (protein + RNA + Mg).
+
+S9 (scCP + pac) CHARMM-GUI build installed. The upload had no Mg, so CHARMM-GUI wrote no MG topology and
+`genion -pname MG` failed ("No such moleculetype MG"). Fixed by copying toppar/MG.itp and toppar/forcefield.itp
+from S4 (they differ from S9's only in the 14 Mg lines) and adding `#include "toppar/MG.itp"` to topol.top.
+Build: 54,214 atoms, K 51 / Cl 51 / Mg 5 (neutral), groups RNA, RNA_BB, RNA_P, MG present. 1000-step EM from the
+grafted model: finite (-8.6e5 kJ/mol); the Arg49/G8-OP1 overlap of the graft did not block it. docs/PLAN.txt:
+gpu9-13 = S9 reps 1-5 (30 ns each).
