@@ -37,7 +37,17 @@ def main():
     if len(sys.argv) < 2:
         sys.exit(__doc__)
     model = ca_by_chain(sys.argv[1])
-    x, y = (sys.argv[2], sys.argv[3]) if len(sys.argv) >= 4 else ("A", "C")
+    if len(model) == 1:                       # single-chain construct: copy 1 - linker - copy 2
+        ch, = model
+        nums = sorted(model[ch])
+        n = len(nums)
+        model = {"1": {i + 1: model[ch][nums[i]] for i in range(129)},
+                 "2": {i + 1: model[ch][nums[n - 129 + i]] for i in range(129)}}
+        print(f"single chain of {n} residues: copy 1 = first 129, copy 2 = last 129 "
+              f"(linker = {n - 258} residues)")
+        x, y = "1", "2"
+    else:
+        x, y = (sys.argv[2], sys.argv[3]) if len(sys.argv) >= 4 else ("A", "C")
     for ch in (x, y):
         print(f"model chain {ch}: {len(model[ch])} CA")
     res = range(1, 130)

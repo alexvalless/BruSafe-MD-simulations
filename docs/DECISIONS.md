@@ -302,3 +302,12 @@ holds the 6 apo jobs (gpu0-2 = S1 reps 1-3, gpu3-5 = S6 reps 1-3); the S4/S8 pla
 S1 rep3 (PC-?) stopped at ~14 ns with "Cannot rename checkpoint file" while 422 GB were free: a Windows file
 lock (antivirus/indexer) on prod.cpt, not the physics. run_slot.sh now retries run_night up to 5 times, 60 s
 apart, resuming from the checkpoint, but only if production had already started (prod.cpt exists).
+
+## 2026-10-16 — scCP model (S2, S9)
+AlphaFold3, ONE chain of 262 residues: CP(1-129) + GGSG + CP(134-262). pLDDT 88.8 overall; linker 51-63 (flexible,
+expected). First attempt (CP / GGSG / CP as three separate chains) was rejected: the linker floated 24-32 A away.
+Graft on S4 (`build S9_sccp_pac`): rigid-core RMSD 0.54 A (225 CA); all-CA RMSD 3.07 A, entirely from the FG loop of
+copy 2 (residues 204-208 = copy-2 residues 71-75, 13-25 A from S4 chain B). One side-chain contact below 2 A:
+Arg49 of copy 2 vs G8 OP1 (1.4-1.5 A); the linker touches nothing. Steepest descent is expected to resolve the
+Arg49 overlap; if EM diverges, copy that side chain from S4. The FG-loop conformation of copy 2 differs from the
+RNA-bound S4 chain B: report as a limitation of the model.
