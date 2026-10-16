@@ -322,3 +322,6 @@ from S4 (they differ from S9's only in the 14 Mg lines) and adding `#include "to
 Build: 54,214 atoms, K 51 / Cl 51 / Mg 5 (neutral), groups RNA, RNA_BB, RNA_P, MG present. 1000-step EM from the
 grafted model: finite (-8.6e5 kJ/mol); the Arg49/G8-OP1 overlap of the graft did not block it. docs/PLAN.txt:
 gpu9-13 = S9 reps 1-5 (30 ns each).
+
+2026-10-16: S1 and S6 finished, so docs/PLAN.txt was renumbered to hold only S2 and S9 on slots 0-7
+(gpu0-2 = S2 reps 1-3, gpu3-7 = S9 reps 1-5). The previous plan is in docs/PLAN_S1_S6_S2_S9_old.txt.
