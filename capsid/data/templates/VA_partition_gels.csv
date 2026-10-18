@@ -1,0 +1,4 @@
+# notebooks/BruSafe_03_M2_soluble_partition.ipynb, USE_SYNTHETIC = False
+# Two concentrations, not a band ratio. Load soluble and resuspended pellet at matched
+# culture-volume equivalents, or the measured ratio is not the partition.
+lactose_uM,time_min,temp_C,soluble_mg_L,pellet_mg_L

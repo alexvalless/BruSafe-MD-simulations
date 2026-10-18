@@ -19,11 +19,12 @@ wiki/                  source pages for the wiki (overview, MD methods, CAPSID m
 
 capsid/                the CAPSID modelling framework
   notebooks/             production, literature, exploratory and archived notebooks (catalogue in notebooks/README.md)
-  data/                  literature data pack and data dictionary
+  data/                  literature data pack, bench-data templates and data dictionary
+  docs/                  framework theory, results write-up, literature runs, M4 compendium
   figures/               figures produced by the notebooks, with an index
   results/logs/          cell-by-cell output of the reported runs
   tools/                 headless runner and calibration studies
-  MANIFEST.csv           every notebook with group, module, language, size and title
+  MANIFEST.csv           every notebook with group, module, size and title
 
 config/systems.tsv     MD registry: what is simulated, how many replicas, and why
 mdp/                   GROMACS parameter files (em, nvt, npt, npt_free, prod)

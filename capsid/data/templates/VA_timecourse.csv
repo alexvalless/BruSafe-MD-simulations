@@ -1,0 +1,4 @@
+# notebooks/BruSafe_01_M1_expression_IPTG.ipynb, USE_SYNTHETIC = False
+# biomass_gdcw_L may be replaced by wet_weight_g_L or OD600; the notebook converts either.
+# CP_mg_L is densitometry read against a purified standard curve, one curve per gel_id.
+dose_uM,time_min,gel_id,biomass_gdcw_L,CP_mg_L

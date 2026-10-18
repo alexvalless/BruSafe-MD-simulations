@@ -1,4 +1,11 @@
-# Literature data pack
+# Data
+
+`litdata/` holds the literature data pack, `templates/` the empty CSV files for bench data, and
+`M4_bench_data_template.csv` the template of the exploratory fitting notebook. `FILES.json` lists what
+ships with the repository, what has to be supplied, and what the notebooks write. The tables below are
+in `litdata/`.
+
+## Literature data pack
 
 Published measurements used by the literature variants (`notebooks/literature/`) and by notebook 04.
 Every table that was transcribed from a paper carries its source in the last columns (`source_*`),
