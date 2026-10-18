@@ -1,6 +1,7 @@
 ; BruSafe -- NVT equilibration, 200 ps, position restraints.
-; gen_seed is rewritten per replica by 02_equilibrate.sh. This is what makes
-; replicas statistically independent -- do NOT branch replicas after this stage.
+; gen_seed is rewritten for each replica by 02_equilibrate.sh, which is what makes
+; the replicas statistically independent. Replicas should not be branched after
+; this stage.
 define                  = -DPOSRES
 
 integrator              = md

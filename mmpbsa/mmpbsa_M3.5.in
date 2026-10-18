@@ -1,8 +1,8 @@
 ; ============================================================================
 ; M3.5 — CP dimer : pac hairpin binding energetics
-; gmx_MMPBSA input (Valdés-Tresanco et al.). Verify flag names against
-; `gmx_MMPBSA --help` for YOUR installed version — several moved between
-; 1.4 / 1.5 / 1.6, especially the entropy keywords.
+; gmx_MMPBSA input (Valdés-Tresanco et al.). Flag names should be checked against
+; `gmx_MMPBSA --help` for the installed version, since several changed between
+; releases 1.4, 1.5 and 1.6, in particular the entropy keywords.
 ;
 ; Run:
 ;   mpirun -np 8 gmx_MMPBSA MPI -O -i mmpbsa.in \
@@ -11,7 +11,8 @@
 ;     -o FINAL_RESULTS.dat -eo FINAL_RESULTS.csv \
 ;     -do FINAL_DECOMP.dat -deo FINAL_DECOMP.csv
 ;
-; PREREQUISITE — trajectory must be PBC-clean or every number is garbage:
+; Prerequisite: the trajectory must be corrected for periodic boundaries, otherwise the
+; energies are meaningless:
 ;   gmx trjconv -s prod.tpr -f prod.xtc -pbc whole -o w.xtc
 ;   gmx trjconv -s prod.tpr -f w.xtc  -pbc nojump -o nj.xtc
 ;   gmx trjconv -s prod.tpr -f nj.xtc -center -pbc mol -ur compact \
@@ -27,14 +28,15 @@
   temperature           = 310.0
 
   ; --- radii ---
-  ; LOCKED: CHARMM36m -> PBRadii = 7 (charmm_radii). Do not change.
+  ; Fixed for this campaign: CHARMM36m -> PBRadii = 7 (charmm_radii).
   ; AMBER ff99SB-ILDN   -> PBRadii = 3  (mbondi2)
   PBRadii               = 7
 
   ; --- entropy ---
-  ; Interaction entropy: cheap, but noisy for highly charged complexes.
-  ; Run it, report it separately, and NEVER fold it silently into "ΔG".
-  ; Do not attempt normal-mode (nmode) on a 258-res + 19-nt system.
+  ; Interaction entropy is inexpensive but noisy for highly charged complexes.
+  ; It is computed, reported separately and never folded silently into "ΔG".
+  ; Normal-mode entropy (nmode) is not attempted for a system of 258 residues
+  ; and 19 nucleotides.
   interaction_entropy   = 1
   ie_segment            = 25
   c2_entropy            = 1
@@ -45,13 +47,13 @@
 ; ---------------------------------------------------------------------------
 ; PB is the primary number for a protein–RNA complex.
 ; GB is run alongside only as an internal consistency check — generalized Born
-; handles the RNA phosphate backbone badly and tends to inflate electrostatic
+; handles the RNA phosphate backbone poorly and tends to inflate electrostatic
 ; discrimination. If PB and GB disagree by more than a few kcal/mol on ΔΔG,
-; trust neither until you understand why.
+; neither should be interpreted until the difference is understood.
 ; ---------------------------------------------------------------------------
 
 &pb
-  istrng                = 0.150       ; MUST match your MD salt concentration
+  istrng                = 0.150       ; must match the salt concentration of the MD simulation
   indi                  = 4.0         ; interior dielectric — see note below
   exdi                  = 80.0
   inp                   = 2           ; SASA + dispersion nonpolar model
@@ -65,9 +67,9 @@
 /
 
 ; ---------------------------------------------------------------------------
-; Per-residue decomposition: the cheapest validation you have. The hot spots
-; it returns should recover the known operator-contact residues of MS2 CP.
-; If they don't, the setup is wrong — stop before interpreting any ΔG.
+; Per-residue decomposition is the least expensive validation available. Its hot
+; spots should recover the known operator-contact residues of MS2 CP; if they do
+; not, the setup is wrong and no ΔG should be interpreted.
 ; ---------------------------------------------------------------------------
 
 &decomposition
@@ -77,13 +79,14 @@
 /
 
 ; ============================================================================
-; SENSITIVITY RUNS — do these, don't skip them
+; SENSITIVITY RUNS (required)
 ;
-; indi (interior dielectric) is the single largest lever on a charged
-; protein–RNA interface. Repeat the whole calculation at indi = 1, 2, 4 and
-; report the spread as part of your error bar. If your conclusion flips
-; between indi = 2 and indi = 4, you do not have a conclusion.
+; indi (interior dielectric) is the largest single source of uncertainty for a
+; charged protein–RNA interface. The whole calculation is repeated at
+; indi = 1, 2 and 4, and the spread is reported as part of the error bar. A
+; conclusion that changes between indi = 2 and indi = 4 is not robust.
 ;
-; Also repeat with startframe shifted (e.g. 5000–10000 vs 2500–7500) to show
-; the estimate is not an artefact of one stretch of trajectory.
+; The calculation is also repeated with a shifted startframe (for example
+; 5000–10000 against 2500–7500) to show that the estimate does not depend on one
+; stretch of the trajectory.
 ; ============================================================================

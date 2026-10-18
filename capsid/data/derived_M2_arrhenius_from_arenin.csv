@@ -1,0 +1,10 @@
+quantity,value,sd,basis
+"soluble fraction, 30 C",0.686,0.0391,measured
+"soluble fraction, 37 C",0.3406,0.0242,measured
+flux ratio 37/30 C,1.471,,ratio of target protein in lysate
+"soluble fraction, 37 C, flux change only",0.6211,,Eq. (3.7) with s50 temperature-independent
+discrepancy in measurement sd,-11.6,,derived
+s50(37)/s50(30),0.173,,Eq. (3.7) inverted
+dE/R (K),23589.0,,"Eq. (3.12), two temperatures"
+"predicted soluble fraction, 25 C, 30 C flux",0.865,,forward prediction
+"predicted soluble fraction, 18 C, 30 C flux",0.974,,forward prediction

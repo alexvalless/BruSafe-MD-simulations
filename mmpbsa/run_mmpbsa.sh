@@ -1,8 +1,12 @@
 #!/usr/bin/env bash
-
-# Gate order matters: decomposition first. If the per-residue hot spots do not
-# recover the known operator-contact residues of MS2 CP, the setup is wrong
-# and no binding energy from it means anything. Do not skip ahead.
+# MM/PBSA (M3.5) for one replica of an RNA-bound system.
+#
+#   PROT_GRP=<n> RNA_GRP=<n> ./run_mmpbsa.sh <system> <replica> [indi]
+#
+# The checks must be made in a fixed order, starting with the per-residue
+# decomposition. If its hot spots do not recover the known operator-contact
+# residues of MS2 CP, the setup is wrong and no binding energy computed from it
+# is meaningful.
 
 set -euo pipefail
 source "$(dirname "$0")/../scripts/lib.sh"
@@ -36,14 +40,13 @@ mpirun -np "${MMPBSA_NP:-8}" gmx_MMPBSA MPI -O -i mmpbsa.in \
 cat <<'NOTE'
 
 ------------------------------------------------------------------
-CHECK IN THIS ORDER:
+CHECKS, IN THIS ORDER:
  1. FINAL_DECOMP.dat -- do the hot spots recover the known operator
-    contact residues? If not, STOP. Fix the setup.
- 2. Repeat at indi = 1, 2 and 4. Report the spread as part of the
-    error bar. A conclusion that flips between 2 and 4 is not a
-    conclusion.
+    contact residues? If not, stop and correct the setup.
+ 2. Repeat at indi = 1, 2 and 4 and report the spread as part of the
+    error bar. A conclusion that changes between 2 and 4 is not robust.
  3. Repeat on two disjoint frame windows.
- 4. Report ddG between systems only. Never quote an absolute dG.
+ 4. Report ddG between systems only; absolute dG values are not quoted.
  5. ddG = -RT ln(ratio); RT = 0.616 kcal/mol at 310 K, so one order
     of magnitude in K_d is about 1.4 kcal/mol.
 ------------------------------------------------------------------

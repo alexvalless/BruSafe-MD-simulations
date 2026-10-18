@@ -1,26 +1,26 @@
-# Running the campaign — tutorial
+# Running the campaign — protocol
 
-Follow this once end-to-end on **S1** before touching any other system. If S1
-works, everything else is the same four commands with a different name.
+The full workflow should be run once from start to finish on **S1** before any other system is
+started. If S1 works, every other system needs the same four commands with a different name.
 
-Terminology: a *system* is a molecular setup (`S1_wt_cc_apo`). A *replica* is
-one independent run of that system (`rep1`, `rep2`, `rep3`).
+Terminology: a *system* is a molecular setup (`S1_wt_cc_apo`). A *replica* is one independent run
+of that system (`rep1`, `rep2`, `rep3`).
 
 ---
 
 ## 0. What the scripts do not do
 
-Be clear about the boundary before you start. The scripts handle solvation,
-ionisation, equilibration, production, PBC cleanup, analysis and bookkeeping.
+The scripts handle solvation, ionisation, equilibration, production, PBC correction, analysis and
+bookkeeping.
 
-They do **not** build your starting structures. Choosing the C/C chain pair out
-of 1MSC, modelling the single-chain linker, mutating the RNA to your designed
-pac sequence — that is science, it is where the mistakes that matter live, and
-it is deliberately left to you. Section 2 covers it.
+They do **not** build the starting structures. Selecting the C/C chain pair from 1MSC, modelling
+the single-chain linker and mutating the RNA to the designed pac sequence are scientific decisions,
+they are where the errors that matter arise, and they are deliberately left to the user. Section 2
+describes them.
 
 ---
 
-## 1. One-time setup, on every machine
+## 1. One-time setup on every machine
 
 ### 1.1 GROMACS
 
@@ -28,22 +28,21 @@ it is deliberately left to you. Section 2 covers it.
 gmx --version | head -3
 ```
 
-Needs **2023 or newer** — `gmx dssp` does not exist before that, and GPU-resident
-update is much better from 2023 on. Build must be CUDA-enabled:
+Version **2023 or newer** is required: `gmx dssp` does not exist in earlier releases, and
+GPU-resident update performs much better from 2023 on. The build must be CUDA-enabled:
 
 ```bash
-gmx --version | grep -i 'GPU support'      # expect: CUDA
+gmx --version | grep -i 'GPU support'      # expected: CUDA
 ```
 
-**Every machine must report the identical version.** Mixed GROMACS versions
-across replicas of the same system makes them non-comparable and quietly
-invalidates your error bars. If one box has 2023.3 and the rest have 2024.2,
-fix it before running anything.
+**Every machine must report the identical version.** Replicas of one system run with different
+GROMACS versions are not comparable, which silently invalidates the error bars. If one machine has
+2023.3 and the others 2024.2, this must be corrected before anything is run.
 
 ### 1.2 CHARMM36m force field
 
-GROMACS does not ship it. Download the GROMACS port from the MacKerell lab,
-unpack, and point `GMXLIB` at the parent directory:
+GROMACS does not include it. The GROMACS port is downloaded from the MacKerell laboratory, unpacked,
+and `GMXLIB` is set to its parent directory:
 
 ```bash
 mkdir -p ~/ff && cd ~/ff
@@ -52,12 +51,12 @@ echo 'export GMXLIB=$HOME/ff' >> ~/.bashrc && source ~/.bashrc
 ls $GMXLIB/charmm36*.ff/forcefield.doc     # must exist
 ```
 
-If the directory name differs from `charmm36-jul2022`, update the `-ff` argument
-in `scripts/01_prepare.sh` **and** record the change in `docs/DECISIONS.md`.
+If the directory name differs from `charmm36-jul2022`, the `-ff` argument in `scripts/01_prepare.sh`
+has to be updated, and the change recorded in `docs/DECISIONS.md`.
 
-### 1.3 gmx_MMPBSA — one or two machines only
+### 1.3 gmx_MMPBSA (one or two machines only)
 
-Not needed for production. Install it where you will run M3.5:
+It is not needed for production and is installed only where M3.5 will be run:
 
 ```bash
 conda create -n mmpbsa -c conda-forge python=3.10 ambertools mpi4py -y
@@ -66,51 +65,51 @@ pip install gmx_MMPBSA
 gmx_MMPBSA --version
 ```
 
-### 1.4 Repo and environment record
+### 1.4 Repository and environment record
 
 ```bash
-git clone <your-remote> brusafe-md && cd brusafe-md
+git clone <remote> brusafe-md && cd brusafe-md
 chmod +x scripts/*.sh analysis/*.sh mmpbsa/*.sh
 ./scripts/00_env.sh
 ```
 
-This writes `docs/env_<hostname>.txt`. **Commit it from every machine.** When a
-judge asks what you ran on, this is the answer, and when two machines disagree
-you will see it here first.
+This writes `docs/env_<hostname>.txt`. The file should be committed from every machine: it
+documents the computing environment of the campaign, and it is where a disagreement between two
+machines shows up first.
 
-### 1.5 Where trajectories live
+### 1.5 Location of the trajectories
 
-Default is `runs/` inside the repo. If you have shared storage, point every
-machine at it so the duplicate-run guard actually works across boxes:
+By default trajectories are written to `runs/` inside the repository. With shared storage, every
+machine can be pointed at it so that the duplicate-run guard works across machines:
 
 ```bash
 echo 'export BRUSAFE_RUNS=/mnt/shared/brusafe/runs' >> ~/.bashrc
 ```
 
-Without shared storage the guard only protects within one machine, and you must
-keep the assignment spreadsheet honest yourself.
+Without shared storage the guard protects only against duplicates on a single machine, and the
+assignment of replicas to machines has to be tracked separately.
 
 ---
 
-## 2. Input structures — the manual part
+## 2. Input structures (the manual part)
 
-Each system expects one of:
+Each system expects one of the following:
 
 ```
 input/<system>/<system>.pdb        # pdb2gmx route  (apo systems)
-input/<system>/gromacs/            # CHARMM-GUI Solution Builder output (RNA)
+input/<system>/gromacs/            # CHARMM-GUI Solution Builder output (RNA systems)
 ```
 
 ### S1 — WT C/C dimer from 1MSC
 
-The asymmetric unit gives you three quasi-equivalent chains and therefore **two
-physically different dimers**: the symmetric C/C pair and the asymmetric A/B
-pair. The free coat protein dimer in solution is the C/C-like conformer; A/B is
-what assembly and RNA binding induce. Simulating the wrong one silently gives
-you an assembly-locked baseline.
+The asymmetric unit contains three quasi-equivalent chains and therefore **two physically different
+dimers**: the symmetric C/C pair and the asymmetric A/B pair. The free coat-protein dimer in
+solution resembles the C/C conformer, whereas A/B is the conformer induced by assembly and RNA
+binding. Simulating the wrong one gives a baseline that is already locked into the assembly state.
 
-Do not take chain IDs on trust. Open the entry, look at the biological assembly,
-and identify which pair has **both** FG loops in the extended conformation. Then:
+Chain identifiers should not be taken at face value. The biological assembly is inspected to
+identify the pair in which **both** FG loops are in the extended conformation. The dimer is then
+extracted:
 
 ```bash
 mkdir -p input/S1_wt_cc_apo
@@ -119,78 +118,69 @@ pdb_selchain -C,C 1msc.pdb | pdb_delhetatm | pdb_tidy > input/S1_wt_cc_apo/S1_wt
 #   grep '^ATOM' 1msc.pdb | awk 'substr($0,22,1)=="C"' > ...
 ```
 
-Checklist before you accept a PDB as input:
+Conditions for accepting a PDB file as input:
 
 - [ ] crystallographic waters removed
-- [ ] alternate locations resolved to one conformer
-- [ ] cryoprotectants / buffer components removed
-- [ ] no missing residues in the FG loop (build them if there are)
-- [ ] termini decided consciously — `01_prepare.sh` runs `pdb2gmx -ter`
-      interactively so you have to choose
+- [ ] alternate locations resolved to a single conformer
+- [ ] cryoprotectants and buffer components removed
+- [ ] no missing residues in the FG loop (built if absent)
+- [ ] termini chosen deliberately (`01_prepare.sh` runs `pdb2gmx -ter` interactively)
 
 ### S2 — single-chain dimer
 
-Build with AlphaFold3 or by grafting the linker onto the 1MSC dimer. **Before
-simulating**, superpose the model onto the 1MSC C/C dimer and record backbone
-RMSD:
+The model is built with AlphaFold3 or by grafting the linker onto the 1MSC dimer. **Before any
+simulation**, the model is superposed onto the 1MSC C/C dimer and the backbone RMSD is recorded:
 
 ```bash
 gmx confrms -f1 input/S1_wt_cc_apo/S1_wt_cc_apo.pdb \
             -f2 input/S2_sccp_apo/S2_sccp_apo.pdb -o fit.pdb
 ```
 
-That number goes on the wiki either way. If the two CP subunits sit in a
-non-native relative orientation, every S1-vs-S2 comparison downstream measures
-an AlphaFold artefact instead of a linker effect, and no amount of sampling
-fixes it.
+This value belongs on the wiki in any case. If the two CP subunits are in a non-native relative
+orientation, every later S1-versus-S2 comparison measures an AlphaFold artefact and not an effect of
+the linker, and no amount of sampling corrects that.
 
 ### S3–S5, S7, S9 — RNA-bound systems
 
-Use the CP–operator **cocrystal**. Do not dock an RNA hairpin de novo when a
-solved complex exists; reviewers will ask why, and you will not like the answer.
-Build your designed pac and the calibration variants by mutating the cocrystal
+The CP–operator **cocrystal** is used. An RNA hairpin should not be docked de novo when a solved
+complex exists. The designed pac and the calibration variants are built by mutating the cocrystal
 RNA in place.
 
-For anything containing RNA, prefer CHARMM-GUI Solution Builder over the
-`pdb2gmx` route:
+For anything containing RNA, CHARMM-GUI Solution Builder is preferred over the `pdb2gmx` route:
 
 ```bash
 ./scripts/01_prepare.sh S3_cp_operator --source charmm-gui
 ```
 
-Two reasons. `pdb2gmx` residue mapping for RNA under the charmm36 port is
-fragile. And CHARMM-GUI handles Mg²⁺ placement properly, which matters more than
-it looks — see §7.
+There are two reasons. The `pdb2gmx` residue mapping for RNA under the charmm36 port is fragile,
+and CHARMM-GUI handles Mg²⁺ placement properly, which matters more than it may seem (see §7).
 
 ---
 
-## 3. S1 end to end
+## 3. S1 from start to finish
 
 ```bash
 ./scripts/01_prepare.sh     S1_wt_cc_apo      # once per system
 ./scripts/02_equilibrate.sh S1_wt_cc_apo 1    # once per replica
 ```
 
-`01_prepare.sh` prints the index groups it built. You want to see `Backbone`,
-`C-alpha`, `SOLU`, `SOLV` in that list — the script now dies if any are missing,
-because `04_postprocess.sh` asks for them by name and failing here is much
-cheaper than failing three days later.
+`01_prepare.sh` prints the index groups it has built. `Backbone`, `C-alpha`, `SOLU` and `SOLV`
+should be present; the script stops if any is missing, because `04_postprocess.sh` requests them by
+name and an early failure is much less costly than one several days later.
 
-`02_equilibrate.sh` runs EM → NVT 200 ps restrained → NPT 1 ns restrained →
-NPT 5 ns free, then applies the **equilibration gate**: density near 1000 kg/m³,
-temperature within 2 K of 310, and density no longer drifting. It refuses to
-exit successfully otherwise. A drifting box means the system has not settled
-whatever the mean says, and the gate catches that where a mean alone would not.
+`02_equilibrate.sh` runs EM → NVT 200 ps restrained → NPT 1 ns restrained → NPT 5 ns free, and then
+applies the **equilibration gate**: density close to 1000 kg/m³, temperature within 2 K of 310, and
+density no longer drifting. It does not exit successfully otherwise. A drifting box indicates an
+unsettled system whatever the mean value is, and the gate detects this where a mean alone would not.
 
-Take about 20 minutes here. Look at `density.xvg` and `rmsd` yourself. This is
-the last cheap moment to notice something is wrong.
+About 20 minutes should be spent here inspecting `density.xvg` and the RMSD, since this is the last
+inexpensive point at which a problem can be noticed.
 
 ---
 
-## 4. Benchmark once, then lock
+## 4. Benchmark once, then lock the configuration
 
-You need a `prod.tpr` to benchmark against, so make one by hand from the
-equilibrated replica:
+A `prod.tpr` is needed for the benchmark, so one is generated by hand from the equilibrated replica:
 
 ```bash
 cd runs/S1_wt_cc_apo/rep1
@@ -199,50 +189,50 @@ gmx grompp -f ../../../mdp/prod.mdp -c npt_free.gro -t npt_free.cpt \
 cd -
 
 ./scripts/bench_gpu.sh runs/S1_wt_cc_apo/rep1/prod.tpr
-rm runs/S1_wt_cc_apo/rep1/prod.tpr    # let 03_production regenerate it from the registry
+rm runs/S1_wt_cc_apo/rep1/prod.tpr    # 03_production.sh regenerates it from the registry
 ```
 
-That `rm` matters. `03_production.sh` sets `nsteps` from the `ns` column in
-`config/systems.tsv`, and S7 runs 150 ns rather than 250. A hand-made tpr would
-silently override that.
+The `rm` is necessary. `03_production.sh` sets `nsteps` from the `ns` column of
+`config/systems.tsv`, and S7 runs 150 ns instead of 250; a hand-made tpr would silently override
+that.
 
-The sweep tries three offload configurations across several thread counts, then
-runs two concurrent jobs on one GPU. At ~35k atoms a single run usually does not
-saturate a 4070, so **aggregate throughput from two concurrent runs is often
-higher than one run alone** — that is the number that sets your schedule.
+The sweep tests three offload configurations at several thread counts and then runs two concurrent
+jobs on one GPU. At ~35k atoms a single run usually does not saturate an RTX 4070, so the
+**aggregate throughput of two concurrent runs is often higher than that of one run**, and this is
+the number that determines the schedule.
 
-Then lock it, everywhere:
+The chosen configuration is then fixed on every machine:
 
 ```bash
 echo 'export BRUSAFE_MDRUN_FLAGS="-nb gpu -pme gpu -bonded gpu -update gpu -ntmpi 1 -ntomp 8 -pin on"' >> ~/.bashrc
 ```
 
-Record the winning string and the date in `docs/DECISIONS.md`. Every replica in
-the campaign must use the identical flags or your timings are not comparable.
+The selected flags and the date are recorded in `docs/DECISIONS.md`. Every replica in the campaign
+must use identical flags, otherwise the timings are not comparable.
 
-If one machine benchmarks 25% below the others, check for thermal or power
-throttling before blaming the software:
+If one machine benchmarks 25% below the others, thermal or power throttling should be excluded
+before the software is suspected:
 
 ```bash
 nvidia-smi -q -d PERFORMANCE | grep -A5 'Clocks Event Reasons'
 ```
 
-OEM desktops with poor airflow are a real and common source of spread across ten
-nominally identical boxes.
+Poor airflow in OEM desktops is a real and common source of spread among nominally identical
+machines.
 
 ---
 
-## 5. Plan across the ten machines
+## 5. Planning across the ten machines
 
 ```bash
-python3 scripts/_registry.py plan --machines 10 --tier 1 --nsday <your measured number>
+python3 scripts/_registry.py plan --machines 10 --tier 1 --nsday <measured value>
 ```
 
-You get a cost table and a per-machine job list. At 250 ns/day tier 1 is about
-5,100 ns-equivalent with a **2.6-day makespan**. Compute is not your constraint;
-that is the point of running this early.
+The output is a cost table and a list of jobs per machine. At 250 ns/day, Tier 1 amounts to about
+5,100 ns-equivalent with a **makespan of 2.6 days**. Compute is therefore not the limiting factor,
+which is the reason for running this early.
 
-Save the job lists and give one to each machine:
+The job lists are saved and one is assigned to each machine:
 
 ```bash
 python3 scripts/_registry.py plan --machines 10 --tier 1 --nsday 250 > docs/PLAN.txt
@@ -253,112 +243,109 @@ git add docs/PLAN.txt && git commit -m "campaign plan, tier 1"
 
 ## 6. The production loop
 
-Per replica, on the assigned machine:
+For each replica, on the assigned machine:
 
 ```bash
-./scripts/01_prepare.sh     S1_wt_cc_apo         # skip if build/ already exists
+./scripts/01_prepare.sh     S1_wt_cc_apo         # skipped if build/ already exists
 ./scripts/02_equilibrate.sh S1_wt_cc_apo 2
 ./scripts/03_production.sh  S1_wt_cc_apo 2 23    # 23 = wall-clock hours per chunk
 ./scripts/04_postprocess.sh S1_wt_cc_apo 2
 ```
 
-`03_production.sh` is **restartable**. When it hits the wall-clock limit or the
-machine reboots, rerun the identical command and it resumes from the last
-checkpoint. A simple loop is enough to run a replica to completion overnight:
+`03_production.sh` is **restartable**. When it reaches the wall-clock limit or the machine reboots,
+the identical command resumes from the last checkpoint. A simple loop runs a replica to completion
+overnight:
 
 ```bash
 until ./scripts/03_production.sh S1_wt_cc_apo 2 23; do sleep 10; done
 ```
 
-It also writes `PROVENANCE.txt` next to the trajectory — host, GROMACS version,
-mdrun flags, seed, start and finish times. That file is what makes a run
-defensible six weeks later when nobody remembers which machine did what.
+The script also writes `PROVENANCE.txt` next to the trajectory, containing the host, GROMACS
+version, mdrun flags, seed, and start and finish times. This file makes a run traceable weeks later,
+when nobody remembers which machine did what.
 
-Progress across everything, any time:
+Overall progress can be checked at any time:
 
 ```bash
 python3 scripts/_registry.py status --runs runs/
 ```
 
-Run this **daily**. The realistic failure with ten unmanaged desktops is not
-running out of compute — it is two boxes running the same replica while a system
-never launched at all.
+The check should be made **daily**. With ten unmanaged desktops the realistic failure is not a lack
+of compute but two machines running the same replica while another system is never launched.
 
 ---
 
-## 7. When things fail
+## 7. Failure modes
 
-**Equilibration gate fails.** Plot `density.xvg`. A slow monotonic drift usually
-means the box has not settled: extend `npt_free` and rerun. A sudden jump or a
-crash on restraint release usually means a bad starting structure — go back to
-§2. Do not force past this gate; production from an unequilibrated box wastes
-GPU-days and you will not notice until analysis.
+**Equilibration gate fails.** `density.xvg` is plotted. A slow, monotonic drift usually means that
+the box has not settled, and `npt_free` is extended and rerun. A sudden jump or a crash when the
+restraints are released usually indicates a poor starting structure, and the work returns to §2. The
+gate should not be bypassed: production from an unequilibrated box wastes GPU-days and the problem
+only becomes visible at the analysis stage.
 
-**`already holds a completed run`.** The duplicate guard did its job. Confirm
-nobody else is running that replica, then `BRUSAFE_FORCE=1 ./scripts/03_...`
-if you genuinely mean to overwrite.
+**`already holds a completed run`.** The duplicate guard has worked as intended. After confirming
+that nobody else is running that replica, `BRUSAFE_FORCE=1 ./scripts/03_...` overrides it if
+overwriting is really intended.
 
-**`gmx dssp` unavailable.** GROMACS is older than 2023. Upgrade, or fall back to
-`do_dssp` with an external DSSP binary. Everything else still runs.
+**`gmx dssp` unavailable.** GROMACS is older than 2023. Either upgrade, or use `do_dssp` with an
+external DSSP binary. Everything else still runs.
 
-**`no 'RNA' group`.** `make_ndx` did not recognise your nucleic acid residue
-names. Add the group manually:
+**`no 'RNA' group`.** `make_ndx` did not recognise the nucleic-acid residue names. The group is
+added manually:
 
 ```bash
 gmx make_ndx -f runs/<sys>/build/solv_ions.gro \
              -n runs/<sys>/build/index.ndx -o runs/<sys>/build/index.ndx
 ```
 
-**Mg²⁺ in the interface.** `04_postprocess.sh` writes `mindist_mg.xvg` for
-RNA systems. Look at it. Mg²⁺ water exchange takes microseconds, so on a 250 ns
-trajectory the ions sit essentially where you placed them — they do not
-equilibrate, and random `genion` placement adds noise rather than realism. An
-ion parked in the protein–RNA interface contaminates every M3.5 energy from
-that replica. Preferred placement order: crystallographic sites, then
-CHARMM-GUI, then `genion` as a documented last resort. This is a good question
-to put to Diego and worth writing up for the wiki either way.
+**Mg²⁺ in the interface.** `04_postprocess.sh` writes `mindist_mg.xvg` for RNA systems, and it
+should be inspected. Water exchange at Mg²⁺ takes microseconds, so on a 250 ns trajectory the ions
+remain essentially where they were placed; random `genion` placement adds noise and no realism. An
+ion located in the protein–RNA interface contaminates every M3.5 energy from that replica. The
+preferred placement order is crystallographic sites, then CHARMM-GUI, then `genion` as a documented
+last resort. This is also a suitable question for the external MD advisor and worth documenting for
+the wiki.
 
 ---
 
 ## 8. Weekly rhythm
 
-- **Daily:** `_registry.py status`. Anything stalled gets restarted the same day.
-- **Twice a week:** commit analysis output, `docs/env_*.txt`, `PROVENANCE.txt`.
-  Never commit `.xtc` — they are gitignored for a reason. Back trajectories up
-  separately; losing them is the one unrecoverable failure here.
-- **27 September:** hard stop on new systems. Anything not launched is out of
-  scope. Compute was never the constraint; your attention is.
+- **Daily:** `_registry.py status`. Stalled runs are restarted the same day.
+- **Twice a week:** analysis output, `docs/env_*.txt` and `PROVENANCE.txt` are committed. `.xtc`
+  files are never committed (they are gitignored); trajectories are backed up separately, since
+  their loss is the one unrecoverable failure.
+- **27 September:** cut-off for new systems. Systems not launched by then are out of scope.
+  Compute was never the limiting factor.
 
 ---
 
-## 9. The comparison that carries the claim
+## 9. The comparison that supports the main claim
 
-A single system's RMSD proves nothing. The claim lives in the comparison:
+The RMSD of a single system demonstrates little. The claim rests on the comparison:
 
 ```bash
 ./analysis/compare_systems.sh S1_wt_cc_apo S2_sccp_apo
 ```
 
-This computes the **essential subspace overlap** between the two systems'
-principal motions. Over the first 10 eigenvectors, >0.7 supports "the linker
-does not alter the dimer's dynamics"; <0.5 means it changed something real. Two
-RMSF curves that look similar by eye is not evidence — overlap is.
+This computes the **essential-subspace overlap** between the principal motions of the two systems.
+Over the first 10 eigenvectors, a value above 0.7 supports the statement that the linker does not
+alter the dynamics of the dimer, and a value below 0.5 indicates a real change. Two RMSF curves that
+look similar by eye are not evidence; the overlap is.
 
-It also prints inter-replica RMSF agreement within each system. **Read that
-first.** A difference between S1 and S2 only means something if it exceeds the
-spread among replicas of the same system. Most over-claimed MD results die right
-here.
+The script also prints the inter-replica RMSF agreement within each system, and **this should be
+read first**. A difference between S1 and S2 is meaningful only if it exceeds the spread among
+replicas of the same system. Many over-interpreted MD results fail at exactly this point.
 
-One practical note: S2 has extra linker residues, so the two systems do not have
-identical atom counts. Restrict the covariance analysis to CP backbone atoms
-present in both before comparing.
+One practical point: S2 contains additional linker residues, so the two systems do not have the same
+number of atoms. The covariance analysis should be restricted to the CP backbone atoms present in
+both before the comparison is made.
 
 ---
 
 ## 10. M3.5
 
-Only after `04_postprocess.sh` has run on the RNA-bound system. Find your group
-numbers, then:
+M3.5 is run only after `04_postprocess.sh` has been run on the RNA-bound system. The group numbers
+are identified first:
 
 ```bash
 gmx make_ndx -f runs/S4_cp_pacdesign/build/solv_ions.gro -o /dev/null  # note the numbers, then q
@@ -367,26 +354,26 @@ export PROT_GRP=<n> RNA_GRP=<n>
 ./mmpbsa/run_mmpbsa.sh S4_cp_pacdesign 1 4.0
 ```
 
-Check the output **in this order**, and the order is not negotiable:
+The output is checked **in this order**, which is fixed:
 
-1. `FINAL_DECOMP.dat` — do the per-residue hot spots recover the known
-   operator-contact residues of MS2 CP? If not, stop. The setup is wrong and no
-   energy from it means anything. This costs a day and gates everything after it.
-2. Repeat at `indi` = 1, 2 and 4. Report the spread as part of the error bar.
-   A conclusion that flips between 2 and 4 is not a conclusion.
-3. Repeat on two disjoint frame windows.
-4. Report **ΔΔG between systems only**. Absolute MM/PBSA binding free energies
-   are routinely off by 5–20 kcal/mol, worse for charged protein–RNA interfaces.
-   Never quote one.
-5. ΔΔG = −RT ln(ratio), RT = 0.616 kcal/mol at 310 K — one order of magnitude in
-   K_d is about 1.4 kcal/mol.
+1. `FINAL_DECOMP.dat`: do the per-residue hot spots recover the known operator-contact residues of
+   MS2 CP? If not, the setup is wrong and no energy computed from it is meaningful. This check takes
+   a day and gates everything that follows.
+2. The calculation is repeated at `indi` = 1, 2 and 4, and the spread is reported as part of the
+   error bar. A conclusion that changes between 2 and 4 is not robust.
+3. The calculation is repeated on two disjoint frame windows.
+4. Only the **ΔΔG between systems** is reported. Absolute MM/PBSA binding free energies are
+   routinely off by 5–20 kcal/mol, and more so for charged protein–RNA interfaces; they are not
+   quoted.
+5. ΔΔG = −RT ln(ratio), RT = 0.616 kcal/mol at 310 K. One order of magnitude in K_d corresponds to
+   about 1.4 kcal/mol.
 
 ---
 
 ## 10b. Figures and animations for the wiki
 
-`analysis/md_report.py` turns the `04_postprocess.sh` output into figures. It
-needs a few extra Python packages, on the analysis machine only:
+`analysis/md_report.py` turns the output of `04_postprocess.sh` into figures. It requires a few
+additional Python packages, on the analysis machine only:
 
 ```bash
 pip install numpy matplotlib plotly MDAnalysis   # MDAnalysis only for animations
@@ -399,55 +386,53 @@ python3 analysis/md_report.py animate --top runs/S1_wt_cc_apo/rep1/analysis/clea
         --traj runs/S1_wt_cc_apo/rep1/analysis/clean.xtc -o s1_rep1.html
 ```
 
-**For the wiki, start with `wiki`.** It writes one compact page per system to
-`analysis_out/wiki/<system>/html/index.html` (summary table; RMSD, RMSF, Rg and
-SASA with all replicas overlaid and mean ± SD; RNA RMSD and Mg²⁺ distance for RNA
-systems; one animation, `--anim-rep N` picks the replica) and an
-`analysis_out/wiki/index.html` linking them:
+**For the wiki, the `wiki` command is the starting point.** It writes one compact page per system to
+`analysis_out/wiki/<system>/html/index.html` (summary table; RMSD, RMSF, Rg and SASA with all
+replicas overlaid and mean ± SD; RNA RMSD and Mg²⁺ distance for RNA systems; one animation, with
+`--anim-rep N` selecting the replica) and an `analysis_out/wiki/index.html` that links them:
 
 ```bash
 python3 analysis/md_report.py wiki --all                    # every system with analysis output
 python3 analysis/md_report.py wiki S4_cp_pacdesign S5_cp_scramble
 ```
 
-Systems with nothing to plot are skipped with a message. `report` below is the
-full set, for the supplement or for checking convergence.
+Systems with nothing to plot are skipped with a message. `report` produces the complete set, for
+the supplement or for checking convergence.
 
 `report` writes to `analysis_out/<system>/`:
 
-| Output | What it is |
+| Output | Content |
 |---|---|
 | `figures/*.png`, `*.svg` | RMSD, RNA RMSD, RMSF (replicas + mean ± SD), Rg, SASA, H-bonds, Mg²⁺ distance, DSSP map and counts, PCA (variance, PC1 with cosine content, PC1×PC2), block-averaging SEM, distributions |
-| `html/index.html` | dashboard: summary table + every plot, interactive |
+| `html/index.html` | dashboard: summary table and every plot, interactive |
 | `html/<plot>.html` | one plot per page, for an `<iframe>` on the wiki |
-| `html/traj_rep<N>.html` | 3Dmol.js trajectory player: play/pause, slider, cartoon/sticks, colour by chain, N→C, secondary structure or RMSF |
-| `summary.csv`, `summary.md` | per-replica means, mean ± SD across replicas |
+| `html/traj_rep<N>.html` | 3Dmol.js trajectory player: play/pause, slider, cartoon/sticks, colouring by chain, N→C, secondary structure or RMSF |
+| `summary.csv`, `summary.md` | per-replica means and mean ± SD across replicas |
 
-**For the iGEM wiki** upload the whole `html/` folder. The default `--js local`
-puts `plotly.min.js` and `3Dmol-min.js` next to the pages because the wiki does
-not allow external CDNs (3Dmol.js is vendored in `analysis/vendor/`, BSD-3).
-`--js inline` makes every page one self-contained file instead.
+**For the iGEM wiki**, the whole `html/` folder is uploaded. The default `--js local` places
+`plotly.min.js` and `3Dmol-min.js` next to the pages, because the wiki does not allow external CDNs
+(3Dmol.js is vendored in `analysis/vendor/`, BSD-3). `--js inline` instead produces self-contained
+single files.
 
-Useful knobs: `--frames 100` (frames per movie; fewer = smaller file),
-`--smooth 5` (average neighbouring frames to damp thermal jitter in the movie
-— say so in the caption if you use it), `--sel "name CA P"` (Cα/P only, for
-big systems like S10), `--equil-ns 50` (relaxation window excluded from all
-statistics), `--no-anim`.
+Useful options: `--frames 100` (frames per movie; fewer frames give a smaller file), `--smooth 5`
+(averages neighbouring frames to damp thermal jitter in the movie; this should be stated in the
+caption), `--sel "name CA P"` (Cα/P atoms only, for large systems such as S10), `--equil-ns 50`
+(relaxation window excluded from all statistics), and `--no-anim`.
 
-The animation must come from `clean.xtc`: a trajectory that is not PBC-whole
-gives a movie with bonds stretched across the box, and the script warns about it.
+The animation must be made from `clean.xtc`: a trajectory that is not PBC-whole gives a movie with
+bonds stretched across the box, and the script warns about this.
 
 ---
 
 ## 11. Before the wiki freeze
 
 - [ ] `docs/env_*.txt` committed from every machine
-- [ ] `docs/DECISIONS.md` complete, including the locked mdrun flags and any
-      deviation from the defaults
+- [ ] `docs/DECISIONS.md` complete, including the locked mdrun flags and any deviation from the
+      defaults
 - [ ] `docs/PREDICTIONS.md` timestamped **before** the dPCR readout
 - [ ] Systems table: atom counts, box, lengths, replicas, achieved ns/day
-- [ ] Block-averaging factor from your own data quoted in the methods section
-      (`convergence.py block` prints it) — this preempts the most common
-      criticism of student MD analysis
-- [ ] An explicit "what we did not validate" section. Writing it yourself is
-      always better than having a judge write it for you.
+- [ ] Block-averaging factor from the campaign's own data quoted in the methods section
+      (`convergence.py block` prints it); this anticipates the most common criticism of
+      student MD analyses
+- [ ] An explicit section on what was not validated; stating the limitations in the authors' own
+      words is preferable to leaving them to a reviewer

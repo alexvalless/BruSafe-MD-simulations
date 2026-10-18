@@ -1,0 +1,139 @@
+
+===== cell 2  (2.5 s) =====
+pymc 5.28.5 | arviz 0.23.4
+
+===== cell 4  (0.5 s) =====
+forward model: 1.96 ms per evaluation
+
+===== cell 6  (0.0 s) =====
+evidence
+Direct        12
+Adapted        6
+Assumption     3
+Reparam.       3 
+
+      tag                            term                                                                                                                                                                        basis    evidence                                                                                                                                              reference
+0    M1.1      dX/dt = mu*X; (1 - X/Xmax)                                                                                                       Logistic carrying capacity stands in for unmodelled nutrient depletion  Assumption                                                             Monod 1949 Annu Rev Microbiol 3:371 gives the mechanistic (substrate-explicit) alternative
+1    M1.2        psi = 1 - phi_h/phi_crit                                                                                                 Growth rate falls ~linearly with the mass fraction of non-functional protein      Direct                                                                             Scott et al. 2010 Science 330:1099; Klumpp, Zhang & Hwa 2009 Cell 139:1366
+2    M1.3   psi also multiplies synthesis                                                                                                         Growth and heterologous expression draw on one shared ribosomal pool     Adapted                                                                    Weisse et al. 2015 PNAS 112:E1038. The shared-factor FORM is ours -- see note below
+3    M1.4                P_REF = 18000 uM                                                                                                         Cytoplasmic protein ~200-300 mg/mL, expressed in CP-mass equivalents      Direct                                                                            Bremer & Dennis 2008 EcoSal Plus; Milo et al. 2010 NAR 38:D750 (BioNumbers)
+4    M1.5                   P_d*(I_e - I)                                                                                                                   IPTG enters independently of LacY at higher concentrations      Direct                                                                                                         Marbach & Bettenbrock 2012 J Biotechnol 157:82
+5    M1.6               LacY term OMITTED                                                                                                    lacY-minus strain removes the saturable carrier and its positive feedback      Direct                                                       Marbach & Bettenbrock 2012 (bimodality at low IPTG in lacY+); Ozbudak et al. 2004 Nature 427:737
+6    M1.7               I_e held constant                                                                                                      IPTG is gratuitous -- not metabolised, so external pool is not depleted      Direct                                                                                         Marbach & Bettenbrock 2012. FAILS for lactose -- see M1.7 note
+7    M1.8                  -mu*I dilution                                                                                                                         Volume expansion dilutes every intracellular species    Reparam.                                                                                                              Standard mass balance; no empirical claim
+8    M1.9                Hill f(I), h ~ 2                                                                                                                Cooperative inducer binding to LacI; two IPTG sites per dimer     Adapted                                                Lewis et al. 1996 Science 271:1247 (structure); Yildirim & Mackey 2003 Biophys J 84:2841 (n=2 in model)
+9   M1.10                eps (basal leak)                                                                                                         lacUV5 in the DE3 lysogen is leaky; magnitude is construct-dependent      Direct                                                                               Studier & Moffatt 1986 JMB 189:113; Dubendorff & Studier 1991 JMB 219:45
+10  M1.11                     k_R*(f - R)                                                                                          First-order relaxation lumps RNAP synthesis, folding and dilution into one constant  Assumption                                                                            No literature reports this lumped constant. It is a time-scale placeholder.
+11  M1.12                     k_m*(R - m)                                                                                                                    Transcript turnover; E. coli median mRNA half-life ~5 min      Direct                                                    Bernstein et al. 2002 PNAS 99:9697 (median 5 min); Selinger et al. 2003 Genome Res 13:216 (6.8 min)
+12  M1.13         elongation NOT modelled                                                              T7 RNAP elongates ~230 nt/s at 37 C, ~5x E. coli RNAP -- transcript completion is fast vs all other time scales      Direct                                      Iost, Guillerez & Dreyfus 1992 J Bacteriol 174:619; Vogel & Jensen 1994 J Bacteriol 176:2807 (E. coli 28-89 nt/s)
+13  M1.14   shared RNAP between cassettes                                                                                                                             Two T7 promoters compete for one polymerase pool     Adapted                                                           Klumpp & Hwa 2008 PNAS 105:20245 (RNAP partitioning). Not implemented in M1; see §2 note (b)
+14  M1.15  CP represses cargo translation                                                                                                              MS2 CP dimer binding the operator blocks downstream translation      Direct                                 Bernardi & Spahr 1972 PNAS 69:3033; Peabody 1993 EMBO J 12:595. Include ONLY if the pac array is 5' of the epitope ORF
+15  M1.16                 G (lumped gain)                                                                                    Product of RNAP level, plasmid copy no., k_tx and k_tl -- not separable from protein data    Reparam.                                                                                   No citation possible or appropriate. See identifiability audit, §4.2
+16  M1.17             ribosome saturation                                                                                                                      Translation capacity saturates as transcript load rises     Adapted                                                                         Scott et al. 2010; Klumpp et al. 2009. Absorbed into G at this level of detail
+17  M1.18                 -(mu + k_deg)*P  First-order CP loss lumping proteolysis, inclusion-body partition and leakage. Without it dP/dt loses every sink once mu -> 0, and P clamps at phi_crit*P_REF for all doses  Assumption  Maurizi 1992 Experientia 48:178 gives ClpP/Lon turnover ranges; no MS2-CP value exists. Measure it directly with a translation-halt chase -- see §3.1
+18  M1.19            log-normal gel error                                                                                                       Band-intensity error is multiplicative at high signal, additive at low     Adapted                                                                          Rocke & Durbin 2001 J Comput Biol 8:557 (two-component intensity error model)
+19  M1.20                   per-gel alpha                                                                                                             Loading, transfer and exposure vary between gels: a batch effect     Adapted                                                                       Gelman & Hill 2007, Data Analysis Using Regression and Multilevel Models, ch. 12
+20  M1.21                discrepancy term                                                                                                      Absorbs structural model error instead of distorting kinetic parameters      Direct                                                                 Kennedy & O'Hagan 2001 JRSS-B 63:425. NOT yet implemented -- add if §10 coverage fails
+21  M1.22                     SMC sampler                                                                                                Tempered sequential importance sampling; gradient-free, handles multimodality      Direct                                                                                                           Del Moral, Doucet & Jasra 2006 JRSS-B 68:411
+22  M1.23           identifiability audit                                                                                                              Structural and practical identifiability must precede inference      Direct                                                                                                                Raue et al. 2009 Bioinformatics 25:1923
+23  M1.24            k_R <-> k_m symmetry                                                                                                                      Cascade transfer function is symmetric in its two poles    Reparam.                                                             Derived in §4.1, not cited -- it is a provable property of the model, verified numerically
+
+===== cell 8  (0.0 s) =====
+t_end=  5.0 h  max relative residual = 2.18e-08
+t_end= 24.0 h  max relative residual = 4.89e-07
+t_end= 48.0 h  max relative residual = 2.50e-06
+PASS
+
+===== cell 10  (0.0 s) =====
+Prior provenance by evidence class:
+evidence
+Direct        4
+Assumption    3
+Adapted       3
+Reparam.      1 
+
+       param    dist      loc  scale    tag                                                                                                                                  basis                                                                                   reference    evidence
+0     mu_max  TruncN   0.0210  0.005   M1.1                                                                                                     Doubling ~33 min, rich medium 37 C                                                            Bremer & Dennis 2008 EcoSal Plus      Direct
+1       Xmax  TruncN   6.0000  1.500   M1.1                                                                                                          Shake-flask carrying capacity                                                      Measured with our own negative control  Assumption
+2   phi_crit  TruncN   0.2500  0.080   M1.2                                                                           Max heterologous proteome fraction; strong T7 reaches 20-30%                      Studier & Moffatt 1986 JMB 189:113; Scott et al. 2010 Science 330:1099      Direct
+3        P_d    LogN   0.3500  0.600   M1.5                                                                                        Passive IPTG entry, equilibrates within minutes                                              Marbach & Bettenbrock 2012 J Biotechnol 157:82     Adapted
+4        K_I    LogN  30.0000  0.700   M1.9                                                                                               Half-maximal IPTG, lacY-minus background                                              Marbach & Bettenbrock 2012 J Biotechnol 157:82      Direct
+5          h  TruncN   2.0000  0.500   M1.9                                                                                                       Two inducer sites per LacI dimer                Lewis et al. 1996 Science 271:1247; Yildirim & Mackey 2003 Biophys J 84:2841     Adapted
+6        eps    LogN   0.0040  0.800  M1.10                                                                                 lacUV5 basal leak in DE3; strongly construct-dependent                                Studier & Moffatt 1986; Dubendorff & Studier 1991 JMB 219:45     Adapted
+7        k_R    LogN   0.0700  0.600  M1.11                                                                                            T7 RNAP accumulation, ~15 min time constant  Order-of-magnitude from Studier & Moffatt 1986; the lumped constant is not itself reported  Assumption
+8        k_m    LogN   0.3000  0.600  M1.12                                                                              Transcript turnover; median E. coli mRNA half-life ~5 min                  Bernstein et al. 2002 PNAS 99:9697; Selinger et al. 2003 Genome Res 13:216      Direct
+9          G    LogN  95.0000  0.800  M1.16                                                                                             LUMPED GAIN: RNAP x copy no. x k_tx x k_tl                No citation possible -- centred to give ~20% proteome fraction at saturation    Reparam.
+10     k_deg    LogN   0.0035  0.900  M1.18  Lumped CP loss: proteolysis + IB partition + leakage. t_1/2 ~ 3 h. UNCONSTRAINED by a 5 h experiment -- see the horizon audit in §3.1          Maurizi 1992 Experientia 48:178 (ClpP/Lon ranges); no MS2-CP-specific value exists  Assumption
+
+===== cell 11  (1.1 s) =====
+400/400 prior draws integrated over 24 h
+doses (mM): [0.005 0.015 0.05  0.15  0.5   1.   ]
+
+===== cell 12  (1.3 s) =====
+findfont: Failed to find font weight normal for Apple Chancery, now using 0.
+Prior-predicted optimum ~0.221 mM (145 mg/L) vs 144 mg/L at 10 mM
+
+===== cell 14  (0.0 s) =====
+A. dose separation in the mM range
+       0.25 mM -> P =  3842.089 uM
+       0.50 mM -> P =  3847.646 uM
+       1.00 mM -> P =  3849.031 uM
+       2.00 mM -> P =  3849.374 uM
+       5.00 mM -> P =  3849.468 uM
+      10.00 mM -> P =  3849.481 uM
+   relative spread over 1-10 mM : 0.0117 %
+   densitometry noise (sig_cp)  : 12 %
+   -> SNR = 9.8e-04. Doses above ~150 uM are one condition, not several.
+
+B. K_I identifiability, all-mM design vs. straddling design
+   K_I=   5.0  all-mM: [3849.5 3849.5 3849.5]   straddling: [3381.8 3792.6 3844.4 3848.9 3849.4 3849.5]
+   K_I=  30.0  all-mM: [3849.  3849.5 3849.5]   straddling: [ 703.9 2477.9 3669.  3828.9 3847.6 3849. ]
+   K_I= 150.0  all-mM: [3837.9 3849.  3849.4]   straddling: [ 133.2  344.6 1729.3 3381.8 3803.3 3837.9]
+   K_I= 500.0  all-mM: [3722.9 3844.4 3848.2]   straddling: [ 107.6  127.9  344.6 1538.  3381.8 3722.9]
+   all-mM rows are near-identical -> flat posterior, no shrinkage vs prior.
+
+C. horizon audit (k_deg = 0.0035 /min, t_1/2 = 3.3 h)
+   k_deg=0   t=  5.0 h  spread across doses =  112.7 %   ceiling hit: 0/7
+   k_deg>0   t=  5.0 h  spread across doses =  115.2 %   ceiling hit: 0/7
+   k_deg=0   t= 12.0 h  spread across doses =   77.2 %   ceiling hit: 4/7
+   k_deg>0   t= 12.0 h  spread across doses =  100.7 %   ceiling hit: 0/7
+   k_deg=0   t= 24.0 h  spread across doses =   45.7 %   ceiling hit: 5/7
+   k_deg>0   t= 24.0 h  spread across doses =   99.1 %   ceiling hit: 0/7
+   k_deg=0   t= 48.0 h  spread across doses =   17.1 %   ceiling hit: 6/7
+   k_deg>0   t= 48.0 h  spread across doses =   99.1 %   ceiling hit: 0/7
+   With k_deg=0 the only brake on P is psi, so every dose converges on
+   phi_crit*P_REF = 4500 uM and the dose-response flattens to noise.
+
+===== cell 18  (0.1 s) =====
+max|P_a - P_b|/max(P) = 1.106e-08  -> exchangeable
+
+
+===== cell 21  (0.0 s) =====
+          protein  centre_mean  centre_sd  IPTG_x_sd  temperature_x_sd  time_x_sd
+0        IL-23p19         2.50       0.20       0.25             11.25       7.50
+1            MICA         0.29       0.06       2.18              4.64       2.77
+2  anti-MICA scFv         0.18       0.04       0.65              1.29       0.80
+measured ranking per protein (largest effect first):
+          IL-23p19 : temperature > time > IPTG   (11.2x, 7.5x, 0.2x)
+              MICA : temperature > time > IPTG   (4.6x, 2.8x, 2.2x)
+    anti-MICA scFv : temperature > time > IPTG   (1.3x, 0.8x, 0.7x)
+
+===== cell 22  (1.0 s) =====
+400/400 prior draws integrated
+                p5  median   p95
+IPTG_mM        0.0    0.15  1.46
+time_h         0.0    0.67  2.80
+temperature_C  0.0    0.00  0.00
+
+measured relative centre-point noise : 0.164
+model main effect / that noise (x):
+    temperature_C :  0.00  [0.00, 0.00]
+           time_h :  0.67  [0.00, 2.80]
+          IPTG_mM :  0.15  [0.00, 1.46]
+
+Measured, averaged over the three proteins:
+    temperature_C :  5.73
+           time_h :  3.69
+          IPTG_mM :  1.03
+
+===== cell 23  (0.1 s) =====

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Convergence and sanity analysis for the BruSafe MD campaign. 
+Convergence and sanity analysis for the BruSafe MD campaign.
 
 Subcommands
 -----------
@@ -9,19 +9,18 @@ Subcommands
   cosine     cosine content of a series (Hess 2000/2002)
   replicas   agreement between per-replica RMSF profiles
 
-Why these three, specifically
------------------------------
-* Block averaging: the naive standard error over MD frames is meaningless
-  because frames are correlated. The SEM only becomes honest once the block
-  size exceeds the correlation time, which is where the curve plateaus.
+Rationale
+---------
+* Block averaging: the naive standard error over MD frames is not meaningful
+  because successive frames are correlated. The SEM is a valid estimate only
+  once the block size exceeds the correlation time, where the curve plateaus.
 
-* Cosine content: a PC1 projection drawn from pure diffusion has cosine
-  content approaching 1. If your headline "conformational transition" scores
-  0.9, it is random drift, not a transition. Better to find that yourself
-  than to have a judge find it.
+* Cosine content: a PC1 projection of pure diffusion has a cosine content close
+  to 1. A reported "conformational transition" with a cosine content of 0.9 is
+  therefore random drift and not a transition.
 
-* Replica agreement: the error bar you report should be the spread across
-  independent replicas, not the spread across correlated frames within one.
+* Replica agreement: the reported error bar should be the spread across
+  independent replicas and not the spread across correlated frames of one run.
 """
 
 from __future__ import annotations
@@ -57,9 +56,9 @@ def read_xvg(path: str) -> np.ndarray:
 def block_average(y: np.ndarray, min_blocks: int = 8) -> tuple[np.ndarray, np.ndarray]:
     """SEM of the mean as a function of block size.
 
-    Returns (block_sizes, sem). Read off the plateau; that is the real
-    uncertainty. If it never plateaus, the run is too short to quote an
-    uncertainty at all.
+    Returns (block_sizes, sem). The plateau gives the actual uncertainty; if
+    the curve never plateaus, the run is too short for an uncertainty to be
+    quoted.
     """
     n = len(y)
     sizes, sems = [], []
@@ -174,8 +173,8 @@ def cmd_cosine(a: argparse.Namespace) -> None:
                    "inconclusive on its own" if c > 0.2 else
                    "not diffusive; safe to interpret")
         print(f"cosine content PC{i}: {c:.3f}   {verdict}")
-    print("\nRun this on every replica. Consistently high PC1 across replicas "
-          "means your 'transition' is drift.")
+    print("\nThis should be run on every replica. A consistently high PC1 value across "
+          "replicas indicates that an apparent 'transition' is drift.")
 
 
 def cmd_replicas(a: argparse.Namespace) -> None:
@@ -190,7 +189,7 @@ def cmd_replicas(a: argparse.Namespace) -> None:
             r = np.corrcoef(mat[i], mat[j])[0, 1]
             flag = "" if r > 0.8 else "   <-- replicas disagree"
             print(f"  rep{i+1} vs rep{j+1}:  r = {r:.3f}{flag}")
-    print("\nper-residue mean +/- spread across replicas is your error bar")
+    print("\nthe per-residue mean +/- spread across replicas is the error bar to report")
     print(f"mean RMSF        : {mat.mean():.4f} nm")
     print(f"mean inter-replica spread: {mat.std(axis=0).mean():.4f} nm")
     worst = int(np.argmax(mat.std(axis=0)))

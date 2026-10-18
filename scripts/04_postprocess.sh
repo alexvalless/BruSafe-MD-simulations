@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # PBC cleanup + the standard analysis battery for one replica.
-# Skipping the PBC step is the single most common way to produce confidently
-# wrong RMSD/MM-PBSA numbers, so it is not optional and not separable.
+# Skipping the PBC correction is a common source of wrong RMSD and MM/PBSA
+# values, so it is part of this script and cannot be run separately.
 #
 #   ./04_postprocess.sh <system_name> <replica_number>
 set -euo pipefail
@@ -33,8 +33,8 @@ cd "$A"
 log "RMSD / Rg / RMSF / SASA / DSSP"
 printf 'Backbone\nBackbone\n' | gmx rms   -s ../prod.tpr -f clean.xtc -n ../index.ndx -o rmsd_backbone.xvg -tu ns
 printf 'Backbone\n'           | gmx gyrate -s ../prod.tpr -f clean.xtc -n ../index.ndx -o gyrate.xvg
-# discard the first 50 ns before RMSF -- fluctuations during relaxation are not
-# the fluctuations you want to report
+# The first 50 ns are discarded before RMSF, because fluctuations during
+# relaxation should not be reported as equilibrium fluctuations.
 printf 'C-alpha\n'            | gmx rmsf  -s ../prod.tpr -f clean.xtc -n ../index.ndx -o rmsf_ca.xvg -res -b 50000
 printf 'SOLU\n'               | gmx sasa  -s ../prod.tpr -f clean.xtc -n ../index.ndx -o sasa.xvg
 gmx dssp -s ../prod.tpr -f clean.xtc -n ../index.ndx -o dssp.dat -num dssp_num.xvg 2>/dev/null \
@@ -55,8 +55,8 @@ if [ "$HAS_RNA" = "yes" ]; then
   printf 'SOLU\n'     | gmx hbond -s ../prod.tpr -f clean.xtc -n ../index.ndx -num hbond_num.xvg \
     || true
   # ---- Mg2+ sanity check ------------------------------------------------
-  # Mg2+ does not equilibrate on this timescale. If an ion has parked itself
-  # in the protein-RNA interface, every energy downstream is contaminated.
+  # Mg2+ does not equilibrate on this timescale. An ion that has moved into the
+  # protein-RNA interface contaminates every energy computed downstream.
   log "Mg2+ interface check -- inspect mindist_mg.xvg by eye"
   printf 'MG\nSOLU\n' | gmx mindist -s ../prod.tpr -f clean.xtc -n ../index.ndx \
                                     -od mindist_mg.xvg 2>/dev/null \

@@ -1,0 +1,4 @@
+run,temperature_C,yeast_feed_g_L,feed_rate_mL_L_h,OD600_at_induction,final_OD600,final_DCW_g_L,prod_6h_mg_L,prod_8h_mg_L,prod_10h_mg_L,IPTG_mM,note,source_first_author,source_year,source_journal,source_doi,source_pmcid,source_table
+R3,30,10,10,105,107,39.0,618,947,613,0.05,fed-batch bioreactor; volumetric production of BsPdaC-CD; 2 technical replicates,"Carnicer M, et al.",2026,Scientific Reports,10.1038/s41598-026-54839-9,PMC13458553,Tables 4 and 5
+R5,22,5,10,90,126,42.0,87,215,199,0.05,fed-batch bioreactor; volumetric production of BsPdaC-CD; 2 technical replicates,"Carnicer M, et al.",2026,Scientific Reports,10.1038/s41598-026-54839-9,PMC13458553,Tables 4 and 5
+R8,30,5,5,73,87,30.3,217,345,299,0.05,fed-batch bioreactor; volumetric production of BsPdaC-CD; 2 technical replicates,"Carnicer M, et al.",2026,Scientific Reports,10.1038/s41598-026-54839-9,PMC13458553,Tables 4 and 5

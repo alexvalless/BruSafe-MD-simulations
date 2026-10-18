@@ -1,8 +1,8 @@
 ; ===========================================================================
-; BruSafe -- PRODUCTION, 250 ns. CHARMM36m / CHARMM-modified TIP3P.
-; This file is IDENTICAL for every system and every replica, including the
-; GPU benchmark. If you edit it mid-campaign, timings and energies stop being
-; comparable and the campaign is over.
+; BruSafe -- production, 250 ns. CHARMM36m / CHARMM-modified TIP3P.
+; This file is identical for every system and replica, including the GPU
+; benchmark. Editing it during the campaign would make timings and energies
+; non-comparable.
 ; ===========================================================================
 
 integrator              = md

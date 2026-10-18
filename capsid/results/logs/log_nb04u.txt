@@ -1,0 +1,134 @@
+
+===== cell 2  (0.7 s) =====
+M3 · T=3 assembly | N = 90 dimers | RT(37 C) = 0.6163 kcal/mol
+dG_contact = -3.820 kcal/mol  (wt MS2, Tm = 66 C at 5.0 uM dimer); placeholder was -4.20
+
+===== cell 4  (0.0 s) =====
+dimers: 60 A/B + 30 C/C = 90 (must be 90)
+schedule sum   : 180.000000  (must be 180.0)
+first addition : 1.01 contacts   (nucleation barrier)
+last addition  : 3.03 contacts   (closure)
+mean           : 2.022 = 180.0/89
+
+===== cell 6  (0.0 s) =====
+   dG_contact   free_uM  capsid_frac  interm_frac  cstar_approx_uM  free_over_cstar
+0       -3.00  26.24845      0.94022      0.00728         53.04316          0.49485
+1       -3.50   5.18431      0.98648      0.00315         10.28176          0.50422
+2       -4.00   1.02352      0.99659      0.00136          1.99299          0.51356
+3       -3.82   1.83551      0.99449      0.00184          3.59773          0.51019
+4       -5.00   0.03989      0.99967      0.00025          0.07488          0.53265
+Two-state: intermediates stay below ~1% of mass at equilibrium, so a capsid
+assembly assay measures essentially a two-species mixture. Free dimer is
+buffered near c*, and the (N-1) approximation lands within a factor ~2 of
+the exact free-dimer plateau across the whole range - good enough for design,
+not good enough to quote as a measured c*.
+
+===== cell 8  (0.7 s) =====
+mass drift over 18 h : 3.8e-15 (relative)
+findfont: Failed to find font weight normal for Apple Chancery, now using 0.
+Left: 20 uM is thermodynamically above c* (~1 uM) yet produces nothing in
+18 h. Being above the critical concentration is necessary, not sufficient -
+if an in vitro reassembly fails, check the lag before blaming the protein.
+
+===== cell 10  (0.6 s) =====
+   bolus_uM  capsid_frac   free_uM  stalled_frac  eq_capsid_frac
+0     200.0       0.4209  102.2457        0.0679          0.9891
+1     500.0       0.7683  102.2392        0.0272          0.9945
+2    1000.0       0.9300    0.0488        0.0700          0.9963
+3    2000.0       0.9297    0.0486        0.0703          0.9973
+4    5000.0       0.9297    0.0485        0.0703          0.9978
+Stalled fraction saturates instead of growing. Free dimer is driven far
+BELOW its equilibrium value (over-depletion) - that is the real trap
+signature here, and it is what a SEC trace would show as a shoulder
+between the dimer and capsid peaks.
+
+===== cell 12  (6.1 s) =====
+             mode  capsid_frac   free_uM  stalled_frac
+0  bolus at t = 0       0.8835   64.8268        0.0084
+1   constant feed       0.7413  131.2090        0.0400
+2     ramped feed       0.7278  136.8421        0.0442
+Feeding cuts stalled intermediates roughly 3-fold versus a bolus - the
+mechanism the trap story predicts. But the reaction is still RUNNING at
+harvest: tens of uM of free dimer remain unconverted at 18 h. Both effects
+are real and they push yield in opposite directions, so 'feed is better'
+is only true for the intermediate fraction, not for total capsid at 18 h.
+
+===== cell 14  (0.0 s) =====
+M2_export.npz not found; using M2 reference values (uM): [408.6 556.1 626.4 643.6]
+
+    dG    c* (uM)   lowest arm / c*   eq capsid frac
+  -3.5      10.28             39.74           0.9842
+  -4.0      1.993               205           0.9961
+  -3.8      3.598             113.6           0.9937
+  -5.0    0.07488              5457           0.9996
+
+Every arm sits 10^2-10^4 above c*, so assembly is NOT concentration-limited
+in this system. The assembly module's leverage is kinetic - lag time and
+stalled fraction - not thermodynamic. Design experiments accordingly: a
+titration meant to bracket c* would spend its whole range on one side of it.
+
+===== cell 16  (4.5 s) =====
+                  regime construct  dG_nuc_aid  capsid_frac  t_to_half_h
+0    fed, in vivo (18 h)    0x pac        -0.0       0.7413      11.3957
+1    fed, in vivo (18 h)    1x pac        -0.8       0.7497      11.2662
+2    fed, in vivo (18 h)    3x pac        -1.8       0.7333      11.5252
+3  bolus 30 uM, in vitro    0x pac        -0.0       0.0000          NaN
+4  bolus 30 uM, in vitro    1x pac        -0.8       0.0000          NaN
+5  bolus 30 uM, in vitro    3x pac        -1.8       0.0000          NaN
+fed regime   : capsid fraction spans 0.7333 - 0.7497 (1.6 percentage points)
+bolus regime : capsid fraction spans 0.0000 - 0.0000 (0.0 percentage points)
+
+===== cell 18  (0.9 s) =====
+   c_end  f_deg  cstar_uM  eq_capsid  kinetic_capsid_18h  stalled
+0   2.02    1.0    3.5977     0.9784              0.8937   0.1053
+1   2.02    2.0    3.5977     0.9823              0.8925   0.1070
+2   2.02    4.0    3.5977     0.9843              0.8925   0.1072
+3   3.00    1.0    3.5977     0.9909              0.5009   0.1018
+4   3.00    2.0    3.5977     0.9945              0.7683   0.0272
+5   3.00    4.0    3.5977     0.9963              0.9298   0.0702
+6   4.00    1.0    3.5977     0.9922              0.0033   0.1285
+7   4.00    2.0    3.5977     0.9958              0.4056   0.0519
+8   4.00    4.0    3.5977     0.9976              0.7040   0.0141
+c*        : identical across all 9 - it depends only on the TOTAL contact
+            count, which IS constrained. Safe to report.
+eq capsid : range 0.9784 - 0.9976. Robust.
+stalled   : range 0.0141 - 0.1285. NOT robust -
+            do not quote a stalled fraction until the schedule comes from
+            the structure.
+
+===== cell 20  (0.0 s) =====
+wrote M3_export.npz
+
+===== cell 22  (0.3 s) =====
+   bolus_uM  f_correct  N_counted    lo95    hi95  halfwidth_pp
+0     200.0     1.0000        200  0.9991  1.0000        0.0438
+1     200.0     1.0000       1000  0.9996  1.0000        0.0206
+2     500.0     1.0000        200  0.9992  1.0000        0.0422
+3     500.0     1.0000       1000  0.9996  1.0000        0.0198
+4    1000.0     0.9292        200  0.8937  0.9648        3.5544
+5    1000.0     0.9292       1000  0.9133  0.9451        1.5896
+
+Model-predicted correctly-formed fraction at the 500 uM bolus: 1.000
+Particles to count for a 95% interval of half-width 5 pp: 1
+
+Protocol this fixes, before any grid is imaged:
+  - count >= 200 particles across >= 5 fields
+  - 'correct' = outer diameter within 27 +/- 2 nm
+  - report the fraction with its binomial 95% interval, not a representative image
+TEM measures SHAPE. The particle count that enters M5 comes from SEC plus a
+protein assay, which is 7.7% CV against 12.7% for 200 counted particles (§7.3).
+
+===== cell 23  (0.9 s) =====
+   c_end  f_deg  f_correct  closed_uM  malformed_uM
+0   2.02    1.0     0.8934     4.9649        0.5926
+1   2.02    2.0     0.8917     4.9584        0.6020
+2   2.02    4.0     0.8915     4.9585        0.6034
+3   3.00    1.0     1.0000     2.7830        0.0001
+4   3.00    2.0     1.0000     4.2686        0.0001
+5   3.00    4.0     0.9290     5.1656        0.3945
+6   4.00    1.0     1.0000     0.0181        0.0000
+7   4.00    2.0     1.0000     2.2531        0.0000
+8   4.00    4.0     1.0000     3.9110        0.0000
+f_correct spans 0.892 - 1.000 (10.8 pp) across the schedule scan.
+Compare against the 5 pp resolution of a 200-particle count: a TEM count is
+informative about the schedule only if that span exceeds its own error bar.

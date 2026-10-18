@@ -1,0 +1,5 @@
+case,dG_kcal,cstar_37C_uM,lowest_arm_over_cstar,free_dimer_eq_uM,eq_capsid_frac,interm_frac,kinetic_capsid_18h
+framework placeholder,-4.2,0.491,863,0.535,0.998,0.00097,0.9369
+"literature Tm inversion, 2.5 uM assay",-4.051,0.801,529,0.867,0.997,0.00125,0.935
+"literature Tm inversion, 5 uM assay",-3.82,1.71,248,1.836,0.9945,0.00184,0.7683
+"literature Tm inversion, 10 uM assay",-3.589,3.65,116,3.884,0.9895,0.00271,0.6452

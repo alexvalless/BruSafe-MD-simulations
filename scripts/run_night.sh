@@ -8,8 +8,8 @@
 # Example (leave at 19:00, back at 07:00 -> 11 h budget):
 #   ./scripts/run_night.sh S1_wt_cc_apo 1 11
 #
-# Requires 01_prepare.sh to have run for this system. Do that during the day:
-# pdb2gmx asks about termini interactively, so it cannot run unattended.
+# Requires 01_prepare.sh to have been run for this system beforehand, in an
+# attended session: pdb2gmx asks about termini interactively.
 set -euo pipefail
 source "$(dirname "$0")/lib.sh"
 need gmx

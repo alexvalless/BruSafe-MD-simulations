@@ -1,0 +1,46 @@
+protein,run,temperature_C,time_h,IPTG_mM,yield_mg_per_mL,source_first_author,source_year,source_journal,source_doi,source_pmcid,source_table
+MICA,1,25,3.0,0.55,0.068,"Gutiérrez-González M, et al.",2019,Scientific Reports,10.1038/s41598-019-53200-7,PMC6856375,Table 2
+MICA,2,37,3.0,0.55,0.285,"Gutiérrez-González M, et al.",2019,Scientific Reports,10.1038/s41598-019-53200-7,PMC6856375,Table 2
+MICA,3,25,6.0,0.55,0.249,"Gutiérrez-González M, et al.",2019,Scientific Reports,10.1038/s41598-019-53200-7,PMC6856375,Table 2
+MICA,4,37,6.0,0.55,0.633,"Gutiérrez-González M, et al.",2019,Scientific Reports,10.1038/s41598-019-53200-7,PMC6856375,Table 2
+MICA,5,25,4.5,0.1,0.311,"Gutiérrez-González M, et al.",2019,Scientific Reports,10.1038/s41598-019-53200-7,PMC6856375,Table 2
+MICA,6,37,4.5,0.1,0.563,"Gutiérrez-González M, et al.",2019,Scientific Reports,10.1038/s41598-019-53200-7,PMC6856375,Table 2
+MICA,7,25,4.5,1.0,0.103,"Gutiérrez-González M, et al.",2019,Scientific Reports,10.1038/s41598-019-53200-7,PMC6856375,Table 2
+MICA,8,37,4.5,1.0,0.415,"Gutiérrez-González M, et al.",2019,Scientific Reports,10.1038/s41598-019-53200-7,PMC6856375,Table 2
+MICA,9,31,3.0,0.1,0.249,"Gutiérrez-González M, et al.",2019,Scientific Reports,10.1038/s41598-019-53200-7,PMC6856375,Table 2
+MICA,10,31,6.0,0.1,0.426,"Gutiérrez-González M, et al.",2019,Scientific Reports,10.1038/s41598-019-53200-7,PMC6856375,Table 2
+MICA,11,31,3.0,1.0,0.248,"Gutiérrez-González M, et al.",2019,Scientific Reports,10.1038/s41598-019-53200-7,PMC6856375,Table 2
+MICA,12,31,6.0,1.0,0.237,"Gutiérrez-González M, et al.",2019,Scientific Reports,10.1038/s41598-019-53200-7,PMC6856375,Table 2
+MICA,13,31,4.5,0.55,0.221,"Gutiérrez-González M, et al.",2019,Scientific Reports,10.1038/s41598-019-53200-7,PMC6856375,Table 2
+MICA,14,31,4.5,0.55,0.339,"Gutiérrez-González M, et al.",2019,Scientific Reports,10.1038/s41598-019-53200-7,PMC6856375,Table 2
+MICA,15,31,4.5,0.55,0.317,"Gutiérrez-González M, et al.",2019,Scientific Reports,10.1038/s41598-019-53200-7,PMC6856375,Table 2
+anti-MICA scFv,1,25,3.0,0.55,0.11,"Gutiérrez-González M, et al.",2019,Scientific Reports,10.1038/s41598-019-53200-7,PMC6856375,Table 2
+anti-MICA scFv,2,37,3.0,0.55,0.094,"Gutiérrez-González M, et al.",2019,Scientific Reports,10.1038/s41598-019-53200-7,PMC6856375,Table 2
+anti-MICA scFv,3,25,6.0,0.55,0.177,"Gutiérrez-González M, et al.",2019,Scientific Reports,10.1038/s41598-019-53200-7,PMC6856375,Table 2
+anti-MICA scFv,4,37,6.0,0.55,0.067,"Gutiérrez-González M, et al.",2019,Scientific Reports,10.1038/s41598-019-53200-7,PMC6856375,Table 2
+anti-MICA scFv,5,25,4.5,0.1,0.077,"Gutiérrez-González M, et al.",2019,Scientific Reports,10.1038/s41598-019-53200-7,PMC6856375,Table 2
+anti-MICA scFv,6,37,4.5,0.1,0.085,"Gutiérrez-González M, et al.",2019,Scientific Reports,10.1038/s41598-019-53200-7,PMC6856375,Table 2
+anti-MICA scFv,7,25,4.5,1.0,0.133,"Gutiérrez-González M, et al.",2019,Scientific Reports,10.1038/s41598-019-53200-7,PMC6856375,Table 2
+anti-MICA scFv,8,37,4.5,1.0,0.068,"Gutiérrez-González M, et al.",2019,Scientific Reports,10.1038/s41598-019-53200-7,PMC6856375,Table 2
+anti-MICA scFv,9,31,3.0,0.1,0.083,"Gutiérrez-González M, et al.",2019,Scientific Reports,10.1038/s41598-019-53200-7,PMC6856375,Table 2
+anti-MICA scFv,10,31,6.0,0.1,0.133,"Gutiérrez-González M, et al.",2019,Scientific Reports,10.1038/s41598-019-53200-7,PMC6856375,Table 2
+anti-MICA scFv,11,31,3.0,1.0,0.123,"Gutiérrez-González M, et al.",2019,Scientific Reports,10.1038/s41598-019-53200-7,PMC6856375,Table 2
+anti-MICA scFv,12,31,6.0,1.0,0.147,"Gutiérrez-González M, et al.",2019,Scientific Reports,10.1038/s41598-019-53200-7,PMC6856375,Table 2
+anti-MICA scFv,13,31,4.5,0.55,0.154,"Gutiérrez-González M, et al.",2019,Scientific Reports,10.1038/s41598-019-53200-7,PMC6856375,Table 2
+anti-MICA scFv,14,31,4.5,0.55,0.164,"Gutiérrez-González M, et al.",2019,Scientific Reports,10.1038/s41598-019-53200-7,PMC6856375,Table 2
+anti-MICA scFv,15,31,4.5,0.55,0.22,"Gutiérrez-González M, et al.",2019,Scientific Reports,10.1038/s41598-019-53200-7,PMC6856375,Table 2
+IL-23p19,1,25,3.0,0.6,1.8,"Gutiérrez-González M, et al.",2019,Scientific Reports,10.1038/s41598-019-53200-7,PMC6856375,Table 2
+IL-23p19,2,37,3.0,0.6,5.1,"Gutiérrez-González M, et al.",2019,Scientific Reports,10.1038/s41598-019-53200-7,PMC6856375,Table 2
+IL-23p19,3,25,5.0,0.6,1.0,"Gutiérrez-González M, et al.",2019,Scientific Reports,10.1038/s41598-019-53200-7,PMC6856375,Table 2
+IL-23p19,4,37,5.0,0.6,2.8,"Gutiérrez-González M, et al.",2019,Scientific Reports,10.1038/s41598-019-53200-7,PMC6856375,Table 2
+IL-23p19,5,25,4.0,0.2,2.2,"Gutiérrez-González M, et al.",2019,Scientific Reports,10.1038/s41598-019-53200-7,PMC6856375,Table 2
+IL-23p19,6,37,4.0,0.2,4.2,"Gutiérrez-González M, et al.",2019,Scientific Reports,10.1038/s41598-019-53200-7,PMC6856375,Table 2
+IL-23p19,7,25,4.0,1.0,2.0,"Gutiérrez-González M, et al.",2019,Scientific Reports,10.1038/s41598-019-53200-7,PMC6856375,Table 2
+IL-23p19,8,37,4.0,1.0,3.9,"Gutiérrez-González M, et al.",2019,Scientific Reports,10.1038/s41598-019-53200-7,PMC6856375,Table 2
+IL-23p19,9,31,3.0,0.2,2.1,"Gutiérrez-González M, et al.",2019,Scientific Reports,10.1038/s41598-019-53200-7,PMC6856375,Table 2
+IL-23p19,10,31,5.0,0.2,1.0,"Gutiérrez-González M, et al.",2019,Scientific Reports,10.1038/s41598-019-53200-7,PMC6856375,Table 2
+IL-23p19,11,31,3.0,1.0,2.8,"Gutiérrez-González M, et al.",2019,Scientific Reports,10.1038/s41598-019-53200-7,PMC6856375,Table 2
+IL-23p19,12,31,5.0,1.0,1.0,"Gutiérrez-González M, et al.",2019,Scientific Reports,10.1038/s41598-019-53200-7,PMC6856375,Table 2
+IL-23p19,13,31,4.0,0.6,2.5,"Gutiérrez-González M, et al.",2019,Scientific Reports,10.1038/s41598-019-53200-7,PMC6856375,Table 2
+IL-23p19,14,31,4.0,0.6,2.7,"Gutiérrez-González M, et al.",2019,Scientific Reports,10.1038/s41598-019-53200-7,PMC6856375,Table 2
+IL-23p19,15,31,4.0,0.6,2.3,"Gutiérrez-González M, et al.",2019,Scientific Reports,10.1038/s41598-019-53200-7,PMC6856375,Table 2

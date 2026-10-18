@@ -805,7 +805,7 @@ def cmd_report(a: argparse.Namespace) -> None:
                               f"{lab} ({unit})", "Distribution over the production window, "
                               "one curve per replica; dotted lines mark replica means. "
                               "Curves that do not overlap mean the replicas sample different "
-                              "states — report that, do not average it away.")
+                              "states, which should be reported and not averaged away.")
         if d:
             dist.append(d)
 
@@ -866,7 +866,7 @@ def cmd_report(a: argparse.Namespace) -> None:
     p = Plot("pca_pc1", "Projection on PC1", "Time (ns)", "PC1 (nm)",
              caption="Projection of each replica onto its own first eigenvector. "
                      "Cosine content near 1 means the 'motion' is indistinguishable "
-                     "from random diffusion — do not interpret it (Hess 2002).")
+                     "from random diffusion and should not be interpreted (Hess 2002).")
     for r in reps:
         x = r.x("pc1.xvg")
         if x is not None:
@@ -895,7 +895,7 @@ def cmd_report(a: argparse.Namespace) -> None:
              "Block length (ns)", "SEM of the mean (Å)", logx=True,
              caption="The naive SEM (block length = one frame, left end) assumes "
                      "independent frames and is wrong. The plateau on the right is the "
-                     "honest uncertainty of one replica; no plateau = run too short. "
+                     "uncertainty of one replica; no plateau means the run is too short. "
                      "Quote the ratio in the methods (convergence.py block).")
     for r in reps:
         x = r.x("rmsd_backbone.xvg")
@@ -912,7 +912,7 @@ def cmd_report(a: argparse.Namespace) -> None:
     plots += dist
 
     if a.compact:
-        # wiki view: what a reader needs to judge the system, nothing per-replica
+        # wiki view: only what a reader needs to assess the system, nothing per-replica
         keep = ["rmsd_backbone", "rmsf", "rg", "sasa"]
         if registry_row(a.system).get("has_rna") == "yes" or any(
                 p.key in ("rmsd_rna", "mindist_mg") for p in plots):
