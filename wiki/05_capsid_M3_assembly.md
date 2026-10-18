@@ -34,7 +34,7 @@ shift assay run at 5–20 µM monomer (2.5–10 µM dimer). The inversion gives
 | 10 µM | −3.59 |
 
 An earlier placeholder of −4.2 kcal mol⁻¹ had no source and is retained only as a comparison line in
-the figures. The values for the mutant ladder are in `capsid/data/derived_M3_dG_from_Tm.csv`.
+the figures. The values for the mutant ladder are in `capsid/data/litdata/derived_M3_dG_from_Tm.csv`.
 
 ## Results
 

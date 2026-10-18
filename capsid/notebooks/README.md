@@ -1,8 +1,7 @@
 # Notebook catalogue
 
 All notebooks, grouped by role. The same information in machine-readable form is in
-[`../MANIFEST.csv`](../MANIFEST.csv). Notebooks are in English unless the language column says
-otherwise.
+[`../MANIFEST.csv`](../MANIFEST.csv). All notebooks are in English.
 
 Each notebook is run from its own folder (see the main [README](../README.md#running-the-notebooks)),
 and the files they exchange are written to that folder. Those files (`*.npz`, `*.nc`, and the
@@ -15,16 +14,16 @@ posterior CSV files) are excluded from version control.
 | 01 | `BruSafe_01_M1_expression_IPTG.ipynb` | M1 | `VA_timecourse.csv` if `USE_SYNTHETIC = False` | `M1_iptg_posterior_draws.csv`, `M1_iptg_posterior_moments.csv`, `M1_iptg_idata.nc` |
 | 02 | `BruSafe_02_M1_expression_lactose.ipynb` | M1 | `VA_lactose_timecourse.csv` if `USE_SYNTHETIC = False` | `M1_lactose_posterior_draws.csv`, `M1_lactose_posterior_moments.csv`, `M1_lactose_idata.nc` |
 | 03 | `BruSafe_03_M2_soluble_partition.ipynb` | M2 | `VA_partition_gels.csv` if `USE_SYNTHETIC = False` | `M2_export.npz` |
-| 04 | `BruSafe_04_M3_capsid_assembly.ipynb` | M3 | `M2_export.npz` (reference values are used if absent), `../data/derived_M3_dG_from_Tm.csv` | `M3_export.npz`, `M3_TEM_observable.npz` |
+| 04 | `BruSafe_04_M3_capsid_assembly.ipynb` | M3 | `M2_export.npz` (reference values are used if absent), `../data/litdata/derived_M3_dG_from_Tm.csv` | `M3_export.npz`, `M3_TEM_observable.npz` |
 | 05 | `BruSafe_05_M5_absolute_quantification.ipynb` | M5 | inputs entered in the swap-point cells | none |
 
-Section numbers in the notebooks refer to the CAPSID framework document, which is not part of this
-repository.
+Section numbers in the notebooks refer to the CAPSID framework document
+([`../docs/CAPSID_framework_theory_v3.md`](../docs/CAPSID_framework_theory_v3.md)).
 
 ## 2. Literature variants (`literature/`)
 
 Each variant replaces the synthetic-data section of a production notebook with published
-measurements. The data pack is read from `../../data/`.
+measurements. The data pack is read from `../../data/litdata/`.
 
 | Notebook | Question addressed | Data |
 |---|---|---|
@@ -42,17 +41,17 @@ assembly and packaging, and they use a module numbering in which "M4" does not c
 Module M4 of the framework. They are background for the M4 module, which the framework specifies
 and which has no production notebook yet.
 
-| Notebook | Language | Content |
-|---|---|---|
-| `Ejemplo_Capside_ensamblaje_N12.ipynb` | es | Kinetic master equation for a dodecahedral (N = 12) capsid after Zlotnick and Hagan; a short introductory example |
-| `M3_expresion_colab.ipynb` | es | Expression of the coat protein to steady state; justification of D = P/2; temperature sweep (Colab-ready) |
-| `M4_ensamblaje_colab.ipynb` | es | Explicit 90-step assembly cascade and the concentration sweep (Colab-ready) |
-| `M4_L1_rate_equations.ipynb` | en | Layer 1: nucleation–elongation rate equations and the yield curve |
-| `M4_L2_nucleation_phase_diagram.ipynb` | en | Layer 2: classical nucleation theory and the assembly phase diagram |
-| `M4_L3_coarsegrained_MC.ipynb` | en | Layer 3: coarse-grained Monte Carlo of patchy subunits, which measures the contact ladder assumed in L1 |
-| `M4_L4_packaging_signal_coassembly.ipynb` | en | Layer 4: stochastic co-assembly around cargo with packaging signals |
-| `M4_bridge_CG_to_ODE_to_bench.ipynb` | en | Connects the CG bond census to the ODE and to benchtop observables (turbidity, TEM) |
-| `M4_FIT_to_bench_data.ipynb` | en | Fits the contact energy, association rate and a recovery scale to bench data; profile likelihood |
+| Notebook | Content |
+|---|---|
+| `Example_capsid_assembly_N12.ipynb` | Kinetic master equation for a dodecahedral (N = 12) capsid after Zlotnick and Hagan; a short introductory example |
+| `M3_expression_colab.ipynb` | Expression of the coat protein to steady state; justification of D = P/2; temperature sweep (Colab-ready) |
+| `M4_assembly_colab.ipynb` | Explicit 90-step assembly cascade and the concentration sweep (Colab-ready) |
+| `M4_L1_rate_equations.ipynb` | Layer 1: nucleation–elongation rate equations and the yield curve |
+| `M4_L2_nucleation_phase_diagram.ipynb` | Layer 2: classical nucleation theory and the assembly phase diagram |
+| `M4_L3_coarsegrained_MC.ipynb` | Layer 3: coarse-grained Monte Carlo of patchy subunits, which measures the contact ladder assumed in L1 |
+| `M4_L4_packaging_signal_coassembly.ipynb` | Layer 4: stochastic co-assembly around cargo with packaging signals |
+| `M4_bridge_CG_to_ODE_to_bench.ipynb` | Connects the CG bond census to the ODE and to benchtop observables (turbidity, TEM) |
+| `M4_FIT_to_bench_data.ipynb` | Fits the contact energy, association rate and a recovery scale to bench data; profile likelihood |
 
 Points to keep in mind when reading these notebooks:
 
@@ -63,10 +62,10 @@ Points to keep in mind when reading these notebooks:
   contact energy derived from the published melting point, and it produces a saturating trap and not a
   declining yield (§5 of notebook 04). The two sets of results should not be mixed.
 - L1–L4, the bridge and the FIT notebook write their simulation source to disk in their first code
-  cell. They refer to `M4_theory_compendium.pdf` and, for the FIT notebook, to
-  `M4_bench_data_template.csv`. Neither file is included in this repository; without the template
-  the FIT notebook falls back to a synthetic example.
-- `Ejemplo_Capside_ensamblaje_N12.ipynb` is the only notebook with stored outputs in this folder.
+  cell. The theory they implement is described in `../docs/M4_theory_compendium.pdf`, and the FIT
+  notebook reads `../../data/M4_bench_data_template.csv`; while the template contains no values, the
+  FIT notebook falls back to a synthetic example.
+- `Example_capsid_assembly_N12.ipynb` is the only notebook with stored outputs in this folder.
 
 ## 4. Archived notebooks (`archive/`)
 

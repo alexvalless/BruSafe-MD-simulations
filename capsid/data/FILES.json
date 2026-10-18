@@ -1,0 +1,31 @@
+{
+ "inputs_shipped": [
+  "derived_M2_arrhenius_from_arenin.csv",
+  "derived_M3_assembly_at_literature_dG.csv",
+  "derived_M3_dG_from_Tm.csv",
+  "lit_M1_fedbatch_timepoints.csv",
+  "lit_M1_induction_design.csv",
+  "lit_M2_partition_gels.csv",
+  "lit_M3_ms2_thermal_stability.csv",
+  "lit_sources.csv",
+  "M4_bench_data_template.csv"
+ ],
+ "templates_to_fill": [
+  "VA_timecourse.csv",
+  "VA_lactose_timecourse.csv",
+  "VA_partition_gels.csv"
+ ],
+ "written_by_notebooks": [
+  "M1_iptg_posterior_draws.csv",
+  "M1_iptg_posterior_moments.csv",
+  "M1_iptg_idata.nc",
+  "M1_lactose_posterior_draws.csv",
+  "M1_lactose_posterior_moments.csv",
+  "M1_lactose_idata.nc",
+  "M2_export.npz",
+  "M2_export_literature.npz",
+  "M3_export.npz",
+  "M3_export_literature.npz",
+  "M3_TEM_observable.npz"
+ ]
+}

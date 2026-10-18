@@ -1,0 +1,3 @@
+# notebooks/BruSafe_02_M1_expression_lactose.ipynb, USE_SYNTHETIC = False
+# biomass_gdcw_L may be replaced by wet_weight_g_L or OD600; the notebook converts either.
+lactose_mM,time_min,gel_id,biomass_gdcw_L,CP_mg_L

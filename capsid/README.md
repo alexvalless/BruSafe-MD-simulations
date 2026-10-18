@@ -18,11 +18,14 @@ notebooks/              the five production modules, in pipeline order
 notebooks/literature/   the same modules confronted with published measurements
 notebooks/exploratory/  earlier assembly and packaging work (separate numbering)
 notebooks/archive/      predecessors of the production notebooks, kept for provenance
-data/                   literature data pack (CSV) used by the notebooks, with a data dictionary
+docs/                   framework document, results write-up, literature runs and the M4 compendium
+data/litdata/           literature data pack (CSV) used by the notebooks, with a data dictionary
+data/templates/         empty CSV templates with the columns each notebook expects from the bench
+data/FILES.json         what ships with the repository, what is supplied, what the notebooks write
 figures/                the figures produced by the notebooks (150 dpi), with an index
 results/logs/           cell-by-cell output of the runs reported in the write-up
 tools/                  headless notebook runner and the calibration studies
-MANIFEST.csv            every notebook, with group, module, language, size and title
+MANIFEST.csv            every notebook, with group, module, size and title
 environment.yml         conda environment (requirements.txt for pip)
 ```
 
@@ -69,7 +72,7 @@ cd notebooks && jupyter lab        # interactive
 
 The notebooks exchange files (`M1_*_posterior_draws.csv`, `M2_export.npz`, …) through the
 **working directory**, and the literature variants read the data pack through relative paths
-(`../data/` from `notebooks/`, `../../data/` from `notebooks/literature/`). Each notebook should
+(`../data/litdata/` from `notebooks/`, `../../data/litdata/` from `notebooks/literature/`). Each notebook should
 therefore be run with its own folder as the working directory, which is the default in Jupyter, and
 the notebooks of one folder should be run in numerical order.
 
@@ -123,6 +126,31 @@ model of M2: gels reading a soluble fraction of exactly 1 were treated as infini
 instead of as censored observations, and a conventional recovery check had accepted this for
 weeks.
 
+## Documents
+
+| File (in `docs/`) | Content |
+|---|---|
+| `CAPSID_framework_theory_v3.docx`, `.md` | the framework: conventions, the five modules derived, assumptions, and the experimental programme; the section numbers quoted in the notebooks refer to this document |
+| `CAPSID_results_interpretation.docx`, `.md` | every result produced by the notebooks, with the provenance of each number |
+| `CAPSID_literature_runs.docx` | the three confrontations with published data |
+| `BruSafe_wiki_model_v2.docx` | the wiki page, written for a general reader |
+| `CAPSID_theory_changes.docx` | what changed in the theory and why, for readers of an earlier draft |
+| `M4_theory_compendium.pdf`, `.md`, `.html` | the assembly and packaging theory behind the exploratory notebooks |
+
+## Supplying bench data
+
+Each production notebook has an empty template in `data/templates/`. To use real data, the template is
+copied into the folder from which the notebook is run, filled in, and `USE_SYNTHETIC` is set to `False`:
+
+| Template | Notebook | Columns |
+|---|---|---|
+| `VA_timecourse.csv` | 01 | `dose_uM, time_min, gel_id, CP_mg_L` and `biomass_gdcw_L` (or `wet_weight_g_L`, or `OD600`) |
+| `VA_lactose_timecourse.csv` | 02 | `lactose_mM, time_min, gel_id, CP_mg_L` and a biomass column |
+| `VA_partition_gels.csv` | 03 | `lactose_uM, time_min, temp_C, soluble_mg_L, pellet_mg_L` |
+
+Lines that start with `#` in the templates are comments and are ignored by the notebooks. The
+template for the exploratory fitting notebook is `data/M4_bench_data_template.csv`.
+
 ## Known limitations
 
 - The contact schedule in M3 is a placeholder with the correct total. It moves the kinetic capsid
@@ -134,9 +162,6 @@ weeks.
 - The recovery efficiencies of M5 are assumed and not measured. They contribute 55% of the variance
   in cargo copies per particle, and the three controls that would measure them are the most valuable
   experiment in the plan.
-- The theory compendium for the exploratory M4 notebooks (`M4_theory_compendium.pdf`), the bench-data
-  template (`M4_bench_data_template.csv`) and the framework document to which the section numbers
-  refer are not part of this repository.
 
 ## Licence and citation
 

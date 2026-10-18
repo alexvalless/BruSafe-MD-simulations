@@ -2,7 +2,7 @@
 
 The CAPSID notebooks run on synthetic data with known truth until the wet-lab data are available.
 In addition, three published datasets are used to confront the models with measurements. The data
-tables are in `capsid/data/`, and a data dictionary is in `capsid/data/README.md`.
+tables are in `capsid/data/litdata/`, and a data dictionary is in `capsid/data/README.md`.
 
 | Module | Quantity | Source | Locator | Conversion applied |
 |---|---|---|---|---|

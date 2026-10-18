@@ -29,8 +29,7 @@ would resolve it.
 | The force-field choice (CHARMM36m) involves a less standard PB radii setup (`PBRadii = 7`) | if the calibration regression performs poorly, the force field is one of the suspects (`docs/DECISIONS.md`) |
 | Review of the force-field decision by the external MD advisor was pending when the decision was logged | to be confirmed in writing |
 
-## Documentation that is not part of the repository
+## Further documentation
 
-The framework document to which the section numbers of the notebooks refer, the theory compendium
-of the exploratory M4 notebooks (`M4_theory_compendium.pdf`), and the bench-data template
-(`M4_bench_data_template.csv`) are not included.
+The framework document to which the section numbers of the notebooks refer, the results write-up and
+the theory compendium of the exploratory M4 notebooks are in `capsid/docs/`.
