@@ -7,9 +7,9 @@
 #   pdb2gmx    : <system_name>.pdb   (cleaned, correct chains, no waters/alt-locs)
 #   charmm-gui : the unzipped CHARMM-GUI Solution Builder gromacs/ output
 #
-# For RNA-containing systems the CHARMM-GUI route is STRONGLY preferred.
-# pdb2gmx residue mapping for RNA under the charmm36 port is fragile and the
-# Mg2+ placement question below is handled properly by the builder.
+# For RNA-containing systems the CHARMM-GUI route is strongly preferred: the
+# pdb2gmx residue mapping for RNA under the charmm36 port is fragile, and the
+# builder handles the Mg2+ placement question discussed below.
 set -euo pipefail
 source "$(dirname "$0")/lib.sh"
 need gmx
@@ -43,8 +43,8 @@ else
     WINPTY="winpty"
   fi
 
-  # 15 = CHARMM36 in the standard pdb2gmx menu ordering; -ter interactive so you
-  # consciously choose termini rather than accepting a default you never saw.
+  # The force field is selected by name (-ff). -ter is interactive so that the
+  # termini are chosen explicitly and not left to a default.
   $WINPTY "$GMX_BIN" pdb2gmx -f "$IN/$SYS.pdb" -o proc.gro -p topol.top -i posre.itp \
               -water tip3p -ff charmm36-jul2022 -ignh -ter
 
@@ -55,16 +55,17 @@ else
 
   if [ "$HAS_RNA" = "yes" ] && [ "$MG" -gt 0 ]; then
     # ---------------------------------------------------------------------
-    # Mg2+ WARNING -- read before trusting anything downstream.
-    # Mg2+ water exchange is a microsecond process. On a 250 ns trajectory the
-    # ions never equilibrate: they stay essentially wherever genion drops them.
-    # Random placement therefore adds noise, not realism.
-    # Preferred order:
+    # Caveat on Mg2+ placement.
+    # Mg2+ water exchange takes microseconds, so on a 250 ns trajectory the
+    # ions do not equilibrate and remain close to where genion places them.
+    # Random placement therefore adds noise and no realism.
+    # Order of preference:
     #   1. crystallographic Mg2+ sites from the cocrystal, placed explicitly
     #   2. CHARMM-GUI placement with its ion-distribution options
-    #   3. genion (this branch) -- acceptable only if you document it and run
-    #      04_postprocess.sh's mg_check, which flags Mg2+ that wandered into
-    #      the binding interface.
+    #   3. genion (this branch), acceptable only if the placement is
+    #      documented and the Mg2+ interface check of 04_postprocess.sh
+    #      (mindist_mg.xvg) is inspected for ions that moved into the
+    #      binding interface.
     # ---------------------------------------------------------------------
     log "WARNING: genion Mg2+ placement is arbitrary and will not equilibrate"
     printf 'SOL\n' | gmx genion -s ions.tpr -o mg.gro -p topol.top \
@@ -79,7 +80,7 @@ else
 fi
 
 # ---- index groups -----------------------------------------------------------
-# TWO sources, concatenated. Both are needed and neither is optional:
+# The index file is the concatenation of two sources, both of which are required:
 #
 #   default.ndx  from make_ndx -- System, Protein, Backbone, C-alpha, RNA, ...
 #                04_postprocess.sh asks for these BY NAME (Backbone, C-alpha,
@@ -98,7 +99,7 @@ rm -f default.ndx custom.ndx
 
 log "index groups: $(grep -o '\[ [^]]* \]' index.ndx | tr -d '[]' | tr -s ' ' | paste -sd' ' -)"
 
-# Fail loudly here rather than three days later inside 04_postprocess.sh.
+# Fail here, with a clear message, instead of days later inside 04_postprocess.sh.
 for g in Backbone C-alpha SOLU SOLV; do
   grep -q "\[ $g \]" index.ndx || die "index.ndx has no '$g' group -- 04_postprocess.sh will fail"
 done

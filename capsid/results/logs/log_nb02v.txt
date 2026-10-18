@@ -1,0 +1,127 @@
+
+===== cell 2  (1.8 s) =====
+pymc 5.28.5 | arviz 0.23.4
+
+===== cell 4  (0.4 s) =====
+forward model: 1.7 ms per evaluation
+
+===== cell 6  (0.0 s) =====
+evidence
+Direct        9
+Adapted       3
+Assumption    1 
+
+       tag                         term                                                                                                basis    evidence                                                                               reference
+0    M1L.1        V_Y*Yp*Le/(K_Y+Le)*xi                                                       Lactose enters only through LacY; K_Y ~ 0.4 mM      Direct            Jacob & Monod 1961 JMB 3:318; Marbach & Bettenbrock 2012 J Biotechnol 157:82
+1    M1L.2         k_cat*B*Li/(K_ML+Li)                                                     beta-galactosidase acts on intracellular lactose      Direct                                        Juers, Matthews & Huber 2012 Protein Sci 21:1792
+2    M1L.3    f_tg split: v_tg vs v_hyd               beta-gal partitions lactose between hydrolysis and transgalactosylation to allolactose      Direct  Huber, Kurz & Wallenfels 1976 Biochemistry 15:1994; Wheatley et al. 2013 JBC 288:12993
+3    M1L.4  v_ah = k_cat*B*Al/(K_MA+Al)  Allolactose is ITSELF a beta-gal substrate: K_M 1.2 mM, V 49.6 U/mg -- as good as lactose or better      Direct                                     Huber, Wallenfels & Kurz 1975 Can J Biochem 53:1035
+4    M1L.5          C = 1/(1+Glc/K_cat)                                   Glucose lowers cAMP-CRP and represses the chromosomal lac promoter     Adapted   Gorke & Stulke 2008 Nat Rev Microbiol 6:613; Deutscher 2008 Curr Opin Microbiol 11:87
+5    M1L.6          xi = 1/(1+Glc/K_ie)                                        Inducer exclusion: PTS-mediated inhibition of LacY by glucose     Adapted                                            Gorke & Stulke 2008. Hyperbolic FORM is ours
+6    M1L.7       glucose consumed first                                       Diauxic sequencing is the basis of lactose autoinduction media      Direct                                                  Studier 2005 Protein Expr Purif 41:207
+7    M1L.8    C does NOT multiply dR/dt                                      lacUV5 was isolated as a catabolite-INSENSITIVE promoter mutant      Direct                                       Silverstone, Arditti & Magasanik 1970 PNAS 66:773
+8    M1L.9   f(Al), Hill in ALLOLACTOSE                                          Allolactose, not lactose, is the physiological LacI inducer      Direct                                                        Jobe & Bourgeois 1972 JMB 69:397
+9   M1L.10         B and Yp share k_lac                               LacZ and LacY are co-transcribed from one operon, so one time constant     Adapted   Jacob & Monod 1961. Equal amplitude is a simplification -- LacY is sub-stoichiometric
+10  M1L.11       positive feedback loop                              Al -> derepress -> more LacY/LacZ -> more Al. Structural, not removable      Direct                    Novick & Weiner 1957 PNAS 43:553; Ozbudak et al. 2004 Nature 427:737
+11  M1L.12                   k_deg on P                     Proteolysis dominates over dilution once growth arrests, i.e. most of a 24 h run  Assumption               Rate is protein- and strain-specific; no generic literature value applies
+12  M1L.13        Glc0 = 2.5 mM default                               Autoinduction media carry glucose to delay induction until it is spent      Direct                                                  Studier 2005 Protein Expr Purif 41:207
+
+===== cell 9  (0.3 s) =====
+Fraction of 24 h protein captured by 300 min: [0.023 0.015 0.013 0.013]
+Time to half-maximal protein (min):         [798 738 696 684]
+Glucose exhausted at (min):                 270
+findfont: Failed to find font weight normal for Apple Chancery, now using 0.
+
+===== cell 12  (0.0 s) =====
+k_slow<->k_fast :  max|dP|/max(P) = 1.38e-06  -> exchangeable
+V_Y*1.6 & k_cat/1.6:  max|dP|/max(P) = 7.00e-01  -> NOT degenerate: both are separately identifiable
+f_tg & k_cat co-scaled: max|dP|/max(P) = 5.63e-01  -> also NOT degenerate (k_cat drives hydrolysis and v_ah too);
+     f_tg is fixed for PARSIMONY, not because it is unidentifiable.
+
+===== cell 14  (0.1 s) =====
+max relative gap between histories: 0.11%
+Below ~1% -> single attractor at these parameters: a deterministic mean is meaningful.
+
+===== cell 17  (0.0 s) =====
+SYNTHETIC data. Ground truth known -> recovery checkable in §8.
+lactose (mM): [ 0.5  1.5  5.5 15. ] | 2 gel(s) | 10 timepoints to 1440.0 min
+biomass 0.02-3.48 gDCW/L | CP 0.04-38.3 mg/L
+
+===== cell 19  (0.0 s) =====
+<cell 19>:1: FutureWarning: pytensor.as_op is deprecated and will be removed in a future release. Please use pytensor.wrap_py instead.
+model built | 13 fitted parameters, 8 fixed
+
+===== cell 21  (588.5 s) =====
+SMC: 2000 draws x 4 chains
+done in 589 s | {'chain': 4, 'draw': 2000, 'log_alpha_free_dim_0': 1, 'log_alpha_dim_0': 2}
+
+===== cell 23  (0.1 s) =====
+             mean      sd  hdi_3%  hdi_97%  mcse_mean  mcse_sd  ess_bulk  ess_tail  r_hat
+mu_max      0.021   0.000   0.021    0.021      0.000    0.000    7834.0    7767.0    1.0
+phi_crit    0.246   0.044   0.172    0.328      0.001    0.000    6893.0    6839.0    1.0
+k_deg       0.000   0.000   0.000    0.001      0.000    0.000    6363.0    5003.0    1.0
+K_cat       0.075   0.068   0.006    0.186      0.001    0.002    6588.0    6299.0    1.0
+V_Y         0.267   0.142   0.059    0.511      0.002    0.002    6914.0    6798.0    1.0
+k_cat       3.132   1.416   1.045    5.648      0.017    0.024    6732.0    5852.0    1.0
+K_A         0.193   0.107   0.048    0.380      0.001    0.002    7555.0    6727.0    1.0
+h           1.633   0.205   1.253    2.019      0.002    0.002    7034.0    6066.0    1.0
+eps         0.005   0.002   0.002    0.009      0.000    0.000    6748.0    7023.0    1.0
+k_lac       0.057   0.034   0.012    0.118      0.000    0.001    6117.0    5393.0    1.0
+k_slow      0.091   0.035   0.042    0.156      0.000    0.001    6617.0    6535.0    1.0
+k_fast      0.262   0.287   0.071    0.612      0.003    0.020    6987.0    7081.0    1.0
+G         109.836  48.796  35.380  197.371      0.593    0.713    6845.0    7270.0    1.0
+sig_X       0.036   0.005   0.027    0.046      0.000    0.000    7290.0    7534.0    1.0
+sig_cp      0.135   0.017   0.105    0.165      0.000    0.000    7642.0    6994.0    1.0
+
+All r_hat <= 1.01
+All ESS >= 200
+
+===== cell 24  (0.0 s) =====
+       param    truth     median      lo94       hi94  recovered
+0     mu_max   0.0210    0.02116   0.02090    0.02144       True
+1   phi_crit   0.2500    0.23884   0.17961    0.34351       True
+2      k_deg   0.0005    0.00025   0.00006    0.00075       True
+3      K_cat   0.0600    0.05580   0.01296    0.23919       True
+4        V_Y   0.3200    0.23716   0.09061    0.59595       True
+5      k_cat   3.0000    2.86839   1.23976    6.31979       True
+6        K_A   0.1500    0.16939   0.06658    0.43374       True
+7          h   2.0000    1.62000   1.27665    2.05384       True
+8        eps   0.0050    0.00462   0.00209    0.01053       True
+9      k_lac   0.0500    0.04887   0.01805    0.13971       True
+10    k_slow   0.0700    0.08381   0.04944    0.17749       True
+11    k_fast   0.3000    0.18548   0.09095    0.82373       True
+12         G  95.0000  101.25437  44.87272  224.14568       True
+
+13/13 recovered within the 94% credible interval.
+~1 miss in 13 is expected by chance. Three or more -> diagnose before trusting real data.
+
+===== cell 25  (0.8 s) =====
+
+===== cell 27  (1.4 s) =====
+
+===== cell 28  (0.1 s) =====
+Predicted optimal harvest: 1440 min (24.0 h), 246 mg/L (90% CI 225-278)
+Yield if harvested at 300 min: 3 mg/L
+
+===== cell 30  (232.8 s) =====
+Refit without 5.5 mM; now predicting it.
+
+===== cell 31  (1.0 s) =====
+Inside 94% predictive interval: 6/10 (60%, nominal 94%)
+Well below nominal -> overconfident on unseen conditions.
+Widen priors or add a Kennedy-O'Hagan discrepancy term before trusting forecasts.
+
+===== cell 33  (1.1 s) =====
+(NetCDF skipped: ValueError; pip install h5netcdf for the full object)
+wrote draws / moments
+
+Posterior correlations |r|>0.4:
+  V_Y       <-> K_A        r=+0.73
+  k_cat     <-> eps        r=-0.88
+  k_cat     <-> G          r=+0.89
+  eps       <-> G          r=-0.99
+
+Carry correlated pairs into M2 as JOINT draws, never independent marginals.
+
+Bistability across posterior: 0% of draws show >5% path dependence
+Report THIS fraction on the wiki, not the single-parameter result from §4.3.

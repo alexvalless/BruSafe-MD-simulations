@@ -1,0 +1,23 @@
+path,group,module,language,code_cells,size_kb,stored_outputs,title
+notebooks/BruSafe_01_M1_expression_IPTG.ipynb,production,M1,en,21,66,no,"BruSafe · Notebook 01 — Module M1: expression, IPTG arm"
+notebooks/BruSafe_02_M1_expression_lactose.ipynb,production,M1,en,17,55,no,"BruSafe · Notebook 02 — Module M1: expression, lactose autoinduction arm (24 h)"
+notebooks/BruSafe_03_M2_soluble_partition.ipynb,production,M2,en,20,68,no,"BruSafe · Notebook 03 — Module M2: soluble partition, and the bridge from M1"
+notebooks/BruSafe_04_M3_capsid_assembly.ipynb,production,M3,en,12,42,no,BruSafe · Notebook 04 — Module M3: T = 3 capsid assembly
+notebooks/BruSafe_05_M5_absolute_quantification.ipynb,production,M5,en,9,33,no,"BruSafe · Notebook 05 — Module M5: absolute quantification, cargo copies per particle"
+notebooks/literature/BruSafe_01L_M1_literature_design.ipynb,literature,M1,en,12,45,no,BruSafe · Notebook 01L — M1 forward model against a published factorial design
+notebooks/literature/BruSafe_03L_M2_literature_arenin.ipynb,literature,M2,en,18,62,no,BruSafe · Notebook 03L — Module M2 run on measured data
+notebooks/literature/BruSafe_04L_M3_literature_dG.ipynb,literature,M3,en,11,40,no,BruSafe · Notebook 04L — Module M3 at a measured contact energy
+notebooks/exploratory/Ejemplo_Capside_ensamblaje_N12.ipynb,exploratory,M3 (expl.),es,1,74,yes,Ensamblaje de una cápside con N = 12 subunidades
+notebooks/exploratory/M3_expresion_colab.ipynb,exploratory,M3 (expl.),es,5,13,no,Módulo 3 — Expresión de la proteína de la cápside (coat protein)
+notebooks/exploratory/M4_FIT_to_bench_data.ipynb,exploratory,M4 (expl.),en,8,28,no,M4-FIT — turning bench data into a corrected model
+notebooks/exploratory/M4_L1_rate_equations.ipynb,exploratory,M4 (expl.),en,7,18,no,M4-L1 — Nucleation–elongation cascade (rate equations)
+notebooks/exploratory/M4_L2_nucleation_phase_diagram.ipynb,exploratory,M4 (expl.),en,5,11,no,M4-L2 — Classical nucleation theory: the assembly phase diagram
+notebooks/exploratory/M4_L3_coarsegrained_MC.ipynb,exploratory,M4 (expl.),en,5,17,no,M4-L3 — Coarse-grained Monte Carlo: measuring what L1 assumes
+notebooks/exploratory/M4_L4_packaging_signal_coassembly.ipynb,exploratory,M4 (expl.),en,7,19,no,M4-L4 — Packaging-signal-mediated co-assembly (stochastic)
+notebooks/exploratory/M4_bridge_CG_to_ODE_to_bench.ipynb,exploratory,M4 (expl.),en,9,29,no,"M4 bridge — from CG geometry to the ODE, and to the bench"
+notebooks/exploratory/M4_ensamblaje_colab.ipynb,exploratory,M4 (expl.),es,7,17,no,Módulo 4 — Ensamblaje de la cápside
+notebooks/archive/BruSafe_M0_M4_allolactose_24h_calibration.ipynb,archive,M0–M4,en,17,773,yes,"BruSafe · Modules 0–4 — Allolactose Autoinduction, 24 h Horizon"
+notebooks/archive/BruSafe_M0_M4_bayesian_calibration_mM_longhorizon.ipynb,archive,M0–M4,en,21,737,yes,BruSafe · Modules 0–4 — Bayesian Calibration
+notebooks/archive/BruSafe_M2_5_soluble_partition.ipynb,archive,M2.5,en,18,321,yes,"BruSafe · Module M2.5 — Soluble Partition, and the Bridge from M0–M4"
+notebooks/archive/BruSafe_M3_capsid_assembly.ipynb,archive,M3,en,10,151,yes,BruSafe · Module M3 — T=3 Capsid Assembly
+notebooks/archive/BruSafe_M6_keystone_CPP_and_scalability.ipynb,archive,M6,en,9,122,yes,"BruSafe · Module M6 — The Keystone Number: cargo copies per particle, and what it buys"

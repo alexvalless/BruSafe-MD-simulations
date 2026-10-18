@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
-# Record the exact software/hardware state of THIS machine. Run once per box,
-# commit the output. If two machines disagree, stop and fix it before running
-# anything -- mixed GROMACS versions across replicas invalidates the campaign.
+# Record the exact software and hardware state of this machine. Run it once per
+# machine and commit the output. If two machines disagree, the discrepancy
+# should be resolved before anything is run: mixed GROMACS versions across
+# replicas make them non-comparable.
 set -euo pipefail
 source "$(dirname "$0")/lib.sh"
 

@@ -1,0 +1,18 @@
+# execution artefacts
+figs/
+handoff/
+.pytensor_cache/
+__pycache__/
+.ipynb_checkpoints/
+
+# files exchanged between notebooks through the working directory
+*.npz
+*.nc
+M1_*_posterior_draws.csv
+M1_*_posterior_moments.csv
+
+# files written when the exploratory notebooks are run
+notebooks/exploratory/brusafe_*.py
+notebooks/exploratory/M3_*.png
+notebooks/exploratory/M4_*.png
+notebooks/exploratory/M4_L1_yield_curve.csv

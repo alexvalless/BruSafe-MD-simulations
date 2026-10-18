@@ -1,0 +1,130 @@
+
+===== cell 2  (0.8 s) =====
+M2 · soluble partition | numpy 2.4.6
+
+===== cell 4  (0.0 s) =====
+
+===== cell 6  (0.0 s) =====
+(a) closed form vs numerical, n=2 : max |diff| = 1.92e-10
+(b) low-flux  phi -> 1 - s/2s50 : 0.999800 vs 0.999950
+    high-flux phi -> sqrt(s50/2s): 0.007046 vs 0.007071
+    phi(s = s50)                 : 0.500000  (must be 0.5)
+(c) mass balance sum(J) - s      : max |resid| = 1.14e-13
+
+===== cell 7  (0.4 s) =====
+findfont: Failed to find font weight normal for Apple Chancery, now using 0.
+No TeX to Unicode mapping for '\\__radicalbig__'.
+No TeX to Unicode mapping for '\\__radicalbig__'.
+No TeX to Unicode mapping for '\\__radicalbig__'.
+No TeX to Unicode mapping for '\\__radicalbig__'.
+No TeX to Unicode mapping for '\\__radicalbig__'.
+No TeX to Unicode mapping for '\\__radicalbig__'.
+Right panel: the high-flux slope IS the aggregation order. That is what the
+titration measures, and why a wide flux range matters more than many doses.
+
+===== cell 9  (0.1 s) =====
+
+===== cell 11  (0.1 s) =====
+M1 reproduction check
+  P(18h), 5500 uM arm : 2729.4 uM
+  -> yield            : 177.7 mg/L   (notebook §3.1 reports 178)
+  mu at 18 h          : [4.33324486e-09 1.89184963e-08 4.78322013e-08 6.21717678e-08]   <- growth fully arrested
+
+===== cell 12  (0.0 s) =====
+
+===== cell 14  (0.2 s) =====
+quadrature vs ODE, gel soluble fraction : max |diff| = 1.12e-03
+quadrature vs ODE, total pool           : max |diff| = 6.83e-03 uM
+
+===== cell 16  (1.2 s) =====
+                                     case max|dev|/max(P) dev at 18 h (uM)
+0                                 no sink        1.58e-07         4.23e-04
+1                      with assembly sink        1.55e-07         4.17e-04
+2  k_deg_agg = 0 (IBs protease-resistant)          12.77%            364.4
+
+max change in gel soluble fraction when assembly is switched ON : 1.30e-09
+same, but with capsids pelleting (hard spin)                    : 0.50
+
+===== cell 19  (1.6 s) =====
+Which axis moves the observable?
+
+ s50 (nM/s) | soluble fraction at 18 h, per lactose arm | spread
+         20 | 0.402  0.334  0.309  0.303 | 0.099
+         50 | 0.549  0.469  0.438  0.430 | 0.119
+        120 | 0.695  0.615  0.581  0.573 | 0.122
+        300 | 0.826  0.761  0.731  0.724 | 0.103
+
+      T (C) | soluble fraction at 18 h, per lactose arm | spread
+         37 | 0.549  0.469  0.438  0.430 | 0.119
+         25 | 0.796  0.726  0.695  0.687 | 0.110
+         18 | 0.900  0.855  0.831  0.825 | 0.075
+
+peak flux across the dose panel: 46 - 119 nM/s (factor 2.6)
+
+===== cell 22  (0.2 s) =====
+SYNTHETIC data. Ground truth known -> recovery checkable in §8.
+120 observations | 4 doses x 3 temps x 5 timepoints x 2 reps
+   lactose_uM  time_min  temp_C  soluble_mg_L  pellet_mg_L    soluble_fraction  rep
+0       500.0     240.0    37.0    107.712861    10.805658  0.9088272596727974    0
+1       500.0     240.0    37.0    119.167116     8.998133  0.9297927213735457    1
+2       500.0     480.0    37.0     75.979870    43.453870  0.6361675521311534    0
+3       500.0     480.0    37.0     94.190074    30.954123  0.7526523505035239    1
+4       500.0     720.0    37.0     65.539078    56.679064  0.5362467222986499    0
+
+===== cell 24  (0.0 s) =====
+
+===== cell 25  (1270.5 s) =====
+  beta = 0.0021  beta = 0.0089  beta = 0.0257  beta = 0.0581  beta = 0.1173  beta = 0.2251  beta = 0.4168  beta = 0.7761  beta = 1.0000  beta = 1.0000
+SMC done in 1270 s | log Z = 184.32
+
+===== cell 27  (0.0 s) =====
+       param    truth      median        lo94        hi94  recovered
+0    s50_ref     50.0     47.1766     43.2775     51.3863       True
+1  dE_over_R  12000.0  12309.7368  11439.3003  13207.5780       True
+2          n      2.6      2.6350      2.4625      2.8237       True
+3         nu     60.0     66.6342     51.1667     85.1332       True
+4/4 recovered within the 94% credible interval.
+
+posterior correlations:
+           s50_ref  dE_over_R      n     nu
+s50_ref      1.000     -0.323 -0.263 -0.006
+dE_over_R   -0.323      1.000 -0.705 -0.078
+n           -0.263     -0.705  1.000  0.172
+nu          -0.006     -0.078  0.172  1.000
+|r| > 0.9 between any pair means that pair is not separately identifiable
+from soluble-fraction data alone; report the correlation, not just the marginal.
+
+===== cell 29  (154.4 s) =====
+         param  coverage94     se  coverage50  mean_rank
+0  log_s50_ref       0.938  0.061       0.562      0.535
+1    dE_over_R       0.938  0.061       0.688      0.603
+2            n       0.938  0.061       0.562      0.535
+3       log_nu       1.000  0.000       0.500      0.605
+R = 16 replicates in 154 s | nominal 0.94, 0.50, 0.50
+Coverage more than ~2 SE below nominal, or ranks piling at one end, means the
+posterior is not what the model says it is. Fix that before reading §8.
+
+===== cell 30  (0.1 s) =====
+
+===== cell 33  (0.5 s) =====
+
+===== cell 35  (46.1 s) =====
+  beta = 0.0044  beta = 0.0196  beta = 0.0578  beta = 0.1394  beta = 0.3162  beta = 0.7045  beta = 1.0000  beta = 1.0000
+Refit without 18 C; now predicting it.
+95% posterior-predictive coverage of unseen 18 C points: 98%
+ >= ~0.90 : the Arrhenius closure survives; two temperatures predict the third.
+ <  ~0.80 : falsified. Report it. A failed extrapolation you predicted in
+            advance is worth more than a fit you never risked.
+
+===== cell 36  (0.1 s) =====
+
+===== cell 38  (0.2 s) =====
+   lactose_uM  P_total_uM  Sol_uM  Agg_uM  dimer_uM  soluble_fraction_18h
+0       500.0      1421.9   786.5   635.4     393.2                   0.6
+1      1500.0      2260.8  1011.0  1249.9     505.5                   0.4
+2      5500.0      2729.4  1111.1  1618.3     555.5                   0.4
+3     15000.0      2852.5  1134.9  1717.6     567.5                   0.4
+wrote M2_export.npz  |  M3 consumes dimer_uM, not P_total_uM.
+Compare dimer_uM against c* from your own Zlotnick module before designing
+any experiment intended to measure c*: if c* is uM-scale, every arm sits far
+above it and assembly is not concentration-limited.

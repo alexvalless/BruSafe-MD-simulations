@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Throughput sweep on one GPU. Run ONCE, on S1, before the campaign starts.
-# Output decides MDRUN_FLAGS for every subsequent run.
+# Throughput sweep on one GPU. Run once, on S1, before the campaign starts; the
+# result sets MDRUN_FLAGS for every subsequent run.
 # usage: bench_gpu.sh <path/to/prod.tpr>
 set -euo pipefail
 source "$(dirname "$0")/lib.sh"
@@ -58,7 +58,7 @@ printf '  AGGREGATE: %9.1f ns/day\n' "$T" | tee -a "$OUT"
 
 cat >> "$OUT" <<'NOTE'
 
-NEXT STEP: export the winning configuration and never change it.
+NEXT STEP: export the fastest configuration and keep it fixed for the whole campaign.
   export BRUSAFE_MDRUN_FLAGS="-nb gpu -pme gpu -bonded gpu -update gpu -ntmpi 1 -ntomp <N> -pin on"
   (on Windows Git Bash leave out -pin on)
 Record it in docs/DECISIONS.md with the date.

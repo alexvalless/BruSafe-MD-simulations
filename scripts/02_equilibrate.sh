@@ -3,9 +3,10 @@
 #
 #   ./02_equilibrate.sh <system_name> <replica_number>
 #
-# The velocity seed is generated per replica here. This is what makes replicas
-# statistically independent. Branching three replicas off one equilibrated
-# frame gives you one run wearing a trenchcoat -- do not do it.
+# The velocity seed is generated per replica at this stage, which is what makes
+# the replicas statistically independent. Replicas must not be branched from a
+# single equilibrated frame: they would be correlated copies of one run, and the
+# error bars computed from them would be too small.
 set -euo pipefail
 source "$(dirname "$0")/lib.sh"
 need gmx

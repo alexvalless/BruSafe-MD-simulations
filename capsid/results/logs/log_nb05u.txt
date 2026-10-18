@@ -1,0 +1,93 @@
+
+===== cell 2  (0.3 s) =====
+VLP protein mass : 2.47 MDa
+cargo mass       : 405 kDa (1227 nt)
+loaded particle  : 2.87 MDa (14% RNA by mass at 1 copy/particle)
+
+===== cell 4  (0.2 s) =====
+findfont: Failed to find font weight normal for Apple Chancery, now using 0.
+optimal occupancy      : lambda = 1.59  -> CV = 0.77%
+CV across lambda 0.1-4 : 2.01% to 1.14%
+Dilute to land in the grey band, then stop worrying about the dPCR step.
+
+===== cell 6  (0.0 s) =====
+method                             CV   basis
+TEM, 200 particles              12.7%   counting + field clustering
+TEM, 1000 particles              5.7%   counting + field clustering
+SEC peak + BCA                   7.7%   assay 5%, integration 5%, dilution 3%
+
+Counting 1000 particles by TEM - a real afternoon of work - is still less
+precise than a protein assay on the same material. Use TEM as the
+ORTHOGONAL check on shape and malformed fraction, which no protein assay
+can give you, and let the protein assay carry the number.
+
+===== cell 8  (0.0 s) =====
+condition number of the 2x2 system : 43.8
+-> a 1% absorbance error becomes up to 44% error in the protein mass
+
+  0 copies/particle: A260/A280 = 0.570, RNA is  0.0% of A260 and  0.0% of A280
+  1 copies/particle: A260/A280 = 1.532, RNA is 87.8% of A260 and 67.2% of A280
+  2 copies/particle: A260/A280 = 1.720, RNA is 93.5% of A260 and 80.4% of A280
+  4 copies/particle: A260/A280 = 1.845, RNA is 96.6% of A260 and 89.1% of A280
+
+A260/A280 IS a good readout for RNA per particle - RNA dominates both
+channels. It is a bad readout for protein. Split the job: A260 for RNA,
+BCA for protein. And note A260 counts ALL packaged RNA including host,
+so comparing it against the dPCR cargo count gives you the packaged-RNA
+specificity for free - see §5.
+
+===== cell 10  (0.0 s) =====
+particles per mL        : 6.1e+13
+CARGO COPIES PER PARTICLE: 0.618   95% [0.467, 0.849]   span 1.82x
+
+ERROR BUDGET (share of log-variance)
+  extraction recovery         55.0 %
+  particle count (protein)    25.7 %
+  capsid disruption           18.0 %
+  protection carryover         1.0 %
+  dPCR counting                0.3 %
+
+dPCR counting is negligible. The recovery controls dominate, which is
+why §2.1 insists on running them rather than assuming efficiency = 1.
+
+===== cell 12  (0.0 s) =====
+                       scenario   CV_%  95%_span
+0  no controls (assume eps = 1)  24.73      2.64
+1          controls, 3 bio reps   8.80      1.41
+2          controls, 6 bio reps   6.23      1.28
+3    controls + duplicate wells   5.77      1.25
+Running the recovery controls at all is worth more than any amount of
+replication without them. Beyond ~6 biological replicates the return
+flattens - spend the next unit of effort on §6's bottleneck instead.
+
+===== cell 14  (0.0 s) =====
+loaded fraction        : 0.618  95% [0.467, 0.849]
+packaging specificity  : 0.474  95% [0.358, 0.651]
+
+Specificity is the number M4's dPCR ladder cannot produce on its own -
+it needs the particle count. Cross-check it against the P(3x)/P(0x)
+enrichment: the two must be consistent, and if they are not, one of the
+two assays has a systematic error you have not found yet.
+
+===== cell 16  (0.0 s) =====
+VLP CONCENTRATION AT HARVEST  (the quantity the process is run for)
+  loaded VLP protein            15.02   95% [5.79, 30]  mg/L culture
+  loaded particles          3.663e+12   95% [1.41e+12, 7.32e+12]  particles/mL
+
+DERIVED, not modelled: the figures below divide the line above by an assumed
+dose size that no experiment of ours constrains. Report them as planning
+numbers, never as a prediction of potency.
+  doses per litre               153.5   95% [52.4, 460]  doses/L
+  culture per 1000 doses        6.513   95% [2.18, 19.1]  L
+  culture cost per dose       0.02605   95% [0.0087, 0.0763]  USD (media+induction only)
+
+Culture cost only. Purification consumables, QC, fill-finish and
+regulatory burden are not here and will dominate a real cost of goods.
+
+===== cell 17  (0.1 s) =====
+Read this as a work-allocation plan, not a result. The two dark bars are
+where an extra week of effort changes the answer; the pale ones are
+already good enough that improving them changes nothing you can measure.
+
+Dose size contributes 51% of the variance in doses per litre and, by
+construction, none of the variance in the harvest titre above.

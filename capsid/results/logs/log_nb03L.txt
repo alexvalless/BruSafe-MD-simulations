@@ -1,0 +1,112 @@
+
+===== cell 2  (0.8 s) =====
+M2 · soluble partition | numpy 2.4.6
+
+===== cell 4  (0.0 s) =====
+
+===== cell 6  (0.0 s) =====
+(a) closed form vs numerical, n=2 : max |diff| = 1.92e-10
+(b) low-flux  phi -> 1 - s/2s50 : 0.999800 vs 0.999950
+    high-flux phi -> sqrt(s50/2s): 0.007046 vs 0.007071
+    phi(s = s50)                 : 0.500000  (must be 0.5)
+(c) mass balance sum(J) - s      : max |resid| = 1.14e-13
+
+===== cell 7  (0.3 s) =====
+findfont: Failed to find font weight normal for Apple Chancery, now using 0.
+No TeX to Unicode mapping for '\\__radicalbig__'.
+No TeX to Unicode mapping for '\\__radicalbig__'.
+No TeX to Unicode mapping for '\\__radicalbig__'.
+No TeX to Unicode mapping for '\\__radicalbig__'.
+No TeX to Unicode mapping for '\\__radicalbig__'.
+No TeX to Unicode mapping for '\\__radicalbig__'.
+Right panel: the high-flux slope IS the aggregation order. That is what the
+titration measures, and why a wide flux range matters more than many doses.
+
+===== cell 9  (0.1 s) =====
+
+===== cell 11  (0.0 s) =====
+M1 reproduction check
+  P(18h), 5500 uM arm : 2729.4 uM
+  -> yield            : 177.7 mg/L   (notebook §3.1 reports 178)
+  mu at 18 h          : [4.33324486e-09 1.89184963e-08 4.78322013e-08 6.21717678e-08]   <- growth fully arrested
+
+===== cell 12  (0.0 s) =====
+
+===== cell 14  (0.1 s) =====
+quadrature vs ODE, gel soluble fraction : max |diff| = 1.12e-03
+quadrature vs ODE, total pool           : max |diff| = 6.83e-03 uM
+
+===== cell 16  (0.8 s) =====
+                                     case max|dev|/max(P) dev at 18 h (uM)
+0                                 no sink        1.58e-07         4.23e-04
+1                      with assembly sink        1.55e-07         4.17e-04
+2  k_deg_agg = 0 (IBs protease-resistant)          12.77%            364.4
+
+max change in gel soluble fraction when assembly is switched ON : 1.30e-09
+same, but with capsids pelleting (hard spin)                    : 0.50
+
+===== cell 19  (1.1 s) =====
+Which axis moves the observable?
+
+ s50 (nM/s) | soluble fraction at 18 h, per lactose arm | spread
+         20 | 0.402  0.334  0.309  0.303 | 0.099
+         50 | 0.549  0.469  0.438  0.430 | 0.119
+        120 | 0.695  0.615  0.581  0.573 | 0.122
+        300 | 0.826  0.761  0.731  0.724 | 0.103
+
+      T (C) | soluble fraction at 18 h, per lactose arm | spread
+         37 | 0.549  0.469  0.438  0.430 | 0.119
+         25 | 0.796  0.726  0.695  0.687 | 0.110
+         18 | 0.900  0.855  0.831  0.825 | 0.075
+
+peak flux across the dose panel: 46 - 119 nM/s (factor 2.6)
+
+===== cell 22  (0.0 s) =====
+MEASURED data (arenin, doi 10.1186/s40643-025-00986-2 Table 1)
+  37 C : soluble fraction 0.341 +/- 0.024   (beta concentration nu = 382)
+  30 C : soluble fraction 0.686 +/- 0.039   (beta concentration nu = 140)
+  measured flux ratio 37/30 C : 1.47x
+   lactose_uM  time_min  temp_C  soluble_fraction  rep
+0      5500.0     480.0    37.0          0.340557    0
+1      5500.0     480.0    30.0          0.685979    0
+
+===== cell 24  (0.0 s) =====
+
+===== cell 25  (1.5 s) =====
+  beta = 0.0477  beta = 0.1789  beta = 0.4534  beta = 0.9789  beta = 1.0000
+SMC done in 1 s | log Z = 0.13
+
+===== cell 27  (0.0 s) =====
+       param  synthetic_run_value  posterior_median       lo94      hi94  synthetic_value_inside
+0    s50_ref                 50.0            26.832     19.652     35.56                   False
+1  dE_over_R              12000.0         20001.321  13521.870  26908.29                   False
+
+Two measurements, two free parameters: the posterior is a ridge, not a peak.
+posterior correlation s50_ref vs dE/R : -0.474
+
+Closed-form check (ratio inversion, independent of the absolute flux scale):
+  s50(37)/s50(30) = 0.173  ->  dE/R = 23,589 K
+  SMC posterior median dE/R        = 20,001 K
+
+Flux change alone, with s50 temperature-independent:
+  predicted 37 C soluble fraction = 0.621, measured 0.341  (-11.6 measurement SD)
+
+===== cell 30  (0.1 s) =====
+
+===== cell 32  (0.0 s) =====
+Forward prediction at the 30 C synthesis flux (nothing free):
+  25 C : soluble fraction 0.808  95% [0.691, 0.889]
+  18 C : soluble fraction 0.946  95% [0.839, 0.983]
+
+One gel at either temperature falsifies the Arrhenius closure of Eq. (3.12).
+
+===== cell 33  (0.1 s) =====
+model minus measured at the two calibration points: 37 C +0.018, 30 C -0.041
+
+===== cell 35  (0.1 s) =====
+   lactose_uM  P_total_uM  Sol_uM  Agg_uM  dimer_uM  soluble_fraction_18h
+0      5500.0      2729.4   946.6  1782.8     473.3                   0.3
+wrote M2_export_literature.npz  |  M3 consumes dimer_uM, not P_total_uM.
+Compare dimer_uM against c* from your own Zlotnick module before designing
+any experiment intended to measure c*: if c* is uM-scale, every arm sits far
+above it and assembly is not concentration-limited.

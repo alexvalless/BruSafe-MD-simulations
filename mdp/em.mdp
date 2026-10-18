@@ -13,7 +13,7 @@ rcoulomb                = 1.2
 pme_order               = 4
 fourierspacing          = 0.12
 
-; CHARMM36 nonbonded block -- identical in every mdp, do not edit piecemeal
+; CHARMM36 nonbonded block: identical in every mdp file; any change must be made in all of them
 vdwtype                 = cutoff
 vdw-modifier            = force-switch
 rvdw_switch             = 1.0

@@ -1,30 +1,30 @@
-# Running on Windows without admin rights (Git Bash)
+# Running on Windows without administrator rights (Git Bash)
 
-The scripts are plain bash and run unchanged on Linux and WSL. This page covers
-lab machines where WSL cannot be enabled. Everything below installs into your
-own user folder; nothing needs administrator rights.
+The scripts are plain bash and run unchanged on Linux and WSL. This page covers laboratory machines
+on which WSL cannot be enabled. Everything below installs into the user's own folder; no
+administrator rights are needed.
 
-If WSL **is** available (`wsl --status` answers without error), prefer it and
-follow `docs/TUTORIAL.md` as written.
+If WSL **is** available (`wsl --status` answers without error), it is preferred, and
+`docs/TUTORIAL.md` applies as written.
 
-## What each machine needs
+## Requirements for each machine
 
-| Piece | How, without admin |
+| Component | Installation without administrator rights |
 | --- | --- |
-| NVIDIA driver | Already installed on the RTX 4070 machines. Check: `nvidia-smi` |
-| bash + coreutils | **PortableGit** from git-scm.com (self-extracting folder, run `git-bash.exe`) |
-| Python 3 + numpy | python.org installer, choose *Install for me only*; then `python -m pip install --user numpy` |
-| GROMACS (CUDA) | Portable `gmx.exe` folder, built once on a machine that has admin (see below) |
-| CHARMM36m port | Unzip `charmm36-jul2022.ff` into a folder, e.g. `C:\Users\<you>\ff` |
+| NVIDIA driver | Already installed on the RTX 4070 machines. Check with `nvidia-smi` |
+| bash + coreutils | **PortableGit** from git-scm.com (self-extracting folder; run `git-bash.exe`) |
+| Python 3 + numpy | python.org installer, option *Install for me only*; then `python -m pip install --user numpy` |
+| GROMACS (CUDA) | Portable `gmx.exe` folder, built once on a machine with administrator rights (see below) |
+| CHARMM36m port | Unzip `charmm36-jul2022.ff` into a folder, for example `C:\Users\<user>\ff` |
 
-**One binary for the whole campaign.** Build GROMACS once and copy the same
-folder to every machine. Mixed GROMACS versions across replicas invalidate the
-error bars (see `TUTORIAL.md` 1.1).
+**One binary for the whole campaign.** GROMACS is built once and the same folder is copied to every
+machine. Different GROMACS versions across replicas invalidate the error bars (see `TUTORIAL.md`,
+section 1.1).
 
-### Building the portable GROMACS (once, on a machine with admin)
+### Building the portable GROMACS (once, on a machine with administrator rights)
 
-Install Visual Studio Build Tools (C++ workload), CMake and the CUDA Toolkit,
-then from an *x64 Native Tools* prompt:
+Visual Studio Build Tools (C++ workload), CMake and the CUDA Toolkit are installed, and the build is
+run from an *x64 Native Tools* prompt:
 
 ```
 cmake -S gromacs-2024.x -B build -G Ninja -DCMAKE_BUILD_TYPE=Release ^
@@ -33,65 +33,65 @@ cmake -S gromacs-2024.x -B build -G Ninja -DCMAKE_BUILD_TYPE=Release ^
 cmake --build build --target install
 ```
 
-Copy the CUDA runtime DLLs that `gmx.exe` depends on (`cudart64_*.dll`,
-`cufft64_*.dll`, from the CUDA Toolkit `bin` folder) into `C:\gromacs\bin`.
-That folder is now portable: copy it to each lab machine.
+The CUDA runtime DLLs on which `gmx.exe` depends (`cudart64_*.dll`, `cufft64_*.dll`, from the `bin`
+folder of the CUDA Toolkit) are copied into `C:\gromacs\bin`. The folder is then portable and can be
+copied to each laboratory machine.
 
 ## One-time setup per machine (inside Git Bash)
 
 ```bash
-# 1. line endings: never let git turn the scripts into CRLF
+# 1. line endings: prevent git from converting the scripts to CRLF
 git config --global core.autocrlf false
 
-# 2. clone (the repo's .gitattributes also forces LF)
+# 2. clone (the repository's .gitattributes also forces LF)
 git clone https://github.com/alexvalless/BruSafe-MD-simulations.git
 cd BruSafe-MD-simulations
 
-# 3. environment -- adjust paths, then reopen Git Bash
+# 3. environment: adjust the paths, then reopen Git Bash
 cat >> ~/.bashrc << 'RC'
-export BRUSAFE_GMX="/c/gromacs/bin/gmx.exe"   # or wherever the folder lives
+export BRUSAFE_GMX="/c/gromacs/bin/gmx.exe"   # or wherever the folder is located
 export GMXLIB="$HOME/ff"                      # folder containing charmm36-jul2022.ff
-# export BRUSAFE_PYTHON="/c/Users/<you>/AppData/Local/Programs/Python/Python312/python.exe"
+# export BRUSAFE_PYTHON="/c/Users/<user>/AppData/Local/Programs/Python/Python312/python.exe"
 RC
 
-# 4. record the machine state and check every line says what you expect
+# 4. record the state of the machine and check that every line is as expected
 ./scripts/00_env.sh
 ```
 
-`00_env.sh` must show: `os : windows`, a CUDA-enabled GROMACS, the RTX 4070,
-a Python 3 version, numpy, and the charmm36 folder under `GMXLIB`.
+`00_env.sh` should show `os : windows`, a CUDA-enabled GROMACS, the RTX 4070, a Python 3 version,
+numpy, and the charmm36 folder under `GMXLIB`.
 
-## What the scripts handle for you on Windows
+## What the scripts handle automatically on Windows
 
 `scripts/lib.sh` detects Git Bash and:
 
-- routes every `gmx` call to `BRUSAFE_GMX` if set;
+- routes every `gmx` call to `BRUSAFE_GMX` if it is set;
 - converts `GMXLIB` to a `C:/...` path that native Windows programs understand;
-- finds a real Python 3, skipping the Microsoft Store `python3` stub;
-- strips the `\r` that Windows Python adds to its output (otherwise `yes`
-  becomes `yes\r` and registry lookups silently fail);
-- drops `-pin on`, which GROMACS does not support on Windows (speed only,
-  results are unaffected);
-- runs `pdb2gmx` through `winpty` so its interactive termini questions work
-  in the Git Bash window.
+- finds a working Python 3 and skips the Microsoft Store `python3` stub;
+- removes the `\r` that Windows Python adds to its output (otherwise `yes` becomes `yes\r` and
+  registry lookups fail silently);
+- omits `-pin on`, which GROMACS does not support on Windows (a speed effect only; the results are
+  unaffected);
+- runs `pdb2gmx` through `winpty`, so that its interactive questions about termini work in the
+  Git Bash window.
 
 ## Running
 
-Same commands as everywhere else. For overnight work:
+The commands are the same as on other platforms. For overnight runs:
 
 ```bash
 ./scripts/run_night.sh S1_wt_cc_apo 1 11
 ```
 
-- **Lock the screen (Win+L), do not sign out.** Signing out kills the run.
-  If it dies anyway, rerun the same command: it resumes from the checkpoint.
-- Check that the machine is not set to sleep or reboot for updates overnight.
-- In the morning, **copy** (do not move) the replica folder from `runs/` to
-  the shared drive. `prod.cpt` must stay on the machine for the next night.
+- **The screen should be locked (Win+L), not signed out.** Signing out terminates the run. If it
+  terminates anyway, the same command resumes from the checkpoint.
+- The machine should not be set to sleep or to restart for updates overnight.
+- In the morning the replica folder from `runs/` is **copied** (not moved) to the shared drive.
+  `prod.cpt` must remain on the machine for the next night.
 
-## Known limits
+## Known limitations
 
-- **MM/PBSA (M3.5) does not run on native Windows.** gmx_MMPBSA depends on
-  AmberTools. Run `mmpbsa/run_mmpbsa.sh` on a Linux, WSL or macOS machine
-  using the trajectories produced here.
-- If you override `BRUSAFE_MDRUN_FLAGS` on Windows, leave out `-pin on`.
+- **MM/PBSA (M3.5) does not run on native Windows.** gmx_MMPBSA depends on AmberTools.
+  `mmpbsa/run_mmpbsa.sh` is run on a Linux, WSL or macOS machine, using the trajectories produced
+  here.
+- If `BRUSAFE_MDRUN_FLAGS` is overridden on Windows, `-pin on` should be left out.

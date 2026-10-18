@@ -67,8 +67,8 @@ abspath() { (cd "$(dirname "$1")" && printf '%s/%s\n' "$(pwd)" "$(basename "$1")
 # never results, so it is dropped there (docs/DECISIONS.md, 2026-10-03).
 if [ "$BRUSAFE_OS" = windows ]; then PIN_FLAGS=""; else PIN_FLAGS="-pin on"; fi
 
-# Locked mdrun configuration. Set by bench_gpu.sh
-# Every replica in the campaign must use the identical string.
+# Locked mdrun configuration, determined with bench_gpu.sh. Every replica in the
+# campaign must use the identical string.
 MDRUN_FLAGS="${BRUSAFE_MDRUN_FLAGS:--nb gpu -pme gpu -bonded gpu -update gpu -ntmpi 1 -ntomp 8 $PIN_FLAGS}"
 
 # Solvent/ion residue names excluded from the SOLU group.
@@ -87,8 +87,8 @@ replica_seed() {
   printf '%s_rep%s' "$1" "$2" | cksum | awk '{print $1 % 2000000000}'
 }
 
-# Refuse to clobber a finished production run unless BRUSAFE_FORCE=1.
-# Prevents the classic "two machines ran the same replica" failure.
+# Refuse to overwrite a finished production run unless BRUSAFE_FORCE=1. This
+# prevents two machines from running the same replica.
 guard_existing() {
   local d="$1"
   if [ -f "$d/prod.gro" ] && [ "${BRUSAFE_FORCE:-0}" != "1" ]; then
@@ -97,7 +97,7 @@ guard_existing() {
 }
 
 # The pdb2gmx route needs the CHARMM36m port under GMXLIB. Fail early with a
-# readable message instead of a GROMACS "force field not found" deep in a run.
+# readable message instead of a GROMACS "force field not found" error later.
 check_ff() {
   local ff="${1:-charmm36-jul2022}"
   [ -n "${GMXLIB:-}" ] || die "GMXLIB is not set -- see docs/TUTORIAL.md section 1.2"

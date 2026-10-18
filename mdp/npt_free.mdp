@@ -1,4 +1,4 @@
-; BruSafe -- NPT equilibration, 5 ns, UNRESTRAINED. Final gate before production.
+; BruSafe -- NPT equilibration, 5 ns, unrestrained. Final step before production.
 ; no position restraints at this stage
 
 integrator              = md
