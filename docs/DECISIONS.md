@@ -325,3 +325,9 @@ gpu9-13 = S9 reps 1-5 (30 ns each).
 
 2026-10-16: S1 and S6 finished, so docs/PLAN.txt was renumbered to hold only S2 and S9 on slots 0-7
 (gpu0-2 = S2 reps 1-3, gpu3-7 = S9 reps 1-5). The previous plan is in docs/PLAN_S1_S6_S2_S9_old.txt.
+
+## 2026-10-19 — S3 restored (S5 and S7 stay dropped)
+S3_cp_operator is back: the wild-type operator, i.e. S4 with residue 11 (C at -5 in 1ZDH) reverted to U,
+built from the S4 PDB (`from:S4_cp_pacdesign`, chains A,B,R). 5 x 30 ns, skip 5 ns, 5 Mg2+ placed per replica.
+It is a one-nucleotide comparison with S4. S5 (scrambled control) and S7 (calibration variants) remain out:
+no specificity or calibration claim is made, so absolute MM/PBSA energies stay unreported.
