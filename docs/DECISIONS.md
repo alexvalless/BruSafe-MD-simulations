@@ -331,3 +331,8 @@ S3_cp_operator is back: the wild-type operator, i.e. S4 with residue 11 (C at -5
 built from the S4 PDB (`from:S4_cp_pacdesign`, chains A,B,R). 5 x 30 ns, skip 5 ns, 5 Mg2+ placed per replica.
 It is a one-nucleotide comparison with S4. S5 (scrambled control) and S7 (calibration variants) remain out:
 no specificity or calibration claim is made, so absolute MM/PBSA energies stay unreported.
+
+S3 CHARMM-GUI build installed (RNA UGAGGAUUACCCA verified residue by residue). As with S9, the upload had no Mg, so
+MG.itp and forcefield.itp were taken from S4 (identical apart from the Mg lines) and `#include "toppar/MG.itp"`
+added. Build: 55,351 atoms, K 51 / Cl 51 / Mg 5; 800-step EM finite (-8.8e5 kJ/mol). docs/PLAN.txt: gpu8-12 = S3 reps 1-5
+(slots 0-7 stay S2/S9).
