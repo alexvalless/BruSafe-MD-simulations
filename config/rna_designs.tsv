@@ -13,3 +13,4 @@
 #
 name	rna_chain	target	note
 S4_cp_pacdesign	R	native	pac = ACAUGAGGAUCACCCAUGU (C(-5) operator); residues 4-16 identical to 1ZDH chain R
+S3_cp_operator	R	UGAGGAUUACCCA	WT operator: S4 (1ZDH, C(-5)) with residue 11 reverted to the wild-type U
