@@ -30,8 +30,8 @@ echo "=== setup check: $(hostname)  $(date '+%Y-%m-%d %H:%M') ==="
 if [ "$REPO" = "$HOME/BruSafe-MD-simulations" ]; then ok "repo at $REPO"
 else warn "repo is at $REPO; the plan assumes ~/BruSafe-MD-simulations (mv it there)"; fi
 BR="$(git -C "$REPO" rev-parse --abbrev-ref HEAD 2>/dev/null || echo '?')"
-[ "$BR" = "claude/gallant-babbage-ydyxr2" ] && ok "branch $BR" \
-  || warn "branch is '$BR'; expected claude/gallant-babbage-ydyxr2 (git checkout it)"
+[ "$BR" = "campaign" ] && ok "branch $BR" \
+  || warn "branch is '$BR'; expected campaign (git checkout it)"
 
 # ---- python ----------------------------------------------------------------
 if [ -z "$PY" ]; then

@@ -50,7 +50,7 @@ Debe imprimir una versión (por ejemplo `2.5.3`).
 ## 4. Clonar el repositorio
 
 ```bash
-cd ~ && git clone https://github.com/alexvalless/BruSafe-MD-simulations.git && cd BruSafe-MD-simulations && git checkout claude/gallant-babbage-ydyxr2
+cd ~ && git clone https://github.com/alexvalless/BruSafe-MD-simulations.git && cd BruSafe-MD-simulations && git checkout campaign
 ```
 
 ## 5. El zip de GROMACS
