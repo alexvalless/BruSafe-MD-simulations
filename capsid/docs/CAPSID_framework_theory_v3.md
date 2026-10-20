@@ -134,7 +134,7 @@ The framework models that system as it behaves inside an induced *E. coli* BL21(
 
 ### 1.5 Module decomposition
 
-![**Figure 1.** The five modules follow the object being built. Top band: the physical species at each stage. Middle: the module that describes it. Lower bands: the quantity the module computes and the measurement it is fitted to.]({{artifact:art_97b59322-e3b4-45e1-9233-3c293b2c04f7}})
+![**Figure 1.** The five modules follow the object being built. Top band: the physical species at each stage. Middle: the module that describes it. Lower bands: the quantity the module computes and the measurement it is fitted to.](../figures/fig28_wiki_model_overview.png)
 
 
 **Table 1.** Module decomposition of the CAPSID framework, with state dimension and identifiability status.

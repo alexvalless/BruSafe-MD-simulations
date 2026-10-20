@@ -47,7 +47,7 @@ In M3 the contact schedule sums to 180.000000 over 89 additions, with 1.01 conta
 
 The prior predictive places the optimum at 0.22 mM IPTG and the saturation audit makes the same point directly: 24 h protein rises from 3842.1 µM at 0.25 mM to 3849.5 µM at 10 mM, a relative spread of 0.0117% across the 1–10 mM range against a densitometry error of 12%. The signal-to-noise ratio of the dose axis above the Hill midpoint is 9.8 × 10⁻⁴.
 
-![Prior predictive over the dose ladder, in mg L⁻¹ and gDCW L⁻¹]({{artifact:art_61c57829-2380-4dfb-a660-d381066aec2f}})
+![Prior predictive over the dose ladder, in mg L⁻¹ and gDCW L⁻¹](../figures/fig01_M1_iptg_prior_predictive.png)
 
 The identifiability half of that audit is the operational consequence. With all doses in the mM range the predicted protein is near-identical for any $K_I$ between 5 and 500 µM, so the posterior for $K_I$ cannot differ from its prior. A ladder that straddles the midpoint separates those same four values by factors of 3 to 30 at the low rungs. The calibration ladder must straddle $K_I$, and this is the argument for it.
 
@@ -55,24 +55,24 @@ The horizon audit explains why the ladder must also be read early. With proteoly
 
 Sequential Monte Carlo [7] at 2000 draws over 4 chains, as implemented in PyMC [8], converged in 781 s with $\hat{R} \le 1.01$ on the rank-normalised diagnostic [9] and bulk ESS above 200 for every sampled quantity. Ten of the eleven structural parameters were recovered inside the 94% credible interval; the exception is $\varphi_{crit}$, at 0.22 against a generating value of 0.25. One miss in eleven is what a 94% interval does.
 
-![Prior against posterior, IPTG arm]({{artifact:art_6807edce-750b-476c-9064-8b0b417cd2b3}})
-![Posterior predictive on the fitted doses]({{artifact:art_558f8796-c6f1-4edd-9762-19baeb91ae6b}})
+![Prior against posterior, IPTG arm](../figures/fig03_M1_iptg_prior_vs_posterior.png)
+![Posterior predictive on the fitted doses](../figures/fig05_M1_iptg_posterior_predictive.png)
 
 The posterior correlations are more informative than the marginals. The strongest are $k_{slow} \leftrightarrow k_{fast}$ at −0.74, $K_I \leftrightarrow h$ at −0.63, $h \leftrightarrow \varepsilon$ at +0.59, $\varphi_{crit} \leftrightarrow G$ at +0.57, and $\varphi_{crit} \leftrightarrow K_I$ and $K_I \leftrightarrow G$ both at +0.49. Hill midpoint and exponent trade off because a single sigmoid can be matched by sliding one against the other. Any forecast built from independent marginal draws of these pairs will be wrong in a way no amount of sampling will fix.
 
 The design forecast narrows the 90% interval on 24 h yield from 314 to 33 mg L⁻¹, an 89% reduction, and places the posterior optimum at 2.81 mM with 195 mg L⁻¹ (90% CI 178–211). The same cell reports that every dose from 0.0452 to 10 mM lies within 5% of that optimum, which is why the notebook refuses to print a single optimal dose.
 
-![Design forecast, prior against posterior]({{artifact:art_dacf0a1a-460e-4955-b780-91056812894b}})
+![Design forecast, prior against posterior](../figures/fig06_M1_iptg_design_forecast.png)
 
 The held-out test is the one the module fails. Refitting without the 150 µM arm and predicting it puts 4 of 8 timepoints inside the 94% posterior-predictive interval — 50% against a nominal 94%. The full-length run was undertaken specifically to determine whether this was an artefact of short chains; it is not. The model interpolates among the doses it was fitted to and is overconfident on a dose it has not seen. The remedy is structural: the discrepancy term listed as M1.21 in the provenance table [10], deliberately left unimplemented, is now required.
 
-![Held-out dose, IPTG arm]({{artifact:art_add3617c-7725-4472-8752-1cf117d3d753}})
+![Held-out dose, IPTG arm](../figures/fig07_M1_iptg_heldout_dose.png)
 
 ## 9.5 M1, lactose arm: the horizon was the bug
 
 The lactose arm was originally written with a 300 min horizon inherited from the IPTG protocol. Simulating the full 24 h shows that the time to half-maximal protein is 798, 738, 696 and 684 min across the four arms and that glucose is not exhausted until 270 min. The autoinduction lag [11] is not a detail of the protocol; it is most of the experiment.
 
-![Lactose horizon]({{artifact:art_bf05d463-f350-4a7d-b381-38b999348a3d}})
+![Lactose horizon](../figures/fig08_M1_lactose_horizon.png)
 
 Positive feedback through LacY raises the possibility of bistability [12,13], which would make a deterministic mean meaningless. The hysteresis test runs each dose from a naive and from a pre-induced inoculum and finds a maximum relative gap of 0.11% between the two histories. At these parameters the system has one attractor.
 
@@ -80,16 +80,16 @@ Three degeneracy checks accompany it. Exchanging $k_{slow}$ and $k_{fast}$ moves
 
 Inference at 2000 draws over 4 chains converged in 589 s, all $\hat{R} \le 1.01$ and ESS above 200, and recovered 13 of 13 parameters. The posterior correlation structure is more severe than in the IPTG arm: $\varepsilon \leftrightarrow G$ at −0.99, $k_{cat} \leftrightarrow G$ at +0.89, $k_{cat} \leftrightarrow \varepsilon$ at −0.88 and $V_Y \leftrightarrow K_A$ at +0.73. A leak–gain correlation of −0.99 means the two are one parameter as far as these data are concerned, and the ridge propagates into every yield forecast the module produces. Breaking it requires a sub-$K_Y$ lactose arm, where leak and gain separate.
 
-![Leak–gain ridge]({{artifact:art_b05e6b60-0d0d-43ac-9dd7-4e3a5b2a6e7a}})
-![Posterior marginals, lactose arm]({{artifact:art_7bd19c83-537d-4ed6-ad8e-90f91d6bd874}})
+![Leak–gain ridge](../figures/fig11_M1_lactose_leak_gain_ridge.png)
+![Posterior marginals, lactose arm](../figures/fig10_M1_lactose_marginals.png)
 
 The harvest-time scan puts the optimum at the 1440 min boundary with 246 mg L⁻¹ (90% CI 225–278), against 3 mg L⁻¹ at 300 min. An optimum sitting on the edge of the search window is a statement about the window: the model cannot see the top of the curve from inside a 24 h horizon.
 
-![Harvest-time forecast]({{artifact:art_20db3b62-82a0-4645-a013-e0b63ed2b8a3}})
+![Harvest-time forecast](../figures/fig13_M1_lactose_harvest_time.png)
 
 The held-out dose test fails as in the IPTG arm: 6 of 10 points inside the 94% interval, 60% against nominal 94%. The two arms share an observation model and they fail the same way.
 
-![Held-out dose, lactose arm]({{artifact:art_3e20175f-6718-4505-bf62-7ac75817094f}})
+![Held-out dose, lactose arm](../figures/fig14_M1_lactose_heldout_dose.png)
 
 ## 9.6 M2, verification: the handoff reproduces M1
 
@@ -97,8 +97,8 @@ Before any partition result, M2 re-implements the M1 forward model in plain SciP
 
 The axis-sensitivity table quantifies which knob the partition module can be calibrated on. Moving $s_{50}$ from 20 to 300 nM s⁻¹ moves the 18 h soluble fraction from 0.402 to 0.826 in the lowest arm; moving temperature from 37 to 18 °C moves it from 0.549 to 0.900. Within either row the spread across the four lactose doses is 0.07 to 0.12, because peak flux varies by only a factor of 2.6 across the whole dose panel. Temperature is the strong axis, flux the weak one, and an experiment that varies dose alone spends its replicates on the wrong variable.
 
-![Partition function and aggregation order]({{artifact:art_69271e15-8db2-42f6-9a72-85e2460ea9d9}})
-![Observation model]({{artifact:art_97c0a9c6-3270-4077-beb8-09729aca8d20}})
+![Partition function and aggregation order](../figures/fig15_M2_partition_function.png)
+![Observation model](../figures/fig16_M2_observation_model.png)
 
 ## 9.7 M2, inference: calibration as the acceptance test
 
@@ -112,15 +112,15 @@ The cause was in the observation model. Over prior draws, 11.8% of design points
 
 A gel cannot report a soluble fraction of 1; it reports that no pellet band is visible above the detection limit. The likelihood now treats boundary observations as censored — the standard remedy for a response with mass at the boundaries of its support [18] — with $y = 1$ contributing $P(Y > 1-\delta)$, $y = 0$ contributing $P(Y < \delta)$, $\delta = 0.01$ of lane intensity, and the generator and posterior-predictive replicates censoring identically. Coverage over 64 replicates is then 0.938, 0.891, 0.938 and 0.938, mean ranks are 0.538, 0.498, 0.487 and 0.466 against a nominal 0.5, and the Kolmogorov–Smirnov statistic of rank uniformity falls from 0.21–0.37 to 0.078–0.125 against a 5% critical value of 0.17. The in-notebook version of the same check, at 16 replicates, returns 0.938 for three parameters and 1.000 for $\nu$ in 154 s.
 
-![Rank histograms, in-notebook calibration]({{artifact:art_6d801f20-85c3-4516-afee-307d73c86ca3}})
+![Rank histograms, in-notebook calibration](../figures/fig27_M2_calibration_ranks.png)
 
 With the corrected likelihood and the data supplied as paired concentrations in mg L⁻¹, the module recovers all four parameters: $s_{50}$ = 47.2 nM s⁻¹ (94% CI 43.3–51.4) against a generating value of 50, $\Delta E/R$ = 12 310 K (11 439–13 208) against 12 000, $n$ = 2.635 (2.46–2.82) against 2.6, and $\nu$ = 66.6 (51.2–85.1) against 60. Sequential Monte Carlo took 1270 s at 2000 particles, log *Z* = 184.32.
 
-![Posterior predictive, partition]({{artifact:art_56a61fcd-038d-4105-9984-34bc54bedd79}})
+![Posterior predictive, partition](../figures/fig17_M2_posterior_predictive.png)
 
 The held-out temperature test returns 98% of points inside a 95% interval. That is above nominal and the reason is worth stating: the 18 °C arm sits close to saturation, so most of its observations are censored and the predictive interval reaches the boundary. The test passes partly because the observable has little left to discriminate, and it should be rebuilt around an arm whose soluble fraction sits away from 1.
 
-![Held-out temperature]({{artifact:art_c5faee30-1bab-497c-9d75-1a4714f09e3f}})
+![Held-out temperature](../figures/fig18_M2_heldout_temperature.png)
 
 The handoff to M3 is a free-dimer pool of 393, 506, 556 and 568 µM across the four lactose arms, from total protein of 1422 to 2853 µM partitioned as 787–1135 µM soluble against 635–1718 µM aggregated.
 
@@ -132,11 +132,11 @@ At that energy $c^{\star}$ = 3.60 µM, against 1.03 µM at the −4.2 kcal mol�
 
 Equilibrium outputs are insensitive to the remaining uncertainty: across the assay band the equilibrium capsid fraction moves from 0.9898 to 0.9970 — 0.72 percentage points — and intermediates hold below 0.2% of mass at the measured energy. Kinetic outputs are not: the capsid fraction reached in 18 h from a 500 µM bolus moves from 0.652 to 0.935 across the same band, a span of 28 percentage points, and the placeholder energy would have reported 0.937 where the measured energy reports 0.760.
 
-![Critical concentration and capsid fraction across the measured band]({{artifact:art_22120951-d964-49ad-bf00-5e3f9dbfe1c1}})
+![Critical concentration and capsid fraction across the measured band](../figures/fig25_M3_literature_dG_sweep.png)
 
 Being above $c^{\star}$ is necessary but not sufficient. A 20 µM bolus is thermodynamically above the critical concentration and produces no capsid at all in 18 h. Anyone reporting a failed *in vitro* reassembly should check the lag before blaming the protein.
 
-![Nucleation lag and size distribution]({{artifact:art_f21b27d2-5649-4f51-a8fa-d9973868f3f3}})
+![Nucleation lag and size distribution](../figures/fig19_M3_nucleation_lag.png)
 
 Feeding versus bolus addition separates two effects that push yield in opposite directions. A bolus at $t = 0$ reaches a capsid fraction of 0.884 with 0.8% stalled intermediates; a constant feed reaches 0.741 with 4.0% stalled; a ramped feed reaches 0.728 with 4.4%. Feeding reduces the trapped fraction relative to a bolus of the same total material but leaves 131–137 µM of free dimer unconverted at harvest. "Feeding is better" is true for the intermediate fraction and false for total capsid at 18 h.
 
@@ -158,7 +158,7 @@ The primary output is the concentration of correctly formed, loaded particles at
 
 Digital PCR counting is the precise step and is not worth optimising. Counting precision is best at a mean occupancy of $\lambda$ = 1.59 copies per partition, where the coefficient of variation is 0.77%, and stays between 2.01% and 1.14% across occupancies from 0.1 to 4.
 
-![dPCR counting precision]({{artifact:art_a8938e4c-5e9b-4fa0-bf0e-0ef123d779d4}})
+![dPCR counting precision](../figures/fig20_M5_dpcr_precision.png)
 
 Spectrophotometric deconvolution of protein and RNA is ill-conditioned: the 2 × 2 system has a condition number of 43.8, so a 1% absorbance error becomes up to a 44% error in protein mass. At one cargo copy per particle, RNA accounts for 87.8% of $A_{260}$ and 67.2% of $A_{280}$. The ratio is a good readout for RNA per particle and a poor one for protein; the right split is $A_{260}$ for RNA with a protein assay for protein.
 
@@ -166,7 +166,7 @@ The error budget on cargo copies per particle is dominated by extraction recover
 
 The variance in the harvest titre itself decomposes differently, and this is the reconciliation of a discrepancy flagged in earlier versions of this section. With the capsid-fraction uncertainty taken from the contact-schedule scan of Section 9.8 rather than from a placeholder, purification recovery carries 58% of the variance in log titre, capsid fraction 24%, loaded fraction 12%, total coat protein 5%, and the soluble fraction and the TEM-correct fraction 1% each. Dose size, which carried 51% of the variance in doses per litre, contributes nothing to the titre by construction. The two decompositions previously disagreed because one varied model-predicted quantities and the other varied the measurable chain; feeding the schedule span into the capsid-fraction prior closes that gap.
 
-![What moves the harvest titre]({{artifact:art_b1c83c4b-ddfa-49d9-ba1b-b8b58769f7d8}})
+![What moves the harvest titre](../figures/fig21_M5_harvest_titre_tornado.png)
 
 ## 9.10 Confrontation with measured data
 
@@ -174,11 +174,11 @@ Three claims have been put to data that were not used to build the model.
 
 The dose-saturation claim of Section 9.4 was tested against a 15-run Box–Behnken design on three unrelated proteins in BL21(DE3) [1]. Main effects divided by the standard deviation of the design's own centre-point replicates rank IPTG last for all three, averaging 1.03 times the replicate noise against 5.73 for temperature and 3.69 for induction time. The same design put through the model with 400 prior draws, normalised by the measured relative centre-point noise of 0.164, gives 0.67 for time and 0.15 for IPTG, with temperature identically zero because M1 has no temperature term. The agreement is ordinal and that is all it can be; what matters is that the ranking was not fitted.
 
-![Measured factor effects against the M1 prior predictive]({{artifact:art_ad074cce-127b-43da-ba1c-2007143cfb33}})
+![Measured factor effects against the M1 prior predictive](../figures/fig23_M1_design_effects.png)
 
 The temperature term in the partition function was tested against soluble and insoluble target protein measured at two induction temperatures [2]. If $s_{50}$ were temperature-independent, the measured 1.47-fold rise in total target protein between 30 and 37 °C would move the soluble fraction from 0.686 to 0.621; the measurement is 0.341, which is 11.6 measurement standard deviations away. The temperature dependence is not optional. Fitting both parameters returns $\Delta E/R$ = 20 000 K (94% CI 13 500–26 900) against the 12 000 K used in the synthetic runs, with residuals of +0.018 and −0.041 at the two calibration points. The ratio-based closed-form inversion, which uses the instantaneous partition function rather than the history-weighted observable, gives 23 600 K; the difference is the proteolysis weighting plus the pull of a prior still centred at 10 000 K.
 
-![M2 calibrated on measured partition data]({{artifact:art_56a5f63a-bbe3-4fc2-ab48-82767a65e0b8}})
+![M2 calibrated on measured partition data](../figures/fig24_M2_literature_calibration.png)
 
 Since two temperatures and two free parameters leave nothing to hold out, the calibration is spent on a forward prediction: at the 30 °C synthesis flux the model forecasts a soluble fraction of 0.808 (95% CI 0.691–0.889) at 25 °C and 0.946 (0.839–0.983) at 18 °C. One gel at either temperature falsifies the Arrhenius closure of Equation (3.12). The censoring correction of Section 9.7 leaves those numbers bit-identical, because 0.34 and 0.69 are nowhere near a detection limit — none of the measured-data conclusions depended on the defect.
 

@@ -59,11 +59,10 @@ and do not grow with concentration. A yield that is non-monotonic in concentrati
 off-pathway or malformed species, which the cascade does not contain.
 
 **Bolus and feed.** An in vitro reassembly is a bolus, whereas in the cell dimer arrives continuously
-at the rate supplied by M2. In the constant-feed case, the free-dimer pool is still above 100 µM at 18 h (131 µM in the notebook
-calculation; the reaction has not finished at harvest). The sentence printed under this comparison in the notebook
-refers to an earlier parameter set and does not match the table at −3.82 kcal mol⁻¹ (stalled fraction
-0.008 for the bolus and 0.040 for the constant feed); the notebook flags this, and the statement that
-a slow feed reduces the stalled fraction is not used here.
+at the rate supplied by M2. At the contact energy of −3.82 kcal mol⁻¹, a constant feed of the same total
+dimer gives a higher stalled fraction than a bolus (0.040 against 0.008) and a lower capsid fraction at
+18 h (0.741 against 0.884). The reaction has not finished at harvest: 131 µM of free dimer remains
+unconverted. A slow feed therefore does not reduce the stalled fraction in this model.
 
 ## Coupling to packaging
 
