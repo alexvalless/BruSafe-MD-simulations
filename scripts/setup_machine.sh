@@ -4,7 +4,7 @@
 #
 #   ./scripts/setup_machine.sh
 #
-# Prerequisites you do by hand once per PC: Git, a Python 3 with numpy
+# Prerequisites to be done by hand once per PC: Git, a Python 3 with numpy
 # (python -m pip install --user numpy), and the repo cloned.
 #
 # What it does
@@ -30,8 +30,8 @@ echo "=== setup check: $(hostname)  $(date '+%Y-%m-%d %H:%M') ==="
 if [ "$REPO" = "$HOME/BruSafe-MD-simulations" ]; then ok "repo at $REPO"
 else warn "repo is at $REPO; the plan assumes ~/BruSafe-MD-simulations (mv it there)"; fi
 BR="$(git -C "$REPO" rev-parse --abbrev-ref HEAD 2>/dev/null || echo '?')"
-[ "$BR" = "campaign" ] && ok "branch $BR" \
-  || warn "branch is '$BR'; expected campaign (git checkout it)"
+[ "$BR" = "main" ] && ok "branch $BR" \
+  || warn "branch is '$BR'; expected main (git checkout it)"
 
 # ---- python ----------------------------------------------------------------
 if [ -z "$PY" ]; then

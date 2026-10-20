@@ -23,10 +23,14 @@ would resolve it.
 
 | Limitation | Consequence |
 |---|---|
-| Production results for the tiered systems are not part of this repository | the MD pages describe the protocol and the analysis; claims about the linker or about binding are made only after replica spread and convergence have been shown |
+| Production results are not part of this repository, and only S1 and S6 had finished when the protocol was written | the MD pages describe the protocol and the analysis; claims about the linker or about binding are made only after replica spread and convergence have been shown |
 | Absolute MM/PBSA binding free energies are unreliable for charged protein–RNA interfaces (typical error 5–20 kcal mol⁻¹) | only ΔΔG between systems is reported, with the sensitivity to the interior dielectric constant |
-| Mg²⁺ ions do not equilibrate on the 250 ns timescale | the placement is documented, and the interface check is made before MM/PBSA |
-| The force-field choice (CHARMM36m) involves a less standard PB radii setup (`PBRadii = 7`) | if the calibration regression performs poorly, the force field is one of the suspects (`docs/DECISIONS.md`) |
+| Mg²⁺ ions do not equilibrate on trajectories of 30–100 ns, and 1ZDH has no crystallographic Mg²⁺ | ions are placed independently for each replica, and the interface table is inspected before MM/PBSA |
+| The crystal RNA of the complexes has a mean occupancy of 0.56, only 13 of 19 nucleotides are resolved, and the terminal pair of the stem may fray within 30 ns | the base pairing is checked in every replica; if the stem opens in most of them, a restraint or an extended stem is applied to all systems alike |
+| The scCP graft keeps the FG-loop conformation of the second copy, which differs from the RNA-bound chain of S4 (3.07 Å all-Cα RMSD against 0.54 Å for the rigid core) | reported as a limitation of the model in the S9 results |
+| The scrambled-RNA control and the calibration variants were dropped, so nothing calibrates the absolute MM/PBSA energies | only ΔΔG for S9 against S4 and for S3 against S4 is reported, and no specificity claim is made |
+| Runs of 30 ns per replica sample only the bound basin | the replicas are independent, and the uncertainty is taken from their spread |
+| The force-field choice (CHARMM36m) involves a less standard PB radii setup (`PBRadii = 7`) | the force field is one of the possible causes of any anomaly in the MM/PBSA results (`docs/DECISIONS.md`) |
 | Review of the force-field decision by the external MD advisor was pending when the decision was logged | to be confirmed in writing |
 
 ## Further documentation

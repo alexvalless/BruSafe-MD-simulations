@@ -2,9 +2,9 @@
 """
 Build the starting structure of one system: input/<system>/<system>.pdb
 
-This is the step the rest of the pipeline cannot check for you. It does the
-mechanical part reproducibly and prints everything you need to judge the
-scientific part (which dimer, which RNA, which gaps).
+The rest of the pipeline cannot check this step. The script does the mechanical
+part reproducibly and prints what is needed to judge the scientific part
+(which dimer, which RNA, which gaps).
 
 Subcommands
 -----------

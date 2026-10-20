@@ -11,8 +11,8 @@ dt = 4 fs.
 
 Why the topology and not the mdp: `mass-repartition-factor` only exists from
 GROMACS 2024 on, and applying both would scale the hydrogens twice. Doing it
-here works with any GROMACS version and puts the masses in a file you can read
-and commit.
+here works with any GROMACS version and puts the masses in a file that can be read
+and committed.
 
 Rules
   - water (any moleculetype with [ settles ]) is left alone, as is usual for HMR

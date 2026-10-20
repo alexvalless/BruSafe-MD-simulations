@@ -1,4 +1,4 @@
-; BruSafe -- NPT equilibration, 2 ns, UNRESTRAINED. Final gate before production.
+; BruSafe -- NPT equilibration, 2 ns, unrestrained. Final step before production.
 ; Shortened from 5 ns (2026-10-04): the first skip_ns of every production run is
 ; also discarded in analysis, so relaxation is not counted twice. HMR, 4 fs.
 ; no position restraints at this stage

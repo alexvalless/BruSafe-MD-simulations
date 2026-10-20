@@ -46,30 +46,38 @@ python ../tools/exec_nb.py BruSafe_01_M1_expression_IPTG.ipynb run01
 
 ## Molecular dynamics
 
-**Software.** GROMACS 2023 or later with CUDA support (identical on all machines), the CHARMM36m port
-(`charmm36-jul2022.ff`), and gmx_MMPBSA with AmberTools on one or two analysis machines. Linux and
-WSL are preferred; macOS (analysis only) and Windows Git Bash are supported (`docs/WINDOWS.md`).
+**Software.** GROMACS 2023 or later with CUDA support (identical on all machines; the laboratory machines
+use a portable 2026.3 build), the CHARMM36m port (`charmm36-jul2022.ff`), and gmx_MMPBSA with AmberTools
+on one or two analysis machines. Linux and WSL are preferred; macOS (analysis only) and Windows (MSYS2
+or Git Bash) are supported (`docs/WINDOWS.md`, `docs/MAQUINAS.md`).
 
 **Record of the environment.** `scripts/00_env.sh` writes `docs/env_<hostname>.txt` with the hardware,
 software versions, force-field location and locked mdrun flags of each machine, and the files are
 committed. Each production replica also writes a `PROVENANCE.txt` (host, GROMACS version, mdrun
 flags, seed, start and end times).
 
-**Determinism.** Velocity seeds are a deterministic hash of `<system>_rep<N>`, so every equilibration
-can be reproduced from the repository.
+**Determinism.** Velocity seeds and ion placement are a deterministic function of `<system>_rep<N>`,
+so every equilibration can be reproduced from the repository. The starting structures are built by
+`scripts/00_build_inputs.py` from the registry and the RNA design table, and their construction is
+documented in `docs/TOPOLOGIES.md`.
 
 **Workflow.**
 
 ```bash
 ./scripts/00_env.sh
 ./scripts/bench_gpu.sh runs/S1_wt_cc_apo/rep1/prod.tpr      # once; the result fixes the mdrun flags
-./scripts/01_prepare.sh     S1_wt_cc_apo
+python3 scripts/00_build_inputs.py build S1_wt_cc_apo        # once per system
+./scripts/01_prepare.sh     S1_wt_cc_apo --replica 1
 ./scripts/02_equilibrate.sh S1_wt_cc_apo 1
 ./scripts/03_production.sh  S1_wt_cc_apo 1 24
 ./scripts/04_postprocess.sh S1_wt_cc_apo 1
 ./analysis/compare_systems.sh S1_wt_cc_apo S2_sccp_apo
 python3 analysis/md_report.py wiki --all
 ```
+
+On the laboratory machines, `scripts/run_slot.sh <slot> <hours>` runs every job assigned to one slot of
+`docs/PLAN.txt` (build, equilibration, production, post-processing, packing of the results), and
+`scripts/progress.sh watch` shows the progress of a machine.
 
 Trajectories, checkpoints and run-time files are excluded from version control (`.gitignore`) and
 are backed up separately. Topologies, index files, `.mdp` files, scripts and analysis output are

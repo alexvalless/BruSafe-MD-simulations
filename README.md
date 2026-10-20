@@ -3,7 +3,7 @@
 Computational work of the iGEM Tec-Chihuahua 2026 project on an MS2 virus-like-particle (VLP)
 platform for mRNA delivery. The repository contains two arms:
 
-- an **all-atom molecular dynamics (MD) campaign** with GROMACS, run on 10 workstations with one
+- an **all-atom molecular dynamics (MD) campaign** with GROMACS, run on laboratory workstations with one
   RTX 4070 each, and
 - **CAPSID**, a chain of five kinetic and statistical models of the path from expression to purified
   VLP (`capsid/`).
@@ -71,7 +71,7 @@ administrator rights (`docs/WINDOWS.md`).
 export BRUSAFE_MDRUN_FLAGS="-nb gpu -pme gpu -bonded gpu -update gpu -ntmpi 1 -ntomp 8 -pin on"
 
 # 2. plan the campaign across machines
-python3 scripts/_registry.py plan --machines 10 --tier 1 --nsday <measured>
+python3 scripts/_registry.py plan --machines 15 --tier 2 --nsday <measured>
 
 # 3. for each system, once, on one machine (see docs/TOPOLOGIES.md)
 python3 scripts/00_build_inputs.py show  2MS2          # chains, gaps, symmetry mates

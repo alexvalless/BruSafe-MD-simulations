@@ -13,7 +13,7 @@ A system without a consumer is removed.
       - AMBER ff99SB-ILDN (or ff14SB) + OL3 for RNA: the most direct path to MM/PBSA
       - CHARMM36m: better loop dynamics, slightly less standard PB radii
 - [ ] Water model and ion set (TIP3P, 150 mM KCl, Mg²⁺ for RNA-containing systems)
-- [ ] GROMACS version pinned and identical on all 10 machines (`gmx --version` logged)
+- [ ] GROMACS version pinned and identical on all laboratory machines (`gmx --version` logged)
 - [ ] Naming convention: `<system>_<conformer>_rep<N>`
 - [ ] Storage and backup plan (~40 GB in total; offsite copy of every `.xtc`, `.tpr` and `.mdp`)
 - [ ] Git repository created; all `.mdp`, `.ndx`, topologies and scripts committed from the start

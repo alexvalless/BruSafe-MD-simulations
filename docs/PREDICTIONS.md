@@ -35,7 +35,11 @@ absolute binding energy being correct.
 
 ---
 
-## P2 — Specificity ΔΔG consistency
+## P2 — Specificity ΔΔG consistency (withdrawn)
+
+**Status:** withdrawn on 2026-10-04. The scrambled-RNA control (S5) and the calibration variants were removed
+from the campaign (`docs/DECISIONS.md`), so there is no specificity ΔΔG to compare with the model. The
+entry is kept for the record.
 
 Model specificity ratio (P1/P2): ______
 Implied ΔΔG = −RT ln(ratio), RT = 0.616 kcal/mol at 310 K: ______ kcal/mol

@@ -224,20 +224,20 @@ machines.
 
 ---
 
-## 5. Planning across the ten machines
+## 5. Planning across the laboratory machines
 
 ```bash
-python3 scripts/_registry.py plan --machines 10 --tier 1 --nsday <measured value>
+python3 scripts/_registry.py plan --machines 15 --tier 2 --nsday <measured value>
 ```
 
 The output is a cost table and a list of jobs per machine. Tier 1 amounts to about 1,400 ns-equivalent including equilibration; at 400 ns/day per GPU
-(hydrogen mass repartitioning, 4 fs) this is well under one day on ten GPUs. Compute is therefore not
+(hydrogen mass repartitioning, 4 fs) this is well under one day on the available GPUs. Compute is therefore not
 the limiting factor, which is the reason for running this early.
 
 The job lists are saved and one is assigned to each machine:
 
 ```bash
-python3 scripts/_registry.py plan --machines 10 --tier 1 --nsday <measured value> > docs/PLAN.txt
+python3 scripts/_registry.py plan --machines 15 --tier 2 --nsday <measured value> > docs/PLAN.txt
 git add docs/PLAN.txt && git commit -m "campaign plan, tier 1"
 ```
 

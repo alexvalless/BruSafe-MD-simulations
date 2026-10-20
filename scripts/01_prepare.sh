@@ -13,7 +13,7 @@
 #   pdb2gmx    : <system_name>.pdb   (cleaned, correct chains, no waters/alt-locs)
 #   charmm-gui : the unzipped CHARMM-GUI Solution Builder gromacs/ output
 #
-# For RNA-containing systems the CHARMM-GUI route is STRONGLY preferred:
+# For RNA-containing systems the CHARMM-GUI route is strongly preferred:
 # pdb2gmx residue mapping for RNA under the charmm36 port is fragile. Only the
 # CHARMM-GUI topology is used; box, water and ions are rebuilt here the same
 # way for both routes.

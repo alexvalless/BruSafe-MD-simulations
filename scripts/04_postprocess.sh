@@ -41,8 +41,8 @@ if grep -q '\[ Backbone \]' ../index.ndx; then BB=Backbone; CA=C-alpha; else BB=
 log "RMSD / Rg / RMSF / SASA / DSSP  (groups: $BB, $CA)"
 printf '%s\n%s\n' "$BB" "$BB" | gmx rms   -s clean.gro -f clean.xtc -n ../index.ndx -o rmsd_backbone.xvg -tu ns
 printf '%s\n' "$BB"           | gmx gyrate -s ../prod.tpr -f clean.xtc -n ../index.ndx -o gyrate.xvg
-# discard the first skip_ns (registry) before RMSF -- fluctuations during
-# relaxation are not the fluctuations you want to report
+# The first skip_ns (registry) are discarded before RMSF, because fluctuations
+# during relaxation should not be reported as equilibrium fluctuations.
 printf '%s\n' "$CA"            | gmx rmsf  -s clean.gro -f clean.xtc -n ../index.ndx -o rmsf_ca.xvg -res -b "$SKIP_PS"
 printf 'SOLU\n'               | gmx sasa  -s ../prod.tpr -f clean.xtc -n ../index.ndx -o sasa.xvg
 gmx dssp -s ../prod.tpr -f clean.xtc -n ../index.ndx -o dssp.dat -num dssp_num.xvg 2>/dev/null \

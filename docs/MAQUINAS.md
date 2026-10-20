@@ -1,42 +1,43 @@
-# Paso a paso para cada computadora del laboratorio
+# Laboratory machines: step-by-step guide
 
-Todos los comandos van en la terminal **MSYS2 UCRT64** (menú Inicio → "MSYS2 UCRT64"),
-**de uno en uno**, tal cual, sin cambiar nada (salvo el número de máquina del paso 8).
-Primera vez en una PC: unos 25 minutos. Después, el trabajo corre solo (1 a 2 horas).
+All commands are typed in the **MSYS2 UCRT64** terminal (Start menu → "MSYS2 UCRT64"), **one at a
+time**, exactly as written, without changes (except the slot number in step 8). The first time on a
+PC takes about 25 minutes. After that, the job runs unattended (1 to 2 hours per job).
 
-Lo que ya está resuelto y no hay que tocar: la versión de GROMACS es **2026.3 con CUDA**
-(la misma en todas), la ruta de OneDrive está guardada en los scripts y los resultados se
-copian solos al terminar.
+The following is already settled and does not need to be changed: the GROMACS version is **2026.3 with
+CUDA** (the same on every machine), the OneDrive path is stored in the scripts, and the results are
+copied automatically when a job finishes.
 
 ---
 
-## 1. GPU y Git
+## 1. GPU and Git
 
 ```bash
 git --version; nvidia-smi --query-gpu=name --format=csv,noheader
 ```
 
-Debe salir la versión de Git y `NVIDIA GeForce RTX 4070`. Si la GPU no sale, esa PC no sirve.
+The output should be the Git version and `NVIDIA GeForce RTX 4070`. If the GPU is not listed, the PC
+cannot be used.
 
-## 2. Instalar Python (sin administrador)
+## 2. Install Python (without administrator rights)
 
 ```bash
 winget.exe install -e --id Python.Python.3.12 --scope user --accept-package-agreements --accept-source-agreements
 ```
 
-Si `winget` no existe o falla: instalador de python.org (3.12, 64 bits), **"Install for me only"**
-y "Add python.exe to PATH" marcado.
+If `winget` does not exist or fails, use the installer from python.org (3.12, 64-bit) with **"Install
+for me only"** and "Add python.exe to PATH" ticked.
 
-**Cierra la terminal y ábrela de nuevo.** Luego:
+**Close the terminal and open it again.** Then:
 
 ```bash
 python --version
 ```
 
-Debe decir `Python 3.12.x`. Usa `python`, no `python3` (ese es un atajo de la Microsoft Store
-que no sirve; los scripts del proyecto ya lo ignoran).
+The output should be `Python 3.12.x`. Use `python` and not `python3`, which is a Microsoft Store
+shortcut that does not work (the project scripts already ignore it).
 
-## 3. Instalar numpy
+## 3. Install numpy
 
 ```bash
 python -m pip install --user numpy
@@ -45,137 +46,110 @@ python -m pip install --user numpy
 python -c "import numpy; print(numpy.__version__)"
 ```
 
-Debe imprimir una versión (por ejemplo `2.5.3`).
+The output should be a version number (for example `2.5.3`).
 
-## 4. Clonar el repositorio
+## 4. Clone the repository
 
 ```bash
-cd ~ && git clone https://github.com/alexvalless/BruSafe-MD-simulations.git && cd BruSafe-MD-simulations && git checkout campaign
+cd ~ && git clone https://github.com/alexvalless/BruSafe-MD-simulations.git && cd BruSafe-MD-simulations
 ```
 
-## 5. El zip de GROMACS
+## 5. The GROMACS zip
 
 ```bash
 ls -lh "/c/Users/A01563079/OneDrive - Instituto Tecnologico y de Estudios Superiores de Monterrey/BruSafe-MD/software/"
 ```
 
-Debe aparecer `gromacs-2026.3-win64-cuda12.6.3-sm89.zip` de **unos 242 MB**.
+The file `gromacs-2026.3-win64-cuda12.6.3-sm89.zip` of **about 242 MB** should appear.
 
-- **Aparece pero no muestra el tamaño, o pesa 0:** OneDrive solo tiene el nombre, no el archivo.
-  En el Explorador de Windows: clic derecho sobre el zip → **"Mantener siempre en este
-  dispositivo"** y espera la marca verde sólida.
-- **No existe la carpeta:** esa PC no tiene OneDrive iniciado. Baja el zip a `Descargas` con tu
-  sesión de GitHub iniciada (y ciérrala al terminar):
+- **It appears but shows no size, or 0:** OneDrive has only the file name and not the file. In
+  Windows Explorer, right-click the zip → **"Always keep on this device"** and wait for the solid
+  green mark.
+- **The folder does not exist:** OneDrive is not running on that PC. Download the zip to
+  `Downloads` while signed in to GitHub (and sign out again afterwards):
   https://github.com/alexvalless/BruSafe-MD-simulations/actions/runs/37343539360/artifacts/11363541517
-- Comprobación de integridad (opcional): la suma debe ser
+- Integrity check (optional): the SHA-256 sum should be
   `ed5fd8e86a8733433a47cba8f816955070d20369ef10fbff6e77a6f38760a940`.
 
-## 6. Preparar y verificar la máquina
+## 6. Prepare and verify the machine
 
 ```bash
 ./scripts/setup_machine.sh
 ```
 
-Extrae GROMACS, deja bien tu `~/.bashrc` y revisa todo. Debe terminar con
-`READY: CHI-12104-PC-XX`. Si dice `NOT READY`, te lista lo que falta.
-**Cierra la terminal y abre una nueva** antes de seguir.
+The script extracts GROMACS, sets up `~/.bashrc` and checks everything. It should end with
+`READY: CHI-12104-PC-XX`. If it prints `NOT READY`, it lists what is missing. **Close the terminal
+and open a new one** before continuing.
 
-## 7. Revisar el plan
+## 7. Check the plan
 
-Los trabajos están en `docs/PLAN.txt`. Hoy son 7:
+The jobs are listed in `docs/PLAN.txt`, one line per job: slot (`gpu<N>`), system, replica, length in
+ns and the purpose of the job. Each PC takes one slot number and runs all the jobs of that slot. Write
+down which PC took which number so that no work is repeated.
 
-| Máquina | Trabajo | Duración aprox. |
-|---|---|---|
-| 0 | S8 (RNA libre) réplica 1 | 1 h |
-| 1 | S8 réplica 2 | 1 h |
-| 2 | S8 réplica 3 | 1 h |
-| 3 | S4 (complejo) réplica 2 | 1.4 h |
-| 4 | S4 réplica 3 | 1.4 h |
-| 5 | S4 réplica 4 | 1.4 h |
-| 6 | S4 réplica 5 | 1.4 h |
+The command sheets `docs/Comandos_S2_S9.docx` and `docs/Comandos_S3.docx` give the launch commands for
+the current plan; this guide describes the general procedure.
 
-Apunta qué PC toma qué número para no repetir trabajos. (S4 réplica 1 ya está hecha.)
+## 8. Launch (Terminal 1)
 
-## 8. Lanzar (Terminal 1)
-
-Copia **solo la línea de tu número**. Cada una actualiza el repo y lanza:
+With the slot number in place of `N` (and `16` as the time budget in hours):
 
 ```bash
-cd ~/BruSafe-MD-simulations && git pull --no-rebase && ./scripts/run_slot.sh 0 16 > slot_0.log 2>&1
-```
-```bash
-cd ~/BruSafe-MD-simulations && git pull --no-rebase && ./scripts/run_slot.sh 1 16 > slot_1.log 2>&1
-```
-```bash
-cd ~/BruSafe-MD-simulations && git pull --no-rebase && ./scripts/run_slot.sh 2 16 > slot_2.log 2>&1
-```
-```bash
-cd ~/BruSafe-MD-simulations && git pull --no-rebase && ./scripts/run_slot.sh 3 16 > slot_3.log 2>&1
-```
-```bash
-cd ~/BruSafe-MD-simulations && git pull --no-rebase && ./scripts/run_slot.sh 4 16 > slot_4.log 2>&1
-```
-```bash
-cd ~/BruSafe-MD-simulations && git pull --no-rebase && ./scripts/run_slot.sh 5 16 > slot_5.log 2>&1
-```
-```bash
-cd ~/BruSafe-MD-simulations && git pull --no-rebase && ./scripts/run_slot.sh 6 16 > slot_6.log 2>&1
+cd ~/BruSafe-MD-simulations && git pull --no-rebase && ./scripts/run_slot.sh N 16 > slot_N.log 2>&1
 ```
 
-Esa terminal queda **ocupada y en silencio** hasta terminar.
+This terminal stays **busy and silent** until the job finishes.
 
-## 9. Ver el avance (Terminal 2, una ventana UCRT64 aparte)
+## 9. Follow the progress (Terminal 2, a separate UCRT64 window)
 
-El mismo comando en todas las máquinas; se refresca solo cada 30 segundos:
+The same command works on every machine and refreshes every 30 seconds:
 
 ```bash
 cd ~/BruSafe-MD-simulations && ./scripts/progress.sh watch
 ```
 
-| Etapa | Cuánto | Qué ves |
+| Stage | Duration | What is shown |
 |---|---|---|
-| construcción + equilibración | ≈10 min | etapa `equil`; en `slot_N.log`: `building`, `equilibration` |
-| producción | S8 ≈1 h, S4 ≈1.3 h | `prod`, ns del último checkpoint (cada 15 min), tamaño de `prod.xtc` y hace cuánto creció |
-| postproceso + empaquetado | unos minutos | `post-processing`, `results packed` |
+| build + equilibration | ≈10 min | stage `equil`; in `slot_N.log`: `building`, `equilibration` |
+| production | depends on the system (about 1 h for S8, 1.3 h for S4) | `prod`, ns at the last checkpoint (every 15 min), size of `prod.xtc` and how long ago it grew |
+| post-processing + packing | a few minutes | `post-processing`, `results packed` |
 
-Salir de la Terminal 2 con **Ctrl+C** es seguro: no afecta el trabajo.
+Leaving Terminal 2 with **Ctrl+C** is safe: it does not affect the job.
 
-## 10. Reglas mientras corre
+## 10. Rules while a job is running
 
-1. **Nunca Ctrl+C en la Terminal 1.** (Es lo que detuvo la PC-02 la primera vez.)
-2. No cierres esa ventana.
-3. Bloquea con **Win+L**; no cierres sesión y evita que el equipo se suspenda.
-4. Si se corta la luz o se reinicia: vuelve a abrir UCRT64 y repite **el mismo comando del
-   paso 8**. Retoma desde el último checkpoint y no repite lo ya terminado.
+1. **Never press Ctrl+C in Terminal 1.** (This is what stopped PC-02 the first time.)
+2. Do not close that window.
+3. Lock the screen with **Win+L**; do not sign out and do not let the machine sleep.
+4. After a power cut or a restart, open UCRT64 again and **repeat the same command of step 8**. The job resumes from the last checkpoint and does not repeat finished work.
 
-## 11. Al terminar
+## 11. When it finishes
 
-El prompt de la Terminal 1 regresa. Comprueba:
+The prompt of Terminal 1 returns. Check with:
 
 ```bash
 tail -3 ~/BruSafe-MD-simulations/slot_N.log
 ```
 
-(con tu número en lugar de `N`). Debe decir `all jobs of slot N completed`.
-Los resultados quedan en tu OneDrive, en `BruSafe-MD/<nombre-de-la-PC>`. Espera a que sus
-archivos tengan la **marca verde** antes de cerrar sesión, y cierra la sesión de OneDrive y
-de GitHub en el navegador (son computadoras compartidas).
+(with the slot number in place of `N`). It should say `all jobs of slot N completed`. The results are
+left in the OneDrive folder `BruSafe-MD/<name-of-the-PC>`. Wait until the files have the **green mark**
+before signing out, and sign out of OneDrive and GitHub in the browser (the computers are shared).
 
 ---
 
-## Si algo falla
+## If something fails
 
-| Síntoma | Qué hacer |
+| Symptom | What to do |
 |---|---|
-| `missing required command: gmx` | `git pull --no-rebase` (ya lo corrige) y relanza; o `source ~/.bashrc` |
-| `Received the INT signal` en el log | Alguien pulsó Ctrl+C. Relanza el mismo comando del paso 8 |
-| `NOT READY` | Lee la línea `[FAIL]` y corrígela; repite `setup_machine.sh` |
-| `python3: Python was not found` | Usa `python` (paso 2) |
-| El zip no muestra tamaño | Paso 5: "Mantener siempre en este dispositivo" |
-| La trayectoria no crece en >10 min | Avisa con el número de máquina |
-| `NO CHARMM-GUI build for ...` | Ese sistema aún no está listo; no es un error de tu PC |
+| `missing required command: gmx` | `git pull --no-rebase` (it already fixes this) and relaunch; or `source ~/.bashrc` |
+| `Received the INT signal` in the log | Someone pressed Ctrl+C. Relaunch the same command of step 8 |
+| `NOT READY` | Read the `[FAIL]` line, correct it and repeat `setup_machine.sh` |
+| `python3: Python was not found` | Use `python` (step 2) |
+| The zip shows no size | Step 5: "Always keep on this device" |
+| The trajectory does not grow for more than 10 min | Report it with the slot number |
+| `NO CHARMM-GUI build for ...` | That system is not ready yet; it is not an error of the PC |
 
-Para pedir ayuda, copia: el nombre de la PC, tu número de máquina y la salida de
+To ask for help, copy the name of the PC, the slot number and the output of
 
 ```bash
 grep -E "^\[|Fatal|FATAL|rror" ~/BruSafe-MD-simulations/slot_N.log | tail -15
