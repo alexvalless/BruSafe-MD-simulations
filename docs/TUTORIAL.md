@@ -429,6 +429,39 @@ bonds stretched across the box, and the script warns about this.
 
 ---
 
+## 10c. Contacts
+
+`analysis/contacts.py` enumerates the protein–RNA contacts of a system, all replicas pooled. It runs on
+CPU, reads `analysis/clean.gro` and `clean.xtc` from `04_postprocess.sh`, and needs MDAnalysis and
+matplotlib.
+
+```bash
+python3 analysis/contacts.py S3_cp_operator --equil-ns 5 --key-residues 29,43,45,47,49,52,55,57,59,61,63,85,87
+```
+
+It writes `analysis_out/contacts/<system>/`: `contacts_pairs.csv` (every protein residue × nucleotide pair
+with its occupancy per replica, mean, SD and the number of replicas where it is persistent), per-residue and
+per-nucleotide tables, `hbonds_pairs.csv`, `interface_pairs.csv` (dimer interface), `summary_contacts.csv`
+and an `index.html` with the figures. About 40 s per replica at 1000 frames.
+
+Before quoting it:
+
+- Use the same `--equil-ns` as the protocol (5 ns for the RNA complexes, 10 ns for the apo systems). If a
+  trajectory is shorter than the window the script analyses all frames and says so, in the log, in
+  `summary_contacts.md` and on the page.
+- The detected chains are printed (`A=129, B=129`). If the numbering does not restart between chains, pass
+  `--chain-sizes 129,129`.
+- `--rna-first N` labels the nucleotides with the numbering of the operator (−15 … −1, +1 … +4). The RNA of
+  the complexes holds residues 4–16 of the 19-mer (UGAGGAUCACCCA), so the first nucleotide is **−12**:
+  `--rna-first -12`. Check the first residue of your `clean.gro` before using it.
+- `--key-residues` is the same check as the MM/PBSA decomposition gate: do the known operator-contact
+  residues (van den Worm et al. 1998) appear among the top contacts? It is geometry, not energy.
+- Occupancy is per replica; the ± is the SD across replicas and `n_reps>=` counts the replicas where the pair
+  is persistent. A pair seen in one replica is not a result.
+- `clean.xtc` holds the solute only, so **water bridges and Mg²⁺ contacts are not computed**.
+
+---
+
 ## 11. Before the wiki freeze
 
 - [ ] `docs/env_*.txt` committed from every machine

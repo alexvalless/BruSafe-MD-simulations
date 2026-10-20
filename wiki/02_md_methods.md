@@ -146,6 +146,20 @@ and for the effect of the linker on the essential subspace are registered in `do
 before the corresponding data exist. The prediction on specificity was withdrawn together with the
 scrambled control.
 
+## Protein–RNA contacts
+
+For the RNA complexes, `analysis/contacts.py` counts the residue pairs (protein residue × nucleotide) with any
+heavy-atom distance below 4.5 Å (3.5 Å for direct contacts) in each frame, and reports the occupancy of each
+pair, the fraction of frames in which it is in contact, together with the hydrogen bonds between protein and
+RNA and the contacts between the two protein chains. Occupancies are computed for each replica after
+discarding the first 5 ns. The values reported are the mean over replicas, the error bar is the standard
+deviation **across replicas**, and the number of replicas in which a contact is persistent is given with each
+pair. A check is made that the residues known to bind the operator (Val29, Thr45, Ser47, Thr59 and Lys61 of the
+binding pocket, and Lys43, Arg49, Ser52, Asn55, Lys57, Glu63, Tyr85 and Asn87; van den Worm et al. 1998) are
+among the contacts that are most often present. The contacts are geometric. They are not binding energies, the
+trajectories of the solute do not contain water or Mg²⁺ and so water-mediated bridges are not counted, and the
+analysis does not replace the per-residue decomposition of MM/PBSA.
+
 ## Reporting pages
 
 `analysis/md_report.py wiki --all` builds one compact interactive page for each system, with all

@@ -22,6 +22,16 @@ and all sources are listed in `lit_sources.csv`.
 | `derived_M3_dG_from_Tm.csv` | 15 | contact energy obtained by inverting each melting point at the stated assay concentrations (2.5, 5 and 10 µM dimer) | 04, 04L |
 | `derived_M3_assembly_at_literature_dG.csv` | 4 | M3 outputs at the placeholder and at the three literature contact energies | 04L |
 
+## Structure-derived data
+
+`structure/` holds the contact schedule of the *T* = 3 capsid, enumerated from PDB 2MS2 by
+`../tools/enumerate_contacts.py` (heavy-atom cutoff 4.5 Å, an interface when at least 5 residue pairs are
+in contact, 4000 growth paths per rule). `contact_schedule.csv` has, for each step k = 2…90, the contacts
+formed and the number of boundary sites for random growth and for the two greedy rules;
+`contact_schedule.json` has the same series with the edge classes and the mean interface weights. The
+figure is `../figures/fig29_M3_contact_schedule.png`, made by `../tools/plot_contact_schedule.py`.
+Notebook 04 does not read these files yet.
+
 ## Notes on the columns
 
 - `lit_M2_partition_gels.csv`: the columns `band_soluble`, `band_pellet` and their SDs hold

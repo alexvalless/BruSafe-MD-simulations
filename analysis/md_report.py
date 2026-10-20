@@ -983,10 +983,13 @@ def cmd_wiki(a: argparse.Namespace) -> None:
         except SystemExit as e:
             failed.append((s, str(e.code)))
             log(f"{s}: skipped -- {e.code}")
-    if done:
+    # list every system already on disk, not just this call's: several calls with
+    # different --equil-ns must not overwrite each other's index
+    present = [p.parent.parent.name for p in sorted(root.glob("*/html/index.html"))]
+    if present:
         rows = "".join(f"<li><a href='{s}/html/index.html'>{html.escape(s)}</a> "
                        f"<span class='cap'>{html.escape(registry_row(s).get('consumer', ''))}"
-                       f"</span></li>" for s in done)
+                       f"</span></li>" for s in present)
         (root / "index.html").write_text(
             f"<!doctype html><html lang='en'><head><meta charset='utf-8'>"
             f"<meta name='viewport' content='width=device-width,initial-scale=1'>"

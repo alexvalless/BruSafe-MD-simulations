@@ -7,7 +7,7 @@ would resolve it.
 
 | Limitation | Consequence | What would resolve it |
 |---|---|---|
-| The contact schedule and degeneracy vector of M3 are placeholders with the correct total (§2 of notebook 04) | the kinetic capsid fraction at 18 h varies between 0.003 and 0.894 across the sensitivity scan; the nucleation lag, the stalled fraction and the intermediate size distribution cannot be quoted | enumerating the contacts from PDB 2MS2 and 1AQ3, which needs no bench work |
+| Notebook 04 still runs with a placeholder contact schedule and degeneracy vector that have the correct total (§2 of the notebook); the schedule enumerated from PDB 2MS2 (`capsid/data/structure/`) has not been wired in | the kinetic capsid fraction at 18 h varies between 0.003 and 0.894 across the sensitivity scan; the nucleation lag, the stalled fraction and the intermediate size distribution cannot be quoted | replacing the placeholder with the enumerated schedule and rerunning the notebook. The enumeration is geometric (4.5 Å, at least 5 residue pairs per interface, all interfaces equivalent) and was not repeated on 1AQ3 |
 | Held-out dose coverage is 50% (IPTG) and 60% (lactose) against a nominal 94% | the model is overconfident at an unseen dose | a Kennedy–O'Hagan discrepancy term, before any forecast interval at an unseen condition is quoted |
 | k<sub>deg</sub> has no MS2-CP-specific literature value, and a 5 h time course cannot constrain it | the predicted optimal IPTG dose changes direction with the horizon depending on k<sub>deg</sub> | time points at 12 and 24 h, or a translation-halted arm |
 | The leak ε and the gain G are correlated (r ≈ −0.98) in the lactose arm | yield forecasts inherit the ridge | an uninduced arm carried for the whole run |

@@ -75,11 +75,57 @@ between *pac* constructs would therefore not test the allosteric coupling. The c
 visible only where nucleation is limiting, that is, in vitro at 20–50 µM purified dimer with and
 without the TR hairpin, followed by SEC or light scattering.
 
-## What depends on the placeholder contact schedule
+## Contact schedule from the structure
 
-The distribution of contacts over the growth path (`contact_schedule`) and the degeneracy vector are
-placeholders with the correct total, and not counts from the structure. The notebook varies both
-over nine combinations:
+The contact schedule (the number of new dimer–dimer interfaces formed when the k-th dimer joins the
+cluster) and the number of sites at which the next dimer can be added were enumerated from the
+asymmetric unit of PDB 2MS2 by `capsid/tools/enumerate_contacts.py`, and the results are shipped in
+`capsid/data/structure/` (`contact_schedule.csv`, `contact_schedule.json`). The procedure is:
+
+1. The 60 icosahedral operators (REMARK 350) are applied to chains A, B and C, giving 180 chains.
+2. The chains are grouped into the 90 dimers of the model: 60 A/B dimers (each A chain with the B chain
+   it shares the largest interface with) and 30 C/C dimers.
+3. Two dimers are in contact if at least 5 pairs of residues have heavy atoms closer than 4.5 Å. This
+   gives **180 interfaces**, 60 between two A/B dimers and 120 between an A/B and a C/C dimer; no
+   interface joins two C/C dimers. The mean interface has 53 residue pairs (A/B–A/B) and 49 (A/B–C/C).
+4. Growth paths on this graph of 90 dimers are generated 4000 times for each of three rules (the next
+   dimer chosen at random, or greedily with the most or the fewest contacts), and the contacts formed
+   at each step are recorded. Every path closes with exactly 180 interfaces.
+
+| Step k | Contacts formed (random growth, mean) | Sites where the next dimer can be added (mean) |
+|---|---|---|
+| 2 | 1.00 | 4.0 |
+| 10 | 1.43 | 10.9 |
+| 30 | 1.69 | 19.8 |
+| 50 | 1.87 | 22.5 |
+| 70 | 2.28 | 17.9 |
+| 80 | 2.85 | 10.8 |
+| 90 | 4.00 | 1.0 |
+
+The first addition forms one interface and the last forms four. Contacts per addition rise slowly,
+from 1.0 to about 2.0 over the first 60 steps, and then steeply as the shell closes (mean 1.66 for steps 2–59
+and 2.70 for steps 60–90). The number of sites where the next dimer can be added is 4 for the first
+addition, peaks at 22.5 near k = 49 and falls to 1 for the last dimer. The placeholder of notebook 04 has
+contacts rising linearly from 1 to 3 and a constant number of sites equal to 2, so the structure
+changes the degeneracy by up to an order of magnitude and the contacts of the final steps by one.
+
+![Contact schedule from 2MS2](../capsid/figures/fig29_M3_contact_schedule.png)
+
+*Figure 2. Contact schedule and boundary sites of the T = 3 capsid enumerated from PDB 2MS2 (4.5 Å,
+at least 5 residue pairs per interface), for random growth (mean ± SD over 4000 paths) and for two greedy
+rules, compared with the placeholder of notebook 04. The greedy curves are not bounds of all possible
+paths.*
+
+The schedule is geometric: it counts residue pairs in contact in the crystal lattice, treats every
+interface as equivalent, and does not say how the dimers actually assemble. The edge threshold (5
+residue pairs) is a choice, and `enumerate_contacts.py` prints the number of interfaces for thresholds of
+3, 5, 10 and 20 residue pairs.
+
+## What depends on the schedule
+
+**The notebook has not yet been rerun with this schedule.** The outputs of notebook 04 shown on this page
+were computed with the placeholder contact schedule and degeneracy vector, which have the correct
+total and are not counts from the structure. Varying both over nine combinations gives:
 
 | Output | Range over the nine combinations | Status |
 |---|---|---|
@@ -89,8 +135,8 @@ over nine combinations:
 | stalled fraction | 0.014 – 0.129 | **not robust** |
 
 The nucleation lag, the stalled fraction and the intermediate size distribution should not be quoted
-until the contact schedule is derived from the structure (PDB 2MS2 or 1AQ3, with a heavy-atom cutoff
-and a growth path on the actual lattice). This requires no bench work.
+until the structure-derived schedule above replaces the placeholder in the notebook and the model is
+rerun. The enumeration requires no bench work and is done; wiring it in is the remaining step.
 
 ## Sensitivity to the contact energy (notebook 04L)
 
@@ -101,7 +147,7 @@ insensitive to the uncertainty of the assay, and kinetic ones are not.
 
 ![Contact energy sweep](../capsid/figures/fig25_M3_literature_dG_sweep.png)
 
-*Figure 2. M3 outputs across the contact energies obtained from the published melting point.*
+*Figure 3. M3 outputs across the contact energies obtained from the published melting point.*
 
 ## What a TEM count can establish
 
