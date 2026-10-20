@@ -20,7 +20,8 @@ HOURS="${3:-11}"
 T0=$(date +%s)
 D="$RUNS/$SYS/rep$REP"
 
-[ -f "$RUNS/$SYS/build/solv_ions.gro" ] || die "no build for $SYS -- run 01_prepare.sh $SYS first"
+[ -f "$D/topol.top" ] || [ -f "$(build_dir "$SYS" "$REP")/solv_ions.gro" ] \
+  || die "no build for $SYS rep$REP -- run 01_prepare.sh $SYS --replica $REP first"
 if [ -f "$D/prod.gro" ]; then log "$SYS rep$REP already finished"; exit 0; fi
 
 if [ ! -f "$D/npt_free.gro" ]; then

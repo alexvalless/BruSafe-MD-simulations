@@ -1,13 +1,15 @@
-; BruSafe -- NPT equilibration, 1 ns, position restraints retained.
-define                  = -DPOSRES
+; BruSafe -- NPT equilibration, 1 ns, position restraints retained. HMR, 4 fs.
+define                  = -DPOSRES -DPOSRES_FC_BB=1000.0 -DPOSRES_FC_SC=1000.0
+; the FC macros are read by CHARMM-GUI topologies; pdb2gmx posre.itp uses 1000 itself
 
 integrator              = md
-dt                      = 0.002
-nsteps                  = 500000          ; 1 ns
+dt                      = 0.004
+; HMR (H ~3 Da) is in the topology, applied by scripts/hmr_top.py in 01_prepare.sh
+nsteps                  = 250000          ; 1 ns @ 4 fs
 comm-mode               = Linear
 nstcomm                 = 100
 
-nstxout-compressed      = 5000
+nstxout-compressed      = 2500            ; 10 ps
 nstenergy               = 1000
 nstlog                  = 1000
 nstcalcenergy           = 100

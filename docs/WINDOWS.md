@@ -77,7 +77,19 @@ numpy, and the charmm36 folder under `GMXLIB`.
 
 ## Running
 
-The commands are the same as on other platforms. For overnight runs:
+The commands are the same as on other platforms. Once per system, before the first night, the
+structures are prepared (the RNA systems come from CHARMM-GUI and do not need `GMXLIB`; S1, S2 and S6
+go through `pdb2gmx` and do):
+
+```bash
+./scripts/01_prepare.sh S4_cp_pacdesign --source charmm-gui --replica 2
+./scripts/01_prepare.sh S8_pac_free --source charmm-gui --replica 1
+```
+
+Ion placement is seeded for each replica (`build_rep<N>`), so a given replica builds identically on
+every machine with the same GROMACS build, while different replicas have different ion positions as
+well as different velocities. `run_slot.sh` performs this step automatically; to do it by hand,
+`--replica N` is used. For overnight runs:
 
 ```bash
 ./scripts/run_night.sh S1_wt_cc_apo 1 11

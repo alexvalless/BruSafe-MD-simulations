@@ -22,9 +22,9 @@
 
 &general
   sys_name              = "CP2_pacWT"
-  startframe            = 2500        ; skip the first 50 ns of a 100 ns run
-  endframe              = 10000
-  interval              = 8           ; ~940 frames; more is not more information
+  startframe            = 501         ; rewritten by run_mmpbsa.sh from skip_ns
+  endframe              = 9999999     ; rewritten by run_mmpbsa.sh (to the end)
+  interval              = 10          ; rewritten by run_mmpbsa.sh (~250 frames/replica)
   temperature           = 310.0
 
   ; --- radii ---
@@ -79,14 +79,14 @@
 /
 
 ; ============================================================================
-; SENSITIVITY RUNS (required)
+; SENSITIVITY RUNS — do these, don't skip them
 ;
-; indi (interior dielectric) is the largest single source of uncertainty for a
-; charged protein–RNA interface. The whole calculation is repeated at
-; indi = 1, 2 and 4, and the spread is reported as part of the error bar. A
-; conclusion that changes between indi = 2 and indi = 4 is not robust.
+; indi (interior dielectric) is the single largest lever on a charged
+; protein–RNA interface. Repeat the whole calculation at indi = 1, 2, 4 and
+; report the spread as part of your error bar. If your conclusion flips
+; between indi = 2 and indi = 4, you do not have a conclusion.
 ;
-; The calculation is also repeated with a shifted startframe (for example
-; 5000–10000 against 2500–7500) to show that the estimate does not depend on one
-; stretch of the trajectory.
+; Also compare the first and second half of the analysed window (e.g. 5-17.5 ns
+; vs 17.5-30 ns, set startframe/endframe by hand) to show
+; the estimate is not an artefact of one stretch of trajectory.
 ; ============================================================================

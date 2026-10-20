@@ -27,12 +27,13 @@ capsid/                the CAPSID modelling framework
   MANIFEST.csv           every notebook with group, module, size and title
 
 config/systems.tsv     MD registry: what is simulated, how many replicas, and why
+config/rna_designs.tsv RNA sequence of each RNA-bound system
 mdp/                   GROMACS parameter files (em, nvt, npt, npt_free, prod)
-scripts/               prepare → equilibrate → produce → postprocess, plus run_night.sh and the GPU benchmark
+scripts/               build inputs → prepare → equilibrate → produce → postprocess, plus run_slot.sh, run_night.sh, progress and packaging helpers
 analysis/              convergence checks, cross-system comparison, md_report.py (figures and wiki pages)
 mmpbsa/                binding-energy (MM/PBSA) input and driver
-docs/                  decision log, predictions, protocol (TUTORIAL), Windows setup, checklist, environment records
-input/                 starting structures, one folder per system
+docs/                  decision log, predictions, protocol (TUTORIAL), structure building (TOPOLOGIES), lab-machine guide (MAQUINAS), Windows setup, checklist, plans, environment records
+input/                 starting structures and CHARMM-GUI builds, one folder per system (committed)
 ```
 
 Trajectories are excluded from version control. `.mdp`, `.top`, `.itp`, `.ndx` files, scripts and
@@ -50,8 +51,9 @@ analysis output are committed.
 | Divalent ions | Mg²⁺ in RNA-containing systems only (see `docs/DECISIONS.md`) |
 | Temperature | 310 K, V-rescale |
 | Pressure | 1 bar, C-rescale, isotropic |
-| Time step | 2 fs, constraints on bonds involving hydrogen |
-| Box | rhombic dodecahedron, 1.2 nm padding |
+| Time step | 4 fs, constraints on bonds involving hydrogen, hydrogen mass repartitioning (H → 3.024 Da, written into the topology) |
+| Box | rhombic dodecahedron, 1.0 nm padding (CHARMM-GUI builds: octahedral, 10 Å) |
+| Lengths | apo systems 3 × 100 ns, RNA complexes 5 × 30 ns; the first `skip_ns` of each run is discarded |
 
 ### Platforms
 
@@ -71,13 +73,18 @@ export BRUSAFE_MDRUN_FLAGS="-nb gpu -pme gpu -bonded gpu -update gpu -ntmpi 1 -n
 # 2. plan the campaign across machines
 python3 scripts/_registry.py plan --machines 10 --tier 1 --nsday <measured>
 
-# 3. for each system and replica
-./scripts/01_prepare.sh     S1_wt_cc_apo               # once per system
-./scripts/02_equilibrate.sh S1_wt_cc_apo 1             # per replica
+# 3. for each system, once, on one machine (see docs/TOPOLOGIES.md)
+python3 scripts/00_build_inputs.py show  2MS2          # chains, gaps, symmetry mates
+python3 scripts/00_build_inputs.py build S1_wt_cc_apo  # writes input/S1_wt_cc_apo/*.pdb
+./scripts/01_prepare.sh     S1_wt_cc_apo --replica 1   # solvate, ions (own placement per replica), HMR, index
+                                                       # RNA systems: --source charmm-gui
+
+# 4. for each replica, on the GPU machines
+./scripts/02_equilibrate.sh S1_wt_cc_apo 1
 ./scripts/03_production.sh  S1_wt_cc_apo 1 24          # restartable
 ./scripts/04_postprocess.sh S1_wt_cc_apo 1
 
-# 4. the comparison that supports the main claim
+# 5. the comparison that supports the main claim
 ./analysis/compare_systems.sh S1_wt_cc_apo S2_sccp_apo
 
 # compact wiki pages: one per system, replicas pooled, one animation each
@@ -86,7 +93,7 @@ python3 analysis/md_report.py wiki --all
 python3 analysis/md_report.py report  S1_wt_cc_apo
 python3 analysis/md_report.py compare S1_wt_cc_apo S2_sccp_apo
 
-# 5. once the RNA-bound systems have been post-processed
+# 6. once the RNA-bound systems have been post-processed
 PROT_GRP=<n> RNA_GRP=<n> ./mmpbsa/run_mmpbsa.sh S4_cp_pacdesign 1 4.0
 
 # at any time: what is running

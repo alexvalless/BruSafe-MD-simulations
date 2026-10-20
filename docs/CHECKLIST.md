@@ -21,26 +21,27 @@ A system without a consumer is removed.
 
 ## Phase 1 — Structure preparation (by 11 Sep)
 
-- [ ] Extract the **C/C symmetric** dimer from 1MSC (selected deliberately, not by default chain order)
+- [ ] Extract the **C/C symmetric** dimer from 2MS2 (selected deliberately, not by default chain order)
 - [ ] Extract the **A/B asymmetric** dimer separately
 - [ ] Remove crystallographic waters, alternate locations and cryoprotectants
 - [ ] Assign protonation states at pH 7.4 (check His tautomers near the RNA face)
-- [ ] Build the scCP dimer model (AF3 or linker graft onto 1MSC)
-      - [ ] Superpose onto the 1MSC dimer and report the backbone RMSD **before** simulating
+- [ ] Build the scCP dimer model (AF3 or linker graft onto 2MS2)
+      - [ ] Superpose onto the 2MS2 dimer and report the backbone RMSD **before** simulating
       - [ ] Confirm that the relative orientation of the subunits is native and not an AF3 artefact
 - [ ] Obtain the CP–operator cocrystal for all RNA-bound systems (no de novo docking)
-- [ ] Build the designed pac hairpin by in-place mutation of the cocrystal RNA
-- [ ] Build the scrambled/non-cognate hairpin control
-- [ ] Build the literature calibration variants (target 6–8, including the tighter-binding U(−5)C)
-- [ ] Build the free hairpin (RNA only, no protein) for the pre-organisation penalty
+- [x] pac hairpin = ACAUGAGGAUCACCCAUGU, the C(−5) operator already present in 1ZDH (no mutation)
+- [x] Wild-type operator (S3): the same structure with residue 11 reverted to U
+- [ ] ~~Scrambled control and calibration variants~~ dropped on 2026-10-04 (`docs/DECISIONS.md`)
+- [ ] Build the free hairpin (RNA only, no protein) for the pre-organisation penalty, taken from the bound pose
 
 ## Phase 2 — Equilibration (identical protocol for every system)
 
-- [ ] Rhombic dodecahedron, 1.2 nm padding, solvation, neutralisation, 150 mM salt
+- [ ] Rhombic dodecahedron, 1.0 nm padding, solvation, neutralisation, 150 mM salt
+- [ ] Hydrogen mass repartitioning applied to the topology (`scripts/hmr_top.py`, run by `01_prepare.sh`)
 - [ ] Energy minimisation (steepest descent, Fmax < 1000 kJ/mol/nm)
 - [ ] NVT 200 ps with position restraints at 310 K, with a **separate velocity seed per replica**
 - [ ] NPT 1 ns with position restraints
-- [ ] NPT 5 ns unrestrained
+- [ ] NPT 2 ns unrestrained
 - [ ] Gate: density ≈ 1000 kg/m³, stable T and P, no instability on release of the restraints
 
 ## Phase 3 — Production
@@ -52,20 +53,18 @@ whole campaign.
 
 | # | System | Replicas × length | Consumer |
 |---|---|---|---|
-| S1 | WT CP dimer, C/C apo | 3 × 250 ns | Reference baseline for all RMSF comparisons |
-| S2 | scCP dimer + linker, apo | 3 × 250 ns | **The construct question** (M0/M1) |
-| S3 | CP dimer + WT operator | 3 × 250 ns | M3.5 reference complex |
-| S4 | CP dimer + designed pac | 3 × 250 ns | M3.5 → K_d prior for M4 |
-| S5 | CP dimer + scrambled hairpin | 3 × 250 ns | M3.5 specificity ΔΔG against the dPCR 0×pac arm |
+| S1 | WT CP dimer, C/C apo | 3 × 100 ns | Reference baseline for all RMSF comparisons |
+| S2 | scCP dimer + linker, apo | 3 × 100 ns | **The construct question** (M0/M1) |
+| S4 | CP dimer + pac hairpin (1ZDH) | 5 × 30 ns | MM/PBSA reference for the S9 linker ΔΔG |
 
 ### Tier 2 — if Tier 1 is complete by 27 Sep
 
 | # | System | Replicas × length | Consumer |
 |---|---|---|---|
-| S6 | WT CP dimer, A/B apo | 3 × 250 ns | FG-loop switch → M3 quasi-equivalence |
-| S7 | Calibration variants (6–8) | 1–2 × 150 ns each | M3.5 method-validation regression |
-| S8 | Free designed pac hairpin | 3 × 250 ns | Pre-organisation penalty; validates the ViennaRNA fold |
-| S9 | scCP dimer + designed pac | 3 × 250 ns | Does the linker perturb RNA binding? |
+| S3 | CP dimer + wild-type operator | 5 × 30 ns | one-nucleotide comparison with S4 (U against C at −5) |
+| S6 | WT CP dimer, A/B apo | 3 × 100 ns | FG-loop switch → M3 quasi-equivalence |
+| S8 | Free pac hairpin, from the bound pose | 3 × 50 ns | Pre-organisation penalty |
+| S9 | scCP dimer + pac | 5 × 30 ns | Does the linker perturb RNA binding? ΔΔG against S4 |
 
 ### Tier 3 — optional
 
