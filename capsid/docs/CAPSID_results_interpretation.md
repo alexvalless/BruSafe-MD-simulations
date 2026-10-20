@@ -138,7 +138,7 @@ Being above $c^{\star}$ is necessary but not sufficient. A 20 µM bolus is therm
 
 ![Nucleation lag and size distribution](../figures/fig19_M3_nucleation_lag.png)
 
-Feeding versus bolus addition separates two effects that push yield in opposite directions. A bolus at $t = 0$ reaches a capsid fraction of 0.884 with 0.8% stalled intermediates; a constant feed reaches 0.741 with 4.0% stalled; a ramped feed reaches 0.728 with 4.4%. Feeding reduces the trapped fraction relative to a bolus of the same total material but leaves 131–137 µM of free dimer unconverted at harvest. "Feeding is better" is true for the intermediate fraction and false for total capsid at 18 h.
+Feeding and bolus addition of the same total dimer give different stalled fractions and different capsid fractions at 18 h. A bolus at $t = 0$ reaches a capsid fraction of 0.884 with 0.8% stalled intermediates; a constant feed reaches 0.741 with 4.0% stalled; a ramped feed reaches 0.728 with 4.4%. Feeding therefore does not reduce the trapped fraction relative to a bolus of the same total material, and 131–137 µM of free dimer remains unconverted at harvest. "Feeding is better" is false in this model for both the intermediate fraction and the total capsid at 18 h.
 
 The *pac* ladder spans 1.6 percentage points of capsid fraction in the fed regime (0.733 to 0.750 across 0×, 1× and 3× constructs) and produces no capsid at all in a 30 µM bolus. The construct series is readable in cells and unreadable *in vitro* at that concentration.
 

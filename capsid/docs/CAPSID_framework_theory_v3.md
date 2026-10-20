@@ -752,7 +752,7 @@ The practical reading is that the kinetic trap is a size-exclusion observable â€
 
 ### 4.9 *In vivo* is a feed, not a bolus
 
-Every *in vitro* reassembly experiment is a bolus: dialyse purified dimer into assembly buffer and watch. Inside the cell nothing of the sort happens. Dimer arrives continuously, at the rate M2 supplies, $\phi(s)\,s/2$. Slow feed keeps the free-dimer pool low, which suppresses over-nucleation, so the two regimes can give opposite answers about the same protein.
+Every *in vitro* reassembly experiment is a bolus: dialyse purified dimer into assembly buffer and watch. Inside the cell nothing of the sort happens. Dimer arrives continuously, at the rate M2 supplies, $\phi(s)\,s/2$. A slow feed might be expected to keep the free-dimer pool low and suppress over-nucleation. In the model it does not: for the same total dimer, the feed ends with a higher stalled fraction and a lower capsid fraction at 18 h than a bolus, so the two regimes give different answers about the same protein.
 
 Comparing a bolus against constant and ramped feeds of the same total dimer over 18 h makes the size of the effect explicit, and it is large. Tier C, and dependent on the contact schedule through the lag. Two conclusions transfer. Conclusions drawn from bolus reassembly experiments do not apply to the expression system without this step, which means published *in vitro* assembly yields cannot be used as priors on $f_{cap}$. And the fed regime is the one the framework must use when predicting harvest yield, which is what Section 5.9 turns on.
 

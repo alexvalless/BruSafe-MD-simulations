@@ -18,3 +18,8 @@ The logs are records of the original runs and have not been edited. The notebook
 was revised afterwards (the code and the numerical results were not changed), so printed messages in
 the logs may differ in wording from the current notebooks. The log of notebook 04 predates the TEM
 section (§12) of the notebook.
+
+One correction postdates the run of notebook 01: the `Xmax` prior inside `build_model` was written in
+OD600 units (6.0 ± 1.5, bounds 2–12) although the model state is biomass in gDCW L⁻¹. It now matches the
+prior table (2.40 ± 0.60, bounds 0.8–4.8). The logged posterior for `Xmax` (2.399 ± 0.040) is set by the
+data and is not expected to change appreciably, but the notebook has not been re-run with the corrected prior.
