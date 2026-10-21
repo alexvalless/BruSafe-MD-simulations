@@ -55,14 +55,14 @@ nucleates within 18 h. Right: size distribution of intermediates at 500 µM at f
 distribution is bimodal, with free dimer and closed shells and very little in between.*
 
 **The kinetic trap saturates.** In this cascade, stalled intermediates plateau at a few percent
-and do not grow with concentration. A yield that is non-monotonic in concentration would require an
+and do not grow with concentration (with the placeholder schedule; see "What depends on the schedule"). A yield that is non-monotonic in concentration would require an
 off-pathway or malformed species, which the cascade does not contain.
 
 **Bolus and feed.** An in vitro reassembly is a bolus, whereas in the cell dimer arrives continuously
 at the rate supplied by M2. At the contact energy of −3.82 kcal mol⁻¹, a constant feed of the same total
 dimer gives a higher stalled fraction than a bolus (0.040 against 0.008) and a lower capsid fraction at
 18 h (0.741 against 0.884). The reaction has not finished at harvest: 131 µM of free dimer remains
-unconverted. A slow feed therefore does not reduce the stalled fraction in this model.
+unconverted. A slow feed therefore does not reduce the stalled fraction in this model, with the placeholder schedule; with the schedule from 2MS2 this depends on the growth rule (see "What depends on the schedule").
 
 ## Coupling to packaging
 
@@ -123,20 +123,62 @@ residue pairs) is a choice, and `enumerate_contacts.py` prints the number of int
 
 ## What depends on the schedule
 
-**The notebook has not yet been rerun with this schedule.** The outputs of notebook 04 shown on this page
-were computed with the placeholder contact schedule and degeneracy vector, which have the correct
-total and are not counts from the structure. Varying both over nine combinations gives:
+Notebook 04 uses the placeholder schedule and degeneracy by default, and every number on this page above this
+section was computed with them. With `SCHEDULE_SOURCE = "structure"` (§2 of the notebook) it reads the schedule
+enumerated from 2MS2 for every section, and §9b repeats the outputs with the placeholder and with each of the three
+growth rules (the run is `capsid/results/logs/log_nb04s.txt`; mass is conserved to better than 10⁻⁶ in the runs of §9b).
+Varying the placeholder over nine combinations gives:
 
 | Output | Range over the nine combinations | Status |
 |---|---|---|
 | c\* | identical | robust |
 | equilibrium capsid fraction | 0.978 – 0.998 | robust |
-| kinetic capsid fraction at 18 h | 0.003 – 0.894 | **not robust** |
+| kinetic capsid fraction at 18 h | 0.003 – 0.930 | **not robust** |
 | stalled fraction | 0.014 – 0.129 | **not robust** |
 
-The nucleation lag, the stalled fraction and the intermediate size distribution should not be quoted
-until the structure-derived schedule above replaces the placeholder in the notebook and the model is
-rerun. The enumeration requires no bench work and is done; wiring it in is the remaining step.
+The schedule from the structure gives (500 µM bolus unless stated):
+
+| Output | Placeholder (default) | 2MS2, random growth | 2MS2, greedy: most contacts first | 2MS2, greedy: fewest contacts first |
+|---|---|---|---|---|
+| c\* (µM) | 3.6 | 3.6 | 3.6 | 3.6 |
+| equilibrium capsid fraction | 0.9945 | 0.9994 | 0.9993 | 0.9995 |
+| kinetic capsid fraction at 18 h | 0.768 | 0.763 | 0.999 | 0.961 |
+| stalled fraction | 0.027 | 0.237 | 0.000 | 0.001 |
+| half-time of the capsid fraction | 1 min | 73 min | 6 min | 1 min |
+| stalled fraction, 600 µM bolus and constant feed | 0.008 and 0.040 | 0.237 and 0.0004 | 0.000 and 0.0005 | 0.0001 and 0.018 |
+| closed shells among the counted particles | 1.000 | 0.760 | 1.000 | 1.000 |
+
+![Effect of the schedule from 2MS2](../capsid/figures/fig30_M3_structure_schedule.png)
+
+*Figure 3. Capsid fraction against time (left) and size distribution of the intermediates at 18 h (right) for a
+500 µM bolus, with the placeholder of notebook 04 and with the schedule enumerated from 2MS2 under three growth
+rules.*
+
+The equilibrium quantities do not move, which confirms that they depend only on the total contact count. The
+kinetic ones do, and the structure does not make them robust: the stalled fraction is 0.000–0.237 across the three
+growth rules, a range wider than the 0.014–0.129 of the placeholder grid, and the half-time of the capsid fraction
+goes from 1 to 73 min. Three statements made above depend on the rule:
+
+- **The trap saturates at a few percent.** This holds for the placeholder. With random growth the stalled fraction
+  still saturates with concentration, at 0.24, and not at a few percent.
+- **A slow feed does not reduce the stalled fraction.** This holds for the placeholder and for the two greedy
+  rules. With random growth the constant feed gives a stalled fraction of 0.0004 against 0.237 for a 600 µM bolus,
+  and a capsid fraction of 0.979 against 0.763.
+- **The kinetic trap is not a TEM observable.** With the placeholder the stalled material is in small oligomers.
+  With random growth it is in shells that lack a few dimers: 99.7% of it is in clusters of 85 to 89 dimers. The
+  notebook counts any cluster of 45 dimers or more as a malformed particle (0.760 of the counted particles are
+  closed shells), but a shell that lacks a few of 90 dimers may not be told apart from a closed one by its
+  diameter, so this fraction is a lower bound on the fraction that a count would classify as correct.
+
+The nucleation lag, the stalled fraction and the intermediate size distribution should therefore be quoted only as
+a range over growth rules, or after the growth rule has been constrained, for instance by SEC or DLS of the
+intermediates. Three things limit the comparison. The schedule is the mean over 4000 paths and not the distribution of
+outputs over paths, and at −3.82 kcal mol⁻¹ one contact changes a dissociation rate by a factor of about 500, so the
+variation between paths is not small. The two greedy rules are not bounds of all possible paths. And every interface
+is treated as equivalent, although the A/B–A/B and A/B–C/C interfaces differ in size (53 and 49 residue pairs on
+average) and, as §2 of the notebook notes, in the energy they should carry. The first association keeps the
+convention of the notebook (one site, f₁ = 1); the four sites of the graph would multiply that rate by four, and this
+was not tested in the notebook.
 
 ## Sensitivity to the contact energy (notebook 04L)
 
@@ -147,7 +189,7 @@ insensitive to the uncertainty of the assay, and kinetic ones are not.
 
 ![Contact energy sweep](../capsid/figures/fig25_M3_literature_dG_sweep.png)
 
-*Figure 3. M3 outputs across the contact energies obtained from the published melting point.*
+*Figure 4. M3 outputs across the contact energies obtained from the published melting point.*
 
 ## What a TEM count can establish
 
@@ -157,7 +199,7 @@ stalled material sits in small oligomers, below the size that a 27 nm field regi
 so TEM would see essentially no malformed particles (counting 200 particles with none malformed
 would bound the fraction below 1.5%, and 1000 particles below 0.3%, at 95%). The kinetic trap is
 therefore an SEC observable, a shoulder between the dimer and capsid peaks, and not a TEM
-observable. The particle number that enters M5 comes from SEC with a protein assay (7.7% CV, against
+observable (with the placeholder schedule; see "What depends on the schedule"). The particle number that enters M5 comes from SEC with a protein assay (7.7% CV, against
 12.7% for 200 counted particles).
 
 ## Experiments supported by the module

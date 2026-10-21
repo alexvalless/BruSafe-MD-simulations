@@ -30,7 +30,7 @@ in contact, 4000 growth paths per rule). `contact_schedule.csv` has, for each st
 formed and the number of boundary sites for random growth and for the two greedy rules;
 `contact_schedule.json` has the same series with the edge classes and the mean interface weights. The
 figure is `../figures/fig29_M3_contact_schedule.png`, made by `../tools/plot_contact_schedule.py`.
-Notebook 04 does not read these files yet.
+Notebook 04 reads `contact_schedule.csv` in §9b, and for every section when `SCHEDULE_SOURCE = "structure"`.
 
 ## Notes on the columns
 

@@ -1,9 +1,10 @@
 
-===== cell 2  (0.7 s) =====
+===== cell 2  (0.6 s) =====
 M3 · T=3 assembly | N = 90 dimers | RT(37 C) = 0.6163 kcal/mol
 dG_contact = -3.820 kcal/mol  (wt MS2, Tm = 66 C at 5.0 uM dimer); placeholder was -4.20
 
 ===== cell 4  (0.0 s) =====
+schedule source: placeholder
 dimers: 60 A/B + 30 C/C = 90 (must be 90)
 schedule sum   : 180.000000  (must be 180.0)
 first addition : 1.01 contacts   (nucleation barrier)
@@ -23,14 +24,13 @@ buffered near c*, and the (N-1) approximation lands within a factor ~2 of
 the exact free-dimer plateau across the whole range - good enough for design,
 not good enough to quote as a measured c*.
 
-===== cell 8  (0.7 s) =====
-mass drift over 18 h : 3.8e-15 (relative)
-findfont: Failed to find font weight normal for Apple Chancery, now using 0.
+===== cell 8  (1.2 s) =====
+mass drift over 18 h : 1.6e-15 (relative)
 Left: 20 uM is thermodynamically above c* (~1 uM) yet produces nothing in
 18 h. Being above the critical concentration is necessary, not sufficient -
 if an in vitro reassembly fails, check the lag before blaming the protein.
 
-===== cell 10  (0.6 s) =====
+===== cell 10  (1.0 s) =====
    bolus_uM  capsid_frac   free_uM  stalled_frac  eq_capsid_frac
 0     200.0       0.4209  102.2457        0.0679          0.9891
 1     500.0       0.7683  102.2392        0.0272          0.9945
@@ -38,20 +38,20 @@ if an in vitro reassembly fails, check the lag before blaming the protein.
 3    2000.0       0.9297    0.0486        0.0703          0.9973
 4    5000.0       0.9297    0.0485        0.0703          0.9978
 Stalled fraction saturates instead of growing. Free dimer is driven far
-BELOW its equilibrium value (over-depletion) - that is the real trap
+below its equilibrium value (over-depletion) - that is the trap
 signature here, and it is what a SEC trace would show as a shoulder
 between the dimer and capsid peaks.
 
-===== cell 12  (6.1 s) =====
+===== cell 12  (9.9 s) =====
              mode  capsid_frac   free_uM  stalled_frac
 0  bolus at t = 0       0.8835   64.8268        0.0084
 1   constant feed       0.7413  131.2090        0.0400
 2     ramped feed       0.7278  136.8421        0.0442
-Feeding cuts stalled intermediates roughly 3-fold versus a bolus - the
-mechanism the trap story predicts. But the reaction is still RUNNING at
-harvest: tens of uM of free dimer remain unconverted at 18 h. Both effects
-are real and they push yield in opposite directions, so 'feed is better'
-is only true for the intermediate fraction, not for total capsid at 18 h.
+Stalled fraction: 0.008 for the bolus, 0.040 for the constant feed.
+Capsid fraction at 18 h: 0.884 for the bolus, 0.741 for the constant feed.
+Free dimer left at 18 h: 65 uM (bolus) and 131 uM (constant feed).
+The reaction is still running at harvest in the fed cases, so the stalled
+fraction and the total capsid at 18 h have to be compared together.
 
 ===== cell 14  (0.0 s) =====
 M2_export.npz not found; using M2 reference values (uM): [408.6 556.1 626.4 643.6]
@@ -62,12 +62,12 @@ M2_export.npz not found; using M2 reference values (uM): [408.6 556.1 626.4 643.
   -3.8      3.598             113.6           0.9937
   -5.0    0.07488              5457           0.9996
 
-Every arm sits 10^2-10^4 above c*, so assembly is NOT concentration-limited
+Every arm sits 10^2-10^4 above c*, so assembly is not concentration-limited
 in this system. The assembly module's leverage is kinetic - lag time and
-stalled fraction - not thermodynamic. Design experiments accordingly: a
-titration meant to bracket c* would spend its whole range on one side of it.
+stalled fraction - not thermodynamic. Experiments should be designed accordingly:
+a titration meant to bracket c* would spend its whole range on one side of it.
 
-===== cell 16  (4.5 s) =====
+===== cell 16  (6.5 s) =====
                   regime construct  dG_nuc_aid  capsid_frac  t_to_half_h
 0    fed, in vivo (18 h)    0x pac        -0.0       0.7413      11.3957
 1    fed, in vivo (18 h)    1x pac        -0.8       0.7497      11.2662
@@ -78,7 +78,7 @@ titration meant to bracket c* would spend its whole range on one side of it.
 fed regime   : capsid fraction spans 0.7333 - 0.7497 (1.6 percentage points)
 bolus regime : capsid fraction spans 0.0000 - 0.0000 (0.0 percentage points)
 
-===== cell 18  (0.9 s) =====
+===== cell 18  (1.3 s) =====
    c_end  f_deg  cstar_uM  eq_capsid  kinetic_capsid_18h  stalled
 0   2.02    1.0    3.5977     0.9784              0.8937   0.1053
 1   2.02    2.0    3.5977     0.9823              0.8925   0.1070
@@ -92,14 +92,31 @@ bolus regime : capsid fraction spans 0.0000 - 0.0000 (0.0 percentage points)
 c*        : identical across all 9 - it depends only on the TOTAL contact
             count, which IS constrained. Safe to report.
 eq capsid : range 0.9784 - 0.9976. Robust.
-stalled   : range 0.0141 - 0.1285. NOT robust -
+stalled   : range 0.0141 - 0.1285. Not robust -
             do not quote a stalled fraction until the schedule comes from
             the structure.
 
-===== cell 20  (0.0 s) =====
+===== cell 20  (98.3 s) =====
+                              schedule  eq_capsid  kinetic_capsid_18h  stalled  t_half_min  bolus600_stalled  fed_capsid_18h  fed_stalled
+0     placeholder (ramp 1 to 3, f = 2)     0.9945              0.7683   0.0272         1.0            0.0084          0.7413       0.0400
+1                  2MS2, random growth     0.9994              0.7629   0.2371        73.0            0.2372          0.9788       0.0004
+2    2MS2, greedy: most contacts first     0.9993              0.9991   0.0000         6.0            0.0000          0.9926       0.0005
+3  2MS2, greedy: fewest contacts first     0.9995              0.9606   0.0008         1.0            0.0001          0.8399       0.0178
+c*        : unchanged (3.598 uM), it only depends on the total number of contacts.
+eq capsid : 0.9945 - 0.9995 across all four. Robust.
+stalled   : placeholder scan of section 9 0.014 - 0.129; the three 2MS2 rules 0.000 - 0.237.
+kinetic capsid at 18 h: placeholder scan 0.003 - 0.930; 2MS2 rules 0.763 - 0.999.
+half-time of the capsid fraction (min): placeholder 1.0; 2MS2 rules 1.0 - 73.0.
+constant feed leaves a larger stalled fraction than a bolus under: placeholder (ramp 1 to 3, f = 2), 2MS2, greedy: most contacts first, 2MS2, greedy: fewest contacts first
+The enumerated schedule fixes the shape of the ramp, but the outputs of the kinetic trap still depend on the
+growth rule: they are not made robust by the structure, and should be quoted with the range of the rules.
+
+===== cell 21  (0.5 s) =====
+
+===== cell 23  (0.0 s) =====
 wrote M3_export.npz
 
-===== cell 22  (0.3 s) =====
+===== cell 25  (0.5 s) =====
    bolus_uM  f_correct  N_counted    lo95    hi95  halfwidth_pp
 0     200.0     1.0000        200  0.9991  1.0000        0.0438
 1     200.0     1.0000       1000  0.9996  1.0000        0.0206
@@ -108,17 +125,22 @@ wrote M3_export.npz
 4    1000.0     0.9292        200  0.8937  0.9648        3.5544
 5    1000.0     0.9292       1000  0.9133  0.9451        1.5896
 
-Model-predicted correctly-formed fraction at the 500 uM bolus: 1.000
-Particles to count for a 95% interval of half-width 5 pp: 1
+Model-predicted correctly-formed fraction at the 500 uM bolus: 1.0000
+The stalled material sits in SMALL oligomers, below the size a 27 nm field
+registers as a particle, so TEM sees no malformed particles at this condition.
+  counting 200: 0 malformed would bound the fraction at < 1.5% (95%)
+  counting 1000: 0 malformed would bound the fraction at < 0.3% (95%)
+The kinetic trap is therefore an SEC observable -- a shoulder between the
+dimer and capsid peaks -- and not a TEM observable.
 
 Protocol this fixes, before any grid is imaged:
   - count >= 200 particles across >= 5 fields
   - 'correct' = outer diameter within 27 +/- 2 nm
   - report the fraction with its binomial 95% interval, not a representative image
 TEM measures SHAPE. The particle count that enters M5 comes from SEC plus a
-protein assay, which is 7.7% CV against 12.7% for 200 counted particles (§7.3).
+protein assay, which is 7.7% CV against 12.7% for 200 counted particles (notebook 05, §2.2).
 
-===== cell 23  (0.9 s) =====
+===== cell 26  (1.5 s) =====
    c_end  f_deg  f_correct  closed_uM  malformed_uM
 0   2.02    1.0     0.8934     4.9649        0.5926
 1   2.02    2.0     0.8917     4.9584        0.6020
@@ -132,3 +154,14 @@ protein assay, which is 7.7% CV against 12.7% for 200 counted particles (§7.3).
 f_correct spans 0.892 - 1.000 (10.8 pp) across the schedule scan.
 Compare against the 5 pp resolution of a 200-particle count: a TEM count is
 informative about the schedule only if that span exceeds its own error bar.
+
+===== cell 27  (60.9 s) =====
+                              schedule  f_correct  closed_uM  malformed_uM  share_in_85_to_89
+0     placeholder (ramp 1 to 3, f = 2)     1.0000     4.2686        0.0001             0.9864
+1                  2MS2, random growth     0.7603     4.2385        1.3364             0.9973
+2    2MS2, greedy: most contacts first     1.0000     5.5507        0.0002             1.0000
+3  2MS2, greedy: fewest contacts first     1.0000     5.3368        0.0000             1.0000
+f_correct: placeholder 1.000; 2MS2 rules 0.760 - 1.000 (a 200-particle count resolves about 5 pp).
+Under 2MS2, random growth the stalled material is made of fragments past half closure, 99.7% of it in clusters of 85 to 89 dimers.
+The notebook counts them as malformed, but a shell that lacks a few dimers may not be told apart
+from a closed one by its diameter, so f_correct above is a lower bound on the fraction a count would classify as correct.

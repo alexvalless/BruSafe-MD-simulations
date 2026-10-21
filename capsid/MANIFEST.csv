@@ -2,7 +2,7 @@ path,group,module,code_cells,size_kb,stored_outputs,title
 notebooks/BruSafe_01_M1_expression_IPTG.ipynb,production,M1,21,66,no,"BruSafe · Notebook 01 — Module M1: expression, IPTG arm"
 notebooks/BruSafe_02_M1_expression_lactose.ipynb,production,M1,17,55,no,"BruSafe · Notebook 02 — Module M1: expression, lactose autoinduction arm (24 h)"
 notebooks/BruSafe_03_M2_soluble_partition.ipynb,production,M2,20,68,no,"BruSafe · Notebook 03 — Module M2: soluble partition, and the bridge from M1"
-notebooks/BruSafe_04_M3_capsid_assembly.ipynb,production,M3,12,42,no,BruSafe · Notebook 04 — Module M3: T = 3 capsid assembly
+notebooks/BruSafe_04_M3_capsid_assembly.ipynb,production,M3,15,54,no,BruSafe · Notebook 04 — Module M3: T = 3 capsid assembly
 notebooks/BruSafe_05_M5_absolute_quantification.ipynb,production,M5,9,33,no,"BruSafe · Notebook 05 — Module M5: absolute quantification, cargo copies per particle"
 notebooks/literature/BruSafe_01L_M1_literature_design.ipynb,literature,M1,12,45,no,BruSafe · Notebook 01L — M1 forward model against a published factorial design
 notebooks/literature/BruSafe_03L_M2_literature_arenin.ipynb,literature,M2,18,62,no,BruSafe · Notebook 03L — Module M2 run on measured data
