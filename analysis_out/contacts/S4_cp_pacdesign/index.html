@@ -1,0 +1,52 @@
+<!doctype html><html lang='en'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>S4_cp_pacdesign contacts</title><style>
+:root{--bg:#fcfcfb;--ink:#0b0b0b;--ink2:#52514e;--rule:#e4e3df;--card:#ffffff;
+      --accent:#2a78d6}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+     font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:1100px;margin:0 auto;padding:24px 16px 64px}
+h1{font-size:1.6rem;margin:0 0 4px}
+h2{font-size:1.15rem;margin:40px 0 8px;padding-top:12px;border-top:1px solid var(--rule)}
+p.lede,p.cap{color:var(--ink2);margin:4px 0 12px}
+p.cap{font-size:.9rem;max-width:75ch}
+table{border-collapse:collapse;font-size:.9rem;font-variant-numeric:tabular-nums;
+      width:100%;display:block;overflow-x:auto}
+th,td{padding:6px 10px;border-bottom:1px solid var(--rule);text-align:right;
+      white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+th{color:var(--ink2);font-weight:600}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,460px),1fr));gap:12px 16px}
+.grid section{min-width:0}
+.card{background:var(--card);border:1px solid var(--rule);border-radius:8px;
+      padding:8px;margin:8px 0}
+iframe{width:100%;height:620px;border:1px solid var(--rule);border-radius:8px;
+       background:var(--card)}
+nav a{color:var(--accent);margin-right:12px;font-size:.9rem}
+footer{color:var(--ink2);font-size:.8rem;margin-top:48px}
+</style></head><body><main><h1>S4_cp_pacdesign - contacts</h1><p class='lede'>M3.5 -&gt; K_d(pac) prior for M4 - 3 replica(s)</p><h2>Summary</h2><table><thead><tr><th>replica</th><th>frames</th><th>contact pairs</th><th>protein residues in contact</th><th>nucleotides in contact</th><th>bound fraction</th><th>min distance (A)</th><th>H-bonds per frame</th><th>interface pairs</th></tr></thead><tbody><tr><td>rep1</td><td>1000</td><td>33.28</td><td>22.55</td><td>7.671</td><td>1</td><td>2.576</td><td>9.301</td><td>185.1</td></tr><tr><td>rep2</td><td>1000</td><td>40.65</td><td>27.44</td><td>8.405</td><td>1</td><td>2.555</td><td>13.49</td><td>175.3</td></tr><tr><td>rep3</td><td>1000</td><td>38.73</td><td>26.28</td><td>8.368</td><td>1</td><td>2.557</td><td>13.12</td><td>174.6</td></tr><tr><td>mean</td><td>1000</td><td>37.55</td><td>25.42</td><td>8.148</td><td>1</td><td>2.563</td><td>11.97</td><td>178.3</td></tr><tr><td>SD across replicas</td><td>0</td><td>3.821</td><td>2.556</td><td>0.4135</td><td>0</td><td>0.01132</td><td>2.32</td><td>5.844</td></tr></tbody></table><p class='cap'>Cutoff 4.5 A, frames t &ge; 5 ns. Mean &plusmn; SD across replicas. Geometry only; solute-only trajectory (no water bridges, no Mg&sup2;&#8314;).</p><pre>hot-spot recovery: 12/13 key residues are among the top 15 contacting residues (29, 43, 45, 47, 49, 52, 55, 57, 59, 61, 63, 85)
+  A:VAL29      occupancy 0.98 +/- 0.01
+  B:VAL29      occupancy 0.91 +/- 0.15
+  A:LYS43      occupancy 0.97 +/- 0.04
+  B:LYS43      occupancy 0.00 +/- 0.00
+  A:THR45      occupancy 1.00 +/- 0.00
+  B:THR45      occupancy 0.87 +/- 0.22
+  A:SER47      occupancy 1.00 +/- 0.00
+  B:SER47      occupancy 0.88 +/- 0.21
+  A:ARG49      occupancy 0.32 +/- 0.22
+  B:ARG49      occupancy 1.00 +/- 0.00
+  A:SER52      occupancy 0.01 +/- 0.01
+  B:SER52      occupancy 1.00 +/- 0.00
+  A:ASN55      occupancy 0.02 +/- 0.04
+  B:ASN55      occupancy 0.99 +/- 0.01
+  A:LYS57      occupancy 0.26 +/- 0.27
+  B:LYS57      occupancy 0.98 +/- 0.03
+  A:THR59      occupancy 1.00 +/- 0.00
+  B:THR59      occupancy 0.94 +/- 0.10
+  A:LYS61      occupancy 1.00 +/- 0.00
+  B:LYS61      occupancy 0.98 +/- 0.04
+  A:GLU63      occupancy 1.00 +/- 0.00
+  B:GLU63      occupancy 0.03 +/- 0.05
+  A:TYR85      occupancy 1.00 +/- 0.00
+  B:TYR85      occupancy 0.19 +/- 0.20
+  A:ASN87      occupancy 0.61 +/- 0.37
+  B:ASN87      occupancy 0.51 +/- 0.35</pre><section><h2>contacts time</h2><img src='figures/contacts_time.svg' alt='contacts_time' style='max-width:100%'><p class='cap'>Number of protein-RNA residue pairs closer than 4.5 A in each frame. A drop to zero means the RNA left.</p></section><section><h2>min distance</h2><img src='figures/min_distance.svg' alt='min_distance' style='max-width:100%'><p class='cap'>Smallest heavy-atom distance between protein and RNA per frame.</p></section><section><h2>protein occupancy</h2><img src='figures/protein_occupancy.svg' alt='protein_occupancy' style='max-width:100%'><p class='cap'>Per protein residue: strongest contact with any nucleotide, mean over replicas, error bars = SD across replicas.</p></section><section><h2>nucleotide occupancy</h2><img src='figures/nucleotide_occupancy.svg' alt='nucleotide_occupancy' style='max-width:100%'><p class='cap'>Per nucleotide, same definition.</p></section><section><h2>contact map</h2><img src='figures/contact_map.svg' alt='contact_map' style='max-width:100%'><p class='cap'>Occupancy of each protein residue - nucleotide pair, mean of replicas.</p></section><section><h2>hbond occupancy</h2><img src='figures/hbond_occupancy.svg' alt='hbond_occupancy' style='max-width:100%'><p class='cap'>Distance &lt; 3 A and angle &gt; 150 deg.</p></section><section><h2>interface time</h2><img src='figures/interface_time.svg' alt='interface_time' style='max-width:100%'><p class='cap'>Residue pairs between different protein chains.</p></section><h2>Top contacts</h2><p class='cap'>The 25 most persistent pairs; the full list is contacts_pairs.csv.</p><table><thead><tr><th>protein residue</th><th>nucleotide</th><th>rep1</th><th>rep2</th><th>rep3</th><th>mean</th><th>SD</th><th>n_reps&gt;=0.5</th><th>H-bond occ.</th><th>top H-bond atoms</th></tr></thead><tbody><tr><td>A:THR45</td><td>R:A-4</td><td>1</td><td>1</td><td>1</td><td>1</td><td>0</td><td>3</td><td>0.738</td><td>THR:OG1 -&gt; ADE:N7</td></tr><tr><td>A:THR59</td><td>R:A-4</td><td>1</td><td>1</td><td>1</td><td>1</td><td>0</td><td>3</td><td>0.4617</td><td>ADE:N6 -&gt; THR:O</td></tr><tr><td>A:LYS61</td><td>R:C-5</td><td>1</td><td>1</td><td>1</td><td>1</td><td>0</td><td>3</td><td>0.589</td><td>LYS:NZ -&gt; CYT:O2&#x27;</td></tr><tr><td>A:TYR85</td><td>R:U-6</td><td>1</td><td>1</td><td>1</td><td>1</td><td>0</td><td>3</td><td>0</td><td></td></tr><tr><td>A:TYR85</td><td>R:C-5</td><td>1</td><td>1</td><td>1</td><td>1</td><td>0</td><td>3</td><td>0.768</td><td>TYR:OH -&gt; CYT:O2P</td></tr><tr><td>A:LYS61</td><td>R:A-4</td><td>1</td><td>1</td><td>0.999</td><td>0.9997</td><td>0.0005774</td><td>3</td><td>0.01767</td><td>LYS:NZ -&gt; ADE:O2P</td></tr><tr><td>B:SER51</td><td>R:A-7</td><td>0.999</td><td>1</td><td>1</td><td>0.9997</td><td>0.0005774</td><td>3</td><td>0.9023</td><td>SER:OG -&gt; ADE:O1P</td></tr><tr><td>A:GLU63</td><td>R:C-5</td><td>0.999</td><td>1</td><td>0.999</td><td>0.9993</td><td>0.0005774</td><td>3</td><td>0.911</td><td>CYT:O2&#x27; -&gt; GLU:OE1</td></tr><tr><td>B:SER51</td><td>R:G-8</td><td>0.998</td><td>1</td><td>1</td><td>0.9993</td><td>0.001155</td><td>3</td><td>0</td><td></td></tr><tr><td>B:SER52</td><td>R:A-7</td><td>0.998</td><td>1</td><td>1</td><td>0.9993</td><td>0.001155</td><td>3</td><td>0.873</td><td>SER:OG -&gt; ADE:O1P</td></tr><tr><td>A:SER47</td><td>R:A-4</td><td>0.999</td><td>0.999</td><td>0.999</td><td>0.999</td><td>0</td><td>3</td><td>0.066</td><td>SER:OG -&gt; ADE:N1</td></tr><tr><td>A:CYS46</td><td>R:A-4</td><td>0.992</td><td>0.999</td><td>0.996</td><td>0.9957</td><td>0.003512</td><td>3</td><td>0</td><td></td></tr><tr><td>B:ASN55</td><td>R:A-7</td><td>0.976</td><td>1</td><td>0.998</td><td>0.9913</td><td>0.01332</td><td>3</td><td>0.38</td><td>ASN:ND2 -&gt; ADE:O1P</td></tr><tr><td>B:ARG49</td><td>R:G-8</td><td>0.957</td><td>1</td><td>1</td><td>0.9857</td><td>0.02483</td><td>3</td><td>0.8787</td><td>ARG:NH2 -&gt; GUA:O2P</td></tr><tr><td>A:VAL29</td><td>R:A-4</td><td>0.98</td><td>0.974</td><td>0.99</td><td>0.9813</td><td>0.008083</td><td>3</td><td>0</td><td></td></tr><tr><td>B:LYS61</td><td>R:A-10</td><td>0.939</td><td>1</td><td>1</td><td>0.9797</td><td>0.03522</td><td>3</td><td>0.65</td><td>LYS:NZ -&gt; ADE:O1P</td></tr><tr><td>B:ARG49</td><td>R:A-10</td><td>0.932</td><td>1</td><td>1</td><td>0.9773</td><td>0.03926</td><td>3</td><td>0.07367</td><td>ARG:NH1 -&gt; ADE:O3&#x27;</td></tr><tr><td>A:LYS43</td><td>R:A-4</td><td>0.927</td><td>1</td><td>0.991</td><td>0.9727</td><td>0.0398</td><td>3</td><td>0.8107</td><td>LYS:NZ -&gt; ADE:O2P</td></tr><tr><td>B:THR59</td><td>R:A-10</td><td>0.832</td><td>0.999</td><td>1</td><td>0.9437</td><td>0.09671</td><td>3</td><td>0.083</td><td>THR:OG1 -&gt; ADE:O4&#x27;</td></tr><tr><td>B:ASN55</td><td>R:U-6</td><td>0.805</td><td>0.989</td><td>0.967</td><td>0.9203</td><td>0.1005</td><td>3</td><td>0.1297</td><td>ASN:ND2 -&gt; URA:O2P</td></tr><tr><td>A:GLU63</td><td>R:A-4</td><td>0.783</td><td>0.988</td><td>0.977</td><td>0.916</td><td>0.1153</td><td>3</td><td>0</td><td></td></tr><tr><td>A:ILE60</td><td>R:A-4</td><td>0.916</td><td>0.838</td><td>0.973</td><td>0.909</td><td>0.06777</td><td>3</td><td>0</td><td></td></tr><tr><td>B:VAL29</td><td>R:A-10</td><td>0.737</td><td>0.993</td><td>0.994</td><td>0.908</td><td>0.1481</td><td>3</td><td>0</td><td></td></tr><tr><td>B:LYS57</td><td>R:G-8</td><td>0.986</td><td>0.786</td><td>0.947</td><td>0.9063</td><td>0.106</td><td>3</td><td>0.4683</td><td>LYS:NZ -&gt; GUA:O2P</td></tr><tr><td>B:SER47</td><td>R:A-10</td><td>0.63</td><td>1</td><td>1</td><td>0.8767</td><td>0.2136</td><td>3</td><td>0.3843</td><td>SER:OG -&gt; ADE:N3</td></tr></tbody></table><footer>Generated by analysis/contacts.py</footer></main></body></html>

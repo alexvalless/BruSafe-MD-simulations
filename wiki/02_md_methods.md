@@ -192,6 +192,39 @@ and it has the fewest contacts (37.7 pairs, against 39.4–42.4). This spread be
 These are geometric contacts of 30 ns trajectories of the solute. They are not binding energies, they do not
 count water-mediated bridges or Mg²⁺, and they say nothing about affinity.
 
+### Result for S4 and comparison with S3
+
+Source: `analysis_out/contacts/S4_cp_pacdesign/index.html`; 3 replicas of 30 ns (the design has 5), the first 5 ns
+discarded, cutoff 4.5 Å, the same options as S3. S4 carries the crystal RNA, which is the C(−5) variant, and S3 reverts
+that nucleotide to U, so the two systems differ in one nucleotide.
+
+| | S3 (5 replicas) | S4 (3 replicas) |
+|---|---|---|
+| RNA bound (fraction of frames) | 1.00 | 1.00 |
+| closest protein–RNA approach (Å) | 2.57 ± 0.01 | 2.56 ± 0.01 |
+| residue-pair contacts per frame | 40.1 ± 1.8 | 37.6 ± 3.8 |
+| protein residues in contact | 27.3 ± 1.2 | 25.4 ± 2.6 |
+| nucleotides in contact | 8.8 ± 0.6 | 8.1 ± 0.4 |
+| protein–RNA hydrogen bonds per frame | 11.6 ± 0.6 | 12.0 ± 2.3 |
+| residue pairs at the dimer interface | 177 ± 6 | 178 ± 6 |
+
+The global counts of the two systems differ by less than the spread among the replicas. Replica 1 of S4 has fewer
+contacts (33.3 pairs and 22.6 residues, against 40.7 and 38.7 pairs in replicas 2 and 3), which is most of the larger
+spread of S4.
+
+The binding pocket is retained. In S4 Thr45 of subunit A hydrogen-bonds N7 of A−4 in 0.74 of the frames (0.73 in S3),
+Val29, Ser47, Thr59 and Lys61 of subunit A contact A−4, and the contacts of subunit B with A−7, G−8 and A−10 are present. Twelve
+of the 13 residues named in the paper are among the 15 residues that contact the RNA most often (11 in S3). The
+difference of one is a change of rank among residues with occupancies close to 1 and is not evidence of a
+difference between the systems.
+
+The contacts with the nucleotide at −5, where the two systems differ, are not the same. Asn87 is in contact less often in
+S4: subunit A 0.61 ± 0.37 (1.00 ± 0.01 in S3) and subunit B 0.51 ± 0.35 (0.94 ± 0.06). Tyr85 of subunit B also falls,
+to 0.19 ± 0.20 (0.60 ± 0.42). Glu63 and Tyr85 of subunit A stay in contact with the base at −5 and their hydrogen bonds to it are present in more frames
+than in S3 (Glu63 with the 2′ oxygen, 0.91 against 0.74; Tyr85 hydroxyl with the phosphate oxygen, 0.77 against 0.58). The
+spread of Asn87 among the three replicas of S4 is large (SD 0.35 to 0.37), so the loss of that contact is not the
+same in every replica, and with this number of replicas it cannot be assigned to the substitution at −5.
+
 ## Reporting pages
 
 `analysis/md_report.py wiki --all` builds one compact interactive page for each system, with all
