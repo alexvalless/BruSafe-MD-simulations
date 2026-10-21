@@ -23,7 +23,7 @@ would resolve it.
 
 | Limitation | Consequence |
 |---|---|
-| Production results are not part of this repository, and only S1 and S6 had finished when the protocol was written | the MD pages describe the protocol and the analysis; claims about the linker or about binding are made only after replica spread and convergence have been shown |
+| Production results are only partly part of this repository: the protein–RNA contact analysis of S3 is in `analysis_out/contacts/S3_cp_operator/`; the other systems have no results here yet | the MD pages describe the protocol and the analysis; claims about the linker or about binding are made only after replica spread and convergence have been shown. The S3 contacts are geometric, are from 30 ns trajectories, and one replica of five deviates |
 | Absolute MM/PBSA binding free energies are unreliable for charged protein–RNA interfaces (typical error 5–20 kcal mol⁻¹) | only ΔΔG between systems is reported, with the sensitivity to the interior dielectric constant |
 | Mg²⁺ ions do not equilibrate on trajectories of 30–100 ns, and 1ZDH has no crystallographic Mg²⁺ | ions are placed independently for each replica, and the interface table is inspected before MM/PBSA |
 | The crystal RNA of the complexes has a mean occupancy of 0.56, only 13 of 19 nucleotides are resolved, and the terminal pair of the stem may fray within 30 ns | the base pairing is checked in every replica; if the stem opens in most of them, a restraint or an extended stem is applied to all systems alike |

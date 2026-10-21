@@ -160,6 +160,38 @@ among the contacts that are most often present. The contacts are geometric. They
 trajectories of the solute do not contain water or Mg²⁺ and so water-mediated bridges are not counted, and the
 analysis does not replace the per-residue decomposition of MM/PBSA.
 
+### Result for S3 (wild-type operator)
+
+Source: `analysis_out/contacts/S3_cp_operator/index.html`; 5 replicas of 30 ns, the first 5 ns discarded,
+heavy-atom cutoff 4.5 Å. All values are the mean over replicas ± SD across replicas.
+
+| | S3 |
+|---|---|
+| RNA bound (fraction of frames with any contact) | 1.00 in every replica |
+| closest protein–RNA approach | 2.57 ± 0.01 Å |
+| residue-pair contacts per frame | 40.1 ± 1.8 |
+| protein residues in contact | 27.3 ± 1.2 |
+| nucleotides in contact | 8.8 ± 0.6 |
+| protein–RNA hydrogen bonds per frame | 11.6 ± 0.6 |
+| residue pairs at the dimer interface | 177 ± 6 |
+
+The interactions described for the cocrystal (van den Worm et al. 1998) are present in every replica. A−4 sits in
+the pocket of subunit A, where Thr45 hydrogen-bonds its N7 (Thr45 Oγ1, 0.73 of the frames) and Thr59 and Val29
+are in contact; U−5 is in contact with Tyr85, Asn87 and Glu63 of subunit A (Glu63 O2′, 0.74 of the frames; Asn87
+Nδ2 to O2, 0.29); and A−10 is in contact with subunit B, through Lys61 (Nζ to the phosphate, 0.87 of the frames),
+Thr45, Val29 and Arg49. Arg49 of subunit B binds the phosphate of G−8 in 0.97 of the frames. The binding is
+asymmetric, as in the crystal: Lys43 contacts the RNA through subunit A (occupancy 0.94) and not through subunit
+B (0.00), and the reverse holds for Ser52 and Asn55 (subunit B 0.99 and 0.84, subunit A 0.01 and 0.03). Of the 13
+residues named in the paper, 11 are among the 15 protein residues that contact the RNA most often; Asn55 (subunit B,
+0.84) and Glu63 (subunit A, 0.93) are in contact in most frames but rank lower.
+
+**Replica 3 deviates.** Its contacts between subunit B and A−10 are partly lost (Val29 0.56, Thr45 0.50, Ser47 0.22,
+Thr59 0.52, Arg49 0.61, against at least 0.98 for Val29, Thr45, Ser47, Thr59 and Arg49 in the other four replicas),
+and it has the fewest contacts (37.7 pairs, against 39.4–42.4). This spread between replicas is part of the result.
+
+These are geometric contacts of 30 ns trajectories of the solute. They are not binding energies, they do not
+count water-mediated bridges or Mg²⁺, and they say nothing about affinity.
+
 ## Reporting pages
 
 `analysis/md_report.py wiki --all` builds one compact interactive page for each system, with all

@@ -1,14 +1,11 @@
 <!--
-DRAFT, NOT YET FOR THE WIKI. The numbers come from contacts.py runs on the 30 ns trajectories of S3
-(5 replicas) and S4 (3 replicas), analysed over ALL frames (0-30 ns), not with the protocol's
-5 ns discard, and the outputs are not in this repository. The wiki rule is that every number has its
-file here. Before this goes into wiki/02_md_methods.md (or a new page):
-  1. Rerun:   python3 analysis/contacts.py S3_cp_operator --equil-ns 5 --rna-first -12 \
-                  --key-residues 29,43,45,47,49,52,55,57,59,61,63,85,87
-              (same for S4, and S9 if wanted) and commit analysis_out/contacts/<system>/.
-     The RNA is residues 4-16 of the 19-mer, so the first nucleotide is -12, NOT -15.
-  2. Replace the numbers below with the new ones, and use all 5 replicas of S4 if they exist.
-  3. Look at replica 3 of S3 (it deviated) and say what is seen.
+DRAFT for the S4 part. The S3 result is already in wiki/02_md_methods.md (source:
+analysis_out/contacts/S3_cp_operator/index.html, first 5 ns discarded, RNA numbered with --rna-first -12).
+The S4 numbers below come from an earlier run over ALL frames (0-30 ns) with 3 replicas and are NOT
+for the wiki. Before using them:
+  python3 analysis/contacts.py S4_cp_pacdesign --equil-ns 5 --rna-first -12 \
+      --key-residues 29,43,45,47,49,52,55,57,59,61,63,85,87
+  and commit analysis_out/contacts/S4_cp_pacdesign/ (use all 5 replicas if they exist).
 -->
 
 ## Protein–RNA contacts in the MS2 coat protein–operator complex
