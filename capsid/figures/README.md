@@ -32,4 +32,5 @@ write-up. Figure 22 is not part of this set. Fig. 28 is a schematic and is not p
 | `fig26_M2_literature_posterior_predictive` | 03L | posterior predictive at the published conditions |
 | `fig27_M2_calibration_ranks` | 03 | rank histograms of the simulation-based calibration |
 | `fig28_wiki_model_overview` | none | schematic of the five modules |
+| `fig30_M3_structure_schedule` | 04 | capsid fraction against time and size distribution of intermediates for a 500 µM bolus, with the placeholder of notebook 04 and with the schedule enumerated from 2MS2 under three growth rules |
 | `fig29_M3_contact_schedule` | none (`tools/plot_contact_schedule.py`) | contacts formed and boundary sites along the growth of the capsid, enumerated from PDB 2MS2, against the placeholder of notebook 04 |

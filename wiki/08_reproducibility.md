@@ -23,7 +23,7 @@ come from `FAST_MODE = False`, with 2000 draws × 4 chains (or 2000 SMC particle
 | 01 · M1, IPTG | ~16 min |
 | 02 · M1, lactose | ~14 min |
 | 03 · M2 | ~25 min |
-| 04 · M3 | ~15 s |
+| 04 · M3 | ~3 min (about 15 s without §9b and the TEM comparison) |
 | 05 · M5 | ~1 s |
 
 **Random seeds.** The seeds are fixed in the notebooks (for example 2026 in notebook 01), so a rerun

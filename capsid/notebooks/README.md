@@ -14,7 +14,7 @@ posterior CSV files) are excluded from version control.
 | 01 | `BruSafe_01_M1_expression_IPTG.ipynb` | M1 | `VA_timecourse.csv` if `USE_SYNTHETIC = False` | `M1_iptg_posterior_draws.csv`, `M1_iptg_posterior_moments.csv`, `M1_iptg_idata.nc` |
 | 02 | `BruSafe_02_M1_expression_lactose.ipynb` | M1 | `VA_lactose_timecourse.csv` if `USE_SYNTHETIC = False` | `M1_lactose_posterior_draws.csv`, `M1_lactose_posterior_moments.csv`, `M1_lactose_idata.nc` |
 | 03 | `BruSafe_03_M2_soluble_partition.ipynb` | M2 | `VA_partition_gels.csv` if `USE_SYNTHETIC = False` | `M2_export.npz` |
-| 04 | `BruSafe_04_M3_capsid_assembly.ipynb` | M3 | `M2_export.npz` (reference values are used if absent), `../data/litdata/derived_M3_dG_from_Tm.csv` | `M3_export.npz`, `M3_TEM_observable.npz` |
+| 04 | `BruSafe_04_M3_capsid_assembly.ipynb` | M3 | `M2_export.npz` (reference values are used if absent), `../data/litdata/derived_M3_dG_from_Tm.csv`, `../data/structure/contact_schedule.csv` (§9b, and every section when `SCHEDULE_SOURCE = "structure"`) | `M3_export.npz`, `M3_TEM_observable.npz` |
 | 05 | `BruSafe_05_M5_absolute_quantification.ipynb` | M5 | inputs entered in the swap-point cells | none |
 
 Section numbers in the notebooks refer to the CAPSID framework document
