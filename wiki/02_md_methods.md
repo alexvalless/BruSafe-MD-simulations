@@ -146,6 +146,85 @@ and for the effect of the linker on the essential subspace are registered in `do
 before the corresponding data exist. The prediction on specificity was withdrawn together with the
 scrambled control.
 
+## Protein–RNA contacts
+
+For the RNA complexes, `analysis/contacts.py` counts the residue pairs (protein residue × nucleotide) with any
+heavy-atom distance below 4.5 Å (3.5 Å for direct contacts) in each frame, and reports the occupancy of each
+pair, the fraction of frames in which it is in contact, together with the hydrogen bonds between protein and
+RNA and the contacts between the two protein chains. Occupancies are computed for each replica after
+discarding the first 5 ns. The values reported are the mean over replicas, the error bar is the standard
+deviation **across replicas**, and the number of replicas in which a contact is persistent is given with each
+pair. A check is made that the residues known to bind the operator (Val29, Thr45, Ser47, Thr59 and Lys61 of the
+binding pocket, and Lys43, Arg49, Ser52, Asn55, Lys57, Glu63, Tyr85 and Asn87; van den Worm et al. 1998) are
+among the contacts that are most often present. The contacts are geometric. They are not binding energies, the
+trajectories of the solute do not contain water or Mg²⁺ and so water-mediated bridges are not counted, and the
+analysis does not replace the per-residue decomposition of MM/PBSA.
+
+### Result for S3 (wild-type operator)
+
+Source: `analysis_out/contacts/S3_cp_operator/index.html`; 5 replicas of 30 ns, the first 5 ns discarded,
+heavy-atom cutoff 4.5 Å. All values are the mean over replicas ± SD across replicas.
+
+| | S3 |
+|---|---|
+| RNA bound (fraction of frames with any contact) | 1.00 in every replica |
+| closest protein–RNA approach | 2.57 ± 0.01 Å |
+| residue-pair contacts per frame | 40.1 ± 1.8 |
+| protein residues in contact | 27.3 ± 1.2 |
+| nucleotides in contact | 8.8 ± 0.6 |
+| protein–RNA hydrogen bonds per frame | 11.6 ± 0.6 |
+| residue pairs at the dimer interface | 177 ± 6 |
+
+The interactions described for the cocrystal (van den Worm et al. 1998) are present in every replica. A−4 sits in
+the pocket of subunit A, where Thr45 hydrogen-bonds its N7 (Thr45 Oγ1, 0.73 of the frames) and Thr59 and Val29
+are in contact; U−5 is in contact with Tyr85, Asn87 and Glu63 of subunit A (Glu63 O2′, 0.74 of the frames; Asn87
+Nδ2 to O2, 0.29); and A−10 is in contact with subunit B, through Lys61 (Nζ to the phosphate, 0.87 of the frames),
+Thr45, Val29 and Arg49. Arg49 of subunit B binds the phosphate of G−8 in 0.97 of the frames. The binding is
+asymmetric, as in the crystal: Lys43 contacts the RNA through subunit A (occupancy 0.94) and not through subunit
+B (0.00), and the reverse holds for Ser52 and Asn55 (subunit B 0.99 and 0.84, subunit A 0.01 and 0.03). Of the 13
+residues named in the paper, 11 are among the 15 protein residues that contact the RNA most often; Asn55 (subunit B,
+0.84) and Glu63 (subunit A, 0.93) are in contact in most frames but rank lower.
+
+**Replica 3 deviates.** Its contacts between subunit B and A−10 are partly lost (Val29 0.56, Thr45 0.50, Ser47 0.22,
+Thr59 0.52, Arg49 0.61, against at least 0.98 for Val29, Thr45, Ser47, Thr59 and Arg49 in the other four replicas),
+and it has the fewest contacts (37.7 pairs, against 39.4–42.4). This spread between replicas is part of the result.
+
+These are geometric contacts of 30 ns trajectories of the solute. They are not binding energies, they do not
+count water-mediated bridges or Mg²⁺, and they say nothing about affinity.
+
+### Result for S4 and comparison with S3
+
+Source: `analysis_out/contacts/S4_cp_pacdesign/index.html`; 3 replicas of 30 ns (the design has 5), the first 5 ns
+discarded, cutoff 4.5 Å, the same options as S3. S4 carries the crystal RNA, which is the C(−5) variant, and S3 reverts
+that nucleotide to U, so the two systems differ in one nucleotide.
+
+| | S3 (5 replicas) | S4 (3 replicas) |
+|---|---|---|
+| RNA bound (fraction of frames) | 1.00 | 1.00 |
+| closest protein–RNA approach (Å) | 2.57 ± 0.01 | 2.56 ± 0.01 |
+| residue-pair contacts per frame | 40.1 ± 1.8 | 37.6 ± 3.8 |
+| protein residues in contact | 27.3 ± 1.2 | 25.4 ± 2.6 |
+| nucleotides in contact | 8.8 ± 0.6 | 8.1 ± 0.4 |
+| protein–RNA hydrogen bonds per frame | 11.6 ± 0.6 | 12.0 ± 2.3 |
+| residue pairs at the dimer interface | 177 ± 6 | 178 ± 6 |
+
+The global counts of the two systems differ by less than the spread among the replicas. Replica 1 of S4 has fewer
+contacts (33.3 pairs and 22.6 residues, against 40.7 and 38.7 pairs in replicas 2 and 3), which is most of the larger
+spread of S4.
+
+The binding pocket is retained. In S4 Thr45 of subunit A hydrogen-bonds N7 of A−4 in 0.74 of the frames (0.73 in S3),
+Val29, Ser47, Thr59 and Lys61 of subunit A contact A−4, and the contacts of subunit B with A−7, G−8 and A−10 are present. Twelve
+of the 13 residues named in the paper are among the 15 residues that contact the RNA most often (11 in S3). The
+difference of one is a change of rank among residues with occupancies close to 1 and is not evidence of a
+difference between the systems.
+
+The contacts with the nucleotide at −5, where the two systems differ, are not the same. Asn87 is in contact less often in
+S4: subunit A 0.61 ± 0.37 (1.00 ± 0.01 in S3) and subunit B 0.51 ± 0.35 (0.94 ± 0.06). Tyr85 of subunit B also falls,
+to 0.19 ± 0.20 (0.60 ± 0.42). Glu63 and Tyr85 of subunit A stay in contact with the base at −5 and their hydrogen bonds to it are present in more frames
+than in S3 (Glu63 with the 2′ oxygen, 0.91 against 0.74; Tyr85 hydroxyl with the phosphate oxygen, 0.77 against 0.58). The
+spread of Asn87 among the three replicas of S4 is large (SD 0.35 to 0.37), so the loss of that contact is not the
+same in every replica, and with this number of replicas it cannot be assigned to the substitution at −5.
+
 ## Reporting pages
 
 `analysis/md_report.py wiki --all` builds one compact interactive page for each system, with all

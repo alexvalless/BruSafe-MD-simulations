@@ -8,7 +8,9 @@
   "lit_M2_partition_gels.csv",
   "lit_M3_ms2_thermal_stability.csv",
   "lit_sources.csv",
-  "M4_bench_data_template.csv"
+  "M4_bench_data_template.csv",
+  "structure/contact_schedule.csv",
+  "structure/contact_schedule.json"
  ],
  "templates_to_fill": [
   "VA_timecourse.csv",

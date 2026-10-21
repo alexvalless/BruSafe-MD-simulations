@@ -90,6 +90,8 @@ python3 scripts/00_build_inputs.py build S1_wt_cc_apo  # writes input/S1_wt_cc_a
 # compact wiki pages: one per system, replicas pooled, one animation each
 python3 analysis/md_report.py wiki --all
 # full set of figures for one system, and cross-system overlays
+# protein-RNA contacts, H-bond occupancy and dimer-interface contacts (CPU only)
+python3 analysis/contacts.py S3_cp_operator --equil-ns 5
 python3 analysis/md_report.py report  S1_wt_cc_apo
 python3 analysis/md_report.py compare S1_wt_cc_apo S2_sccp_apo
 
